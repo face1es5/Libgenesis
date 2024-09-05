@@ -28,13 +28,83 @@ class LibgenAPI {
     /// Parse book tag into array.
     ///
     /// [id, authors, title, publisher, year, pages, language, size, format, mirros, edit link]
-    func parseTableContents(_ ele: Element) throws -> BookItem {
-        var res: [String] = []
+    func parseTableContents(_ ele: Element, header: [String]) throws -> BookItem {
+        var colIndex: Int = 0
+        var id: String = "NON"
+        var authors: String = "NON"
+        var title: String = "NON"
+        var publisher: String = "NON"
+        var year: Int = 0
+        var pages: Int = 0
+        var language: String = "NON"
+        var size: String = "NON"
+        var format: String = "NON"
+        var mirrors: [String] = []
+        var edit: String = "NON"
+        var edition: String = "NON"
+        var isbn: String = "NON"
+        var md5: String = "NON"
+        var href: String = "NON"
+        let md5reg = try NSRegularExpression(pattern: "md5=([A-Fa-f0-9]{32})")
         try ele.select("tr td").forEach { col in
-            let val = try col.text()
-            res.append(val)
+            switch colIndex {
+            case 0:
+                id = try col.text()
+                break;
+            case 1: //authors
+                authors = try col.text()
+                break;
+            case 2: //title, md5, and
+                if let titleTag = try col.select("td a").first() {
+                    title = try titleTag.text()
+                    // extract md5
+                    href = try titleTag.attr("href")
+                    if let match = md5reg.firstMatch(in: href, options: [], range: NSRange(location: 0, length: href.utf16.count)) {
+                        if let range = Range(match.range(at: 1), in: href) {
+                            md5 = String(href[range])
+                        }
+                    }
+                    // extract edtion and isbn
+                    let fonts = try titleTag.select("a font")
+                    if fonts.count == 2 {
+                        edition = try fonts.get(0).text()
+                        isbn = try fonts.get(1).text()
+                    } else if fonts.count == 1 {
+                        isbn = try fonts.get(0).text()
+                    }
+                }
+                break;
+            case 3:
+                publisher = try col.text()
+                break;
+            case 4:
+                year = try Int(col.text()) ?? 0
+                break;
+            case 5:
+                pages = try Int(col.text()) ?? 0
+                break;
+            case 6:
+                language = try col.text()
+                break;
+            case 7:
+                size = try col.text()
+                break;
+            case 8:
+                format = try col.text()
+                break;
+            case 9:
+                mirrors = try col.text().components(separatedBy: ",")
+                break;
+            case 10:
+                edit = try col.text()
+                break;
+                
+            default:
+                break;
+            }
+            colIndex += 1
         }
-        return BookItem(id: res[0], authors: res[1], title: res[2], publisher: res[3], year: res[4], pages: res[5], language: res[6], size: res[7], format: res[8], mirrors: res[9], edit: res[10])
+        return BookItem(id: id, authors: authors, title: title, publisher: publisher, year: year, pages: pages, language: language, size: size, format: format, mirrors: mirrors, edit: edit, md5: md5, href: href, isbn: isbn, edition: edition)
     }
     
     func latestBooks() async throws -> [BookItem] {
@@ -48,7 +118,7 @@ class LibgenAPI {
                 if idx == 0 {
                     tableHeader = try parseTableHeader(book)
                 } else {
-                    try books.append(parseTableContents(book))
+                    try books.append(parseTableContents(book, header: tableHeader))
                 }
                 idx += 1
             }

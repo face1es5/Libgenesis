@@ -17,6 +17,9 @@
 		CFFCB4B92C89814B00996675 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = CFFCB4B82C89814B00996675 /* SwiftSoup */; };
 		CFFCB4BC2C89815B00996675 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = CFFCB4BB2C89815B00996675 /* Kingfisher */; };
 		CFFCB4BF2C89989D00996675 /* BookModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCB4BE2C89989D00996675 /* BookModel.swift */; };
+		CFFCB4C12C89A1FA00996675 /* BookDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCB4C02C89A1FA00996675 /* BookDetailsView.swift */; };
+		CFFCB4C32C89B53200996675 /* DownloadListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCB4C22C89B53200996675 /* DownloadListView.swift */; };
+		CFFCB4C52C89B70700996675 /* Downloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCB4C42C89B70700996675 /* Downloader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +33,9 @@
 		CFDEC1652C7D722100FDF3E4 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 		CFFCB4B52C897B2600996675 /* LibgenAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibgenAPI.swift; sourceTree = "<group>"; };
 		CFFCB4BE2C89989D00996675 /* BookModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookModel.swift; sourceTree = "<group>"; };
+		CFFCB4C02C89A1FA00996675 /* BookDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailsView.swift; sourceTree = "<group>"; };
+		CFFCB4C22C89B53200996675 /* DownloadListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadListView.swift; sourceTree = "<group>"; };
+		CFFCB4C42C89B70700996675 /* Downloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Downloader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,9 +76,11 @@
 				CFDEC1652C7D722100FDF3E4 /* APIService.swift */,
 				CFDEC1632C7D6EB600FDF3E4 /* ServerMirror.swift */,
 				CFFCB4B52C897B2600996675 /* LibgenAPI.swift */,
+				CFFCB4C02C89A1FA00996675 /* BookDetailsView.swift */,
 				CFDEC1582C7D6AA000FDF3E4 /* Assets.xcassets */,
 				CFDEC15A2C7D6AA000FDF3E4 /* Libgenesis.entitlements */,
 				CFDEC15B2C7D6AA000FDF3E4 /* Preview Content */,
+				CFFCB4C22C89B53200996675 /* DownloadListView.swift */,
 			);
 			path = Libgenesis;
 			sourceTree = "<group>";
@@ -89,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				CFFCB4BE2C89989D00996675 /* BookModel.swift */,
+				CFFCB4C42C89B70700996675 /* Downloader.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -171,9 +180,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFFCB4C32C89B53200996675 /* DownloadListView.swift in Sources */,
 				CFFCB4BF2C89989D00996675 /* BookModel.swift in Sources */,
+				CFFCB4C12C89A1FA00996675 /* BookDetailsView.swift in Sources */,
 				CFDEC1572C7D6A9F00FDF3E4 /* ContentView.swift in Sources */,
 				CFFCB4B62C897B2600996675 /* LibgenAPI.swift in Sources */,
+				CFFCB4C52C89B70700996675 /* Downloader.swift in Sources */,
 				CFDEC1552C7D6A9F00FDF3E4 /* LibgenesisApp.swift in Sources */,
 				CFDEC1662C7D722100FDF3E4 /* APIService.swift in Sources */,
 				CFDEC1642C7D6EB600FDF3E4 /* ServerMirror.swift in Sources */,
