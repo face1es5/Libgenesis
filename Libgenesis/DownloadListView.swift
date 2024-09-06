@@ -23,7 +23,7 @@ struct DownloadListView: View {
     @ObservedObject var downloadManager = DownloadManager.shared
     var body: some View {
         ScrollView {
-            VStack(spacing: 5) {
+            VStack(alignment: .leading, spacing: 5) {
                 ForEach(downloadManager.downloadTasks) { dtask in
                     DownloadTaskView(dtask: dtask)
                 }

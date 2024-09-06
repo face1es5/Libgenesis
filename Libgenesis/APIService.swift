@@ -12,6 +12,9 @@ class APIService {
     init(to: String) {
         urlstr = to
     }
+    init(to: URL) {
+        urlstr = to.absoluteString
+    }
     func getHtml() async throws -> String {
         guard let url = URL(string: urlstr) else { throw APIError.invalidURL }
         do {
@@ -37,5 +40,6 @@ enum APIError: Error {
     case invalidURL
     case invalidResponse
     case decodingError
+    case nilURL
     
 }

@@ -7,7 +7,21 @@
 
 import Foundation
 
-struct BookItem: Codable, Identifiable, Hashable {
+struct BookDetailsItem: Codable {
+    var description: String
+    var fileLinks: [URL] = []
+    var coverURL: URL?
+}
+
+class BookItem: Identifiable, Hashable, Equatable, ObservableObject {
+    static func == (lhs: BookItem, rhs: BookItem) -> Bool {
+        return lhs.id == rhs.id && lhs.md5 == rhs.md5
+    }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine("\(id)\(md5)")
+    }
+    
+    @Published var details: BookDetailsItem?
     let id: String
     let authors: String
     var authorSeqs: [String] {
@@ -15,10 +29,10 @@ struct BookItem: Codable, Identifiable, Hashable {
     }
     let title: String
     var truncTitle: String {
-        if title.count <= 20 {
+        if title.count <= 15 {
             return title
         } else {
-            return String(title[..<title.index(title.startIndex, offsetBy: 17)])+"..."
+            return String(title[..<title.index(title.startIndex, offsetBy: 12)])+"..."
         }
     }
     let publisher: String
@@ -27,14 +41,15 @@ struct BookItem: Codable, Identifiable, Hashable {
     let language: String
     let size: String
     let format: String
-    let mirrors: [String]
+    let mirrors: [URL]
     let edit: String
     let md5: String
-    let href: String
+    let href: URL?
     let isbn: String
     let edition: String
+    var downloadLinks: [String] = []
     
-    init(id: String, authors: String, title: String, publisher: String, year: Int, pages: Int, language: String, size: String, format: String, mirrors: [String], edit: String, md5: String, href: String, isbn: String, edition: String) {
+    init(id: String, authors: String, title: String, publisher: String, year: Int, pages: Int, language: String, size: String, format: String, mirrors: [URL], edit: String, md5: String, href: URL?, isbn: String, edition: String) {
         self.id = id
         self.authors = authors
         self.title = title
@@ -50,5 +65,12 @@ struct BookItem: Codable, Identifiable, Hashable {
         self.href = href
         self.isbn = isbn
         self.edition = edition
+    }
+    
+    func loadDetails() async {
+        let bookDetails = try? await LibgenAPI.shared.parseBookDetails(md5, links: mirrors)
+        await MainActor.run {
+            self.details = bookDetails
+        }
     }
 }

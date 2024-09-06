@@ -25,6 +25,7 @@ class LibgenAPI {
         return res
     }
     
+    
     /// Parse book tag into array.
     ///
     /// [id, authors, title, publisher, year, pages, language, size, format, mirros, edit link]
@@ -39,13 +40,15 @@ class LibgenAPI {
         var language: String = "NON"
         var size: String = "NON"
         var format: String = "NON"
-        var mirrors: [String] = []
+        var mirrors: [URL] = []
         var edit: String = "NON"
         var edition: String = "NON"
         var isbn: String = "NON"
         var md5: String = "NON"
-        var href: String = "NON"
+        var hrefstr: String = "NON"
+        var hrefURL: URL?
         let md5reg = try NSRegularExpression(pattern: "md5=([A-Fa-f0-9]{32})")
+        
         try ele.select("tr td").forEach { col in
             switch colIndex {
             case 0:
@@ -58,12 +61,14 @@ class LibgenAPI {
                 if let titleTag = try col.select("td a").first() {
                     title = try titleTag.text()
                     // extract md5
-                    href = try titleTag.attr("href")
-                    if let match = md5reg.firstMatch(in: href, options: [], range: NSRange(location: 0, length: href.utf16.count)) {
-                        if let range = Range(match.range(at: 1), in: href) {
-                            md5 = String(href[range])
+                    hrefstr = try titleTag.attr("href")
+                    if let match = md5reg.firstMatch(in: hrefstr, options: [], range: NSRange(location: 0, length: hrefstr.utf16.count)) {
+                        if let range = Range(match.range(at: 1), in: hrefstr) {
+                            md5 = String(hrefstr[range])
                         }
                     }
+                    // make href url
+                    hrefURL = URL(string: "\(baseURL)/\(hrefstr)")
                     // extract edtion and isbn
                     let fonts = try titleTag.select("a font")
                     if fonts.count == 2 {
@@ -92,10 +97,13 @@ class LibgenAPI {
             case 8:
                 format = try col.text()
                 break;
-            case 9:
-                mirrors = try col.text().components(separatedBy: ",")
+            case 9, 10:
+                let urlstr = try col.getElementsByTag("a").attr("href")
+                if let url = URL(string: urlstr) {
+                    mirrors.append(url)
+                }
                 break;
-            case 10:
+            case 11:
                 edit = try col.text()
                 break;
                 
@@ -104,11 +112,54 @@ class LibgenAPI {
             }
             colIndex += 1
         }
-        return BookItem(id: id, authors: authors, title: title, publisher: publisher, year: year, pages: pages, language: language, size: size, format: format, mirrors: mirrors, edit: edit, md5: md5, href: href, isbn: isbn, edition: edition)
+        return BookItem(id: id, authors: authors, title: title, publisher: publisher, year: year, pages: pages, language: language, size: size, format: format, mirrors: mirrors, edit: edit, md5: md5, href: hrefURL, isbn: isbn, edition: edition)
     }
     
-    func latestBooks() async throws -> [BookItem] {
-        let ht = try await APIService(to: baseURL+"/search.php?mode=last").getHtml()
+    /// Parse description, download links, cover url
+    ///
+    func parseBookDetails(_ md5: String?, links: [URL]) async throws -> BookDetailsItem? {
+        if md5 == nil {
+            return nil
+        }
+        print("parse book details.")
+        var desc: String = ""
+        var coverURL: String = ""
+        async let doc = try SwiftSoup.parse(try await APIService(to: "\(baseURL)/book/index.php?md5=\(md5!)").getHtml())
+        async let urls = try parseDirectDownloadLinks(links)
+        if let table = try await doc.body()?.select("table > tbody").first() {
+            desc = try table.select("tr > td[colspan='4']").text()
+            if let coverPath = try table.select("tr > td[rowspan='22'] > a[href] > img[src]").first()?.attr("src") {
+                coverURL = "\(baseURL)/\(coverPath)"
+            }
+        }
+
+        return try await BookDetailsItem(description: desc, fileLinks: urls, coverURL: URL(string: coverURL))
+    }
+    
+    func parseDirectDownloadLinks(_ links: [URL]) async throws -> [URL] {
+        var urls: [URL] = []
+        for url in links {
+            let doc = try SwiftSoup.parse(try await APIService(to: url).getHtml())
+            if try doc.body()?.select("div[role='alert']").first()?.text() == "File not found in DB" {   // invalid response
+                continue
+            } else {
+                try doc.body()?.getElementById("download")?.select("h2 > a[href], ul > li > a[href]").forEach { atag in
+                    if let fileLink = try? URL(string: atag.attr("href")) {
+                        urls.append(fileLink)
+                    }
+                }
+            }
+        }
+        return urls
+    }
+
+    func queryBooks(url: URL?) async throws -> [BookItem] {
+        guard
+            let url = url
+        else {
+            throw APIError.nilURL
+        }
+        let ht = try await APIService(to: url).getHtml()
         let doc: Document = try SwiftSoup.parse(ht)
         var tableHeader: [String] = []
         var books: [BookItem] = []
@@ -118,13 +169,42 @@ class LibgenAPI {
                 if idx == 0 {
                     tableHeader = try parseTableHeader(book)
                 } else {
-                    try books.append(parseTableContents(book, header: tableHeader))
+                    books.append(try parseTableContents(book, header: tableHeader))
                 }
                 idx += 1
             }
         }
-        print("header: \(tableHeader)")
+//        print("header: \(tableHeader)")
         return books
     }
     
+    func search(_ searchStr: String, page: Int = 1) async throws -> [BookItem] {
+        var query: [String: String] = [:]
+        var pageN = page
+        if searchStr.count >= 2 {
+            pageN = 1
+            query["req"] = searchStr
+        } else {
+            query["mode"] = "last"
+        }
+        query["page"] = "\(pageN)"
+        return try await queryBooks(url: makeURL(baseURL: baseURL, path: "search.php", query: query))
+    }
+    
+    func latestBooks(page: Int = 1) async throws -> [BookItem] {
+        var query: [String: String] = [:]
+        query["mode"] = "last"
+        query["page"] = "\(page)"
+        return try await queryBooks(url: makeURL(baseURL: baseURL, path: "search.php", query: query))
+    }
+    
+    func makeURL(baseURL: String, path: String,  query: [String: String]) -> URL? {
+        guard
+            var url = URLComponents(string: "\(baseURL)/\(path)")
+        else {
+            return nil
+        }
+        url.queryItems = query.map { k, v in URLQueryItem(name: k, value: v) }
+        return url.url
+    }
 }

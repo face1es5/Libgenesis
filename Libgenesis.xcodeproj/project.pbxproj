@@ -31,6 +31,7 @@
 		CFDEC15C2C7D6AA000FDF3E4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		CFDEC1632C7D6EB600FDF3E4 /* ServerMirror.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerMirror.swift; sourceTree = "<group>"; };
 		CFDEC1652C7D722100FDF3E4 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		CFE297792C8A8F58007C403A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		CFFCB4B52C897B2600996675 /* LibgenAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibgenAPI.swift; sourceTree = "<group>"; };
 		CFFCB4BE2C89989D00996675 /* BookModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookModel.swift; sourceTree = "<group>"; };
 		CFFCB4C02C89A1FA00996675 /* BookDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailsView.swift; sourceTree = "<group>"; };
@@ -70,6 +71,7 @@
 		CFDEC1532C7D6A9F00FDF3E4 /* Libgenesis */ = {
 			isa = PBXGroup;
 			children = (
+				CFE297792C8A8F58007C403A /* Info.plist */,
 				CFFCB4BD2C89988D00996675 /* Models */,
 				CFDEC1542C7D6A9F00FDF3E4 /* LibgenesisApp.swift */,
 				CFDEC1562C7D6A9F00FDF3E4 /* ContentView.swift */,
@@ -317,6 +319,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Libgenesis/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -355,6 +358,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Libgenesis/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

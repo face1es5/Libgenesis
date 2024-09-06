@@ -10,10 +10,17 @@ import Foundation
 class DownloadTask: ObservableObject, Identifiable {
     let id = UUID().uuidString
     let book: BookItem
+    var targetURL: URL?
     
     @Published var started: Bool = false
     
     init(_ book: BookItem) {
+        self.book = book
+        self.targetURL = book.details?.fileLinks.randomElement()
+    }
+    
+    init(_ url: URL, book: BookItem) {
+        self.targetURL = url
         self.book = book
     }
 }
@@ -30,9 +37,17 @@ class DownloadManager: ObservableObject {
         starting()
     }
     
-    func addDownloadTask(_ book: BookItem) {
-        condition.lock()
+    func download(_ from: URL, book: BookItem) {
+        downloadTasks.append(DownloadTask(from, book: book))
+    }
+    
+    func download(_ book: BookItem) {
         downloadTasks.append(DownloadTask(book))
+    }
+    
+    func addDownloadTask(_ dtask: DownloadTask) {
+        condition.lock()
+        downloadTasks.append(dtask)
         condition.unlock()
         condition.signal()
     }
