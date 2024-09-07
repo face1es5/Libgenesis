@@ -8,73 +8,56 @@
 import SwiftUI
 import Kingfisher
 
-extension URL {
-    func urlDecode() -> String {
-        return self.absoluteString.urlDecode()
-    }
-    func domainSuffix() -> String? {
-        guard
-            let host = self.host(percentEncoded: true)
-        else {
-            return nil
-        }
-        return host.components(separatedBy: ".").last
-    }
-    func domain() -> String? {
-        return self.host(percentEncoded: true)
-    }
-}
 
-extension String {
-    func urlEncode() -> String {
-        return self.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? self
-    }
-    func urlDecode() -> String {
-        return self.removingPercentEncoding ?? self
-    }
-}
 
 struct BookDetailsView: View {
-    @Binding var book: BookItem?
+    @ObservedObject var book: BookItem
     @State var detailsLoaded: Bool = false
     
     var body: some View {
         VStack(spacing: 5) {
-            if book != nil {
-                VStack(alignment: .leading, spacing: 5) {
-                    TitleView()
-                        .lineLimit(2)
+            VStack(alignment: .leading, spacing: 5) {
+                TitleView()
+                    .lineLimit(2)
 #if DEBUG
-                    DebugView()
+                DebugView()
 #endif
-                    HStack {
-                        CoverView()
-                        InfoView()
-                            .lineLimit(1)
-                    }
-                    DownloadsView()
-                    MiscView()
+                HStack {
+                    CoverView()
+                    InfoView()
+                        .lineLimit(2)
                 }
-                AttrView()
-            } else {
-                Text("No book selected.")
+                DownloadsView()
+                MiscView()
             }
+            AttrView()
             Spacer()
         }
-        .onChange(of: book) { _ in
-            if book != nil, book?.details == nil {
-                detailsLoaded = false
-                Task.detached(priority: .background) {
-                    await book?.loadDetails()
-                    await MainActor.run {
-                        detailsLoaded = true
-                        if book?.details == nil {
-                            print("Load details of book \(book?.truncTitle) failed.")
-                        }
-                    }
+        .task {
+            if book.details == nil {
+                loadDetails(self.book)
+            }
+        }
+        .onChange(of: book) { newbook in
+            debugPrint("\(newbook.id) md5: \(newbook.md5)")
+            if newbook.details == nil {
+                print("Detect book changes and new book's details is nil, load details.")
+                loadDetails(newbook)
+            }
+        }
+    }
+    
+    private func loadDetails(_ book: BookItem) {
+        detailsLoaded = false
+        Task.detached(priority: .background) {
+            await book.loadDetails()
+            await MainActor.run {
+                detailsLoaded = true
+                if book.details == nil {
+                    debugPrint("Load details of book \(String(describing: book.truncTitle)) failed.")
+                } else {
+                    debugPrint("Load details of book \(String(describing: book.truncTitle)) succeed.")
                 }
-            } else if book?.details == nil {
-                detailsLoaded = false
             }
         }
     }
@@ -84,9 +67,9 @@ struct BookDetailsView: View {
             DisclosureGroup {
                 VStack(alignment: .leading) {
                     HStack(alignment: .top) {
-                        if detailsLoaded, book?.details != nil {    // load success
-                            if (book?.details?.description.count ?? 0) > 0 {
-                                Text(book?.details?.description ?? "Error occured.")
+                        if detailsLoaded, book.details != nil {    // load success
+                            if (book.details?.description.count ?? 0) > 0 {
+                                Text(book.details?.description ?? "Failed to load description.")
                                     .lineLimit(15)
                             }
                         } else if !detailsLoaded {  // loading...
@@ -114,20 +97,20 @@ struct BookDetailsView: View {
                     HStack(alignment: .top) {
                         Text("Md5: ")
                             .bold()
-                        Text(book!.md5)
                         Spacer()
+                        Text(book.md5)
                     }
                     HStack(alignment: .top) {
                         Text("ISBN: ")
                             .bold()
-                        Text(book!.isbn)
                         Spacer()
+                        Text(book.isbn)
                     }
                     HStack(alignment: .top) {
                         Text("Edition: ")
                             .bold()
-                        Text(book!.edition)
                         Spacer()
+                        Text(book.edition)
                     }
                 }
                 .padding()
@@ -142,33 +125,32 @@ struct BookDetailsView: View {
     private func DownloadsView() -> some View {
         DisclosureGroup {
             VStack(alignment: .leading, spacing: 20) {
-                if let links = book?.details?.fileLinks {
+                if let links = book.details?.fileLinks {
                     ForEach(links, id: \.self) { link in
                         HStack {
                             DownloadMirror.toIcon(link)
-                                .aspectRatio(contentMode: .fit)
                                 .frame(width: 20, height: 20)
+                                .scaledToFit()
                             Text(link.urlDecode())
                                 .lineLimit(1)
-                                .help(link.urlDecode())
                             Spacer()
-                            Button(action: {
-                                DownloadManager.shared.download(link, book: book!)
-                            }) {
-                                Image(systemName: "plus.app")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 15, height: 15)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .help("Click to download")
                         }
+                        .onTapGesture {
+                            DownloadManager.shared.download(link, book: book)
+                        }
+                        .hoveringEffect(0.5, duration: 1)
+                        .contextMenu {
+                            Button("Download \(book.truncTitle) from this mirror") {
+                                DownloadManager.shared.download(link, book: book)
+                            }
+                        }
+                        .help("Click to download this book")
                     }
                 } else {
                     Text("No available download links.")
                 }
             }
-            .padding()
+            .padding(5)
         } label: {
             Label("Downloads", systemImage: "square.and.arrow.down.on.square.fill")
                 .bold()
@@ -180,23 +162,27 @@ struct BookDetailsView: View {
             HStack(alignment: .top) {
                 Text("Author(s): ")
                     .bold()
-                Text(book!.authors)
-                    .help(book!.authors)
+                Spacer()
+                Text(book.authors)
+                    .help(book.authors)
             }
             HStack(alignment: .top) {
                 Text("Language: ")
                     .bold()
-                Text(book!.language)
+                Spacer()
+                Text(book.language)
             }
             HStack(alignment: .top) {
                 Text("Size: ")
                     .bold()
-                Text("\(book!.size)")
+                Spacer()
+                Text("\(book.size)")
             }
             HStack(alignment: .top) {
                 Text("Format: ")
                     .bold()
-                Text("\(book!.format)")
+                Spacer()
+                Text("\(book.format)")
             }
         }
     }
@@ -206,28 +192,26 @@ struct BookDetailsView: View {
             HStack(alignment: .top) {
                 Text("Download link pages: ")
                     .bold()
-                if let mirrors = book?.mirrors {
-                    ForEach(mirrors.indices, id: \.self) { idx in
-                        Link(destination: mirrors[idx]) {
-                            Text("[\(idx+1)]")
-                        }.help(mirrors[idx].absoluteString)
-                    }
+                ForEach(book.mirrors.indices, id: \.self) { idx in
+                    Link(destination: book.mirrors[idx]) {
+                        Text("[\(idx+1)]")
+                    }.help(book.mirrors[idx].absoluteString)
                 }
             }
             HStack(alignment: .top) {
                 Text("Publisher: ")
                     .bold()
-                Text(book!.publisher)
+                Text(book.publisher)
             }
             HStack(alignment: .top) {
                 Text("Year: ")
                     .bold()
-                Text("\(book!.year)")
+                Text("\(book.year)")
             }
             HStack(alignment: .top) {
                 Text("Pages: ")
                     .bold()
-                Text("\(book!.pages)")
+                Text("\(book.pages)")
             }
         }
     }
@@ -236,61 +220,100 @@ struct BookDetailsView: View {
         HStack {
             Text("ID: ")
                 .bold()
-            Text("\(book!.id)")
+            Text("\(book.id)")
         }
     }
     
     private func TitleView() -> some View {
         VStack {
-            if let href = book?.href {
+            if let href = book.href {
                 Link(destination: href) {
-                    Text(book!.title)
+                    Text(book.title)
                         .lineLimit(2)
                 }
             } else {
-                Text(book!.title)
+                Text(book.title)
             }
         }
-        .help(book!.title)
+        .help(book.title)
         .font(.title2)
     }
     
     private func CoverView() -> some View {
         VStack {
-            if detailsLoaded, book?.details?.coverURL != nil {
-                ImageView(url: book?.details?.coverURL)
-            } else {
-                Image(systemName: "books.vertical")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 150)
-            }
+            ImageView(url: book.details?.coverURL, width: 100, height: 161.8, cornerRadius: 10, defaultImg: "books.vertical")
+                .frame(width: 100, height: 161.8)
         }
     }
 }
 
 struct ImageView: View {
     let url: URL?
-    var body: some View {
-        KFImage(url)
-            .placeholder {
-                ProgressView()
-                    .scaledToFit()
-            }
-            .setProcessor(DownsamplingImageProcessor(size: CGSize(width: 150, height: 150))
-                |> RoundCornerImageProcessor(cornerRadius: 20))
-            .cacheOriginalImage()
-            .fade(duration: 1)
-            .onSuccess { result in
-                print("Load image succeed: \(result.source.url?.absoluteString ?? "")")
-            }
-            .onFailure { error in
-                print("Load image failed: \(error.localizedDescription)")
-            }
-            .resizable()
-            .scaledToFit()
-            .frame(height: 150)
+    var preferredWidth: CGFloat = 150
+    var preferredHeight: CGFloat = 150
+    var cornerRadius: CGFloat = 20
+    var defaultImg: String
+    var breathing: Bool = false
+    
+    init(url: URL?, defaultImg: String = "eye", breathing: Bool = false) {
+        self.url = url
+        self.defaultImg = defaultImg
+        self.breathing = false
     }
+    
+    init(url: URL?, width: CGFloat = 150, height: CGFloat = 150, cornerRadius: CGFloat = 20, defaultImg: String = "eye", breathing: Bool = false) {
+        self.url = url
+        self.preferredWidth = width
+        self.preferredHeight = height
+        self.cornerRadius = cornerRadius
+        self.defaultImg = defaultImg
+        self.breathing = breathing
+    }
+    
+    var body: some View {
+        if let url = self.url {
+            KFImage(url)
+                .placeholder {
+                    ProgressView()
+                        .scaledToFit()
+                }
+                .setProcessor(DownsamplingImageProcessor(size: CGSize(width: preferredWidth, height: preferredHeight))
+                              |> RoundCornerImageProcessor(cornerRadius: cornerRadius))
+                .cacheMemoryOnly()
+                .retry(maxCount: 3, interval: .seconds(5))
+                .fade(duration: 1)
+                .onSuccess { result in
+//                    print("Load image succeed: \(result.source.url?.absoluteString ?? "")")
+                }
+                .onFailure { error in
+                    print("Load image failed: \(error.localizedDescription)")
+                }
+                .resizable()
+                .scaledToFit()
+//                .background(Color.clear)
+//                .overlay(
+//                    RoundedRectangle(cornerRadius: cornerRadius)
+//                        .stroke(.clear, lineWidth: 1)
+//                )
+        } else {
+            if breathing {
+                Image(systemName: defaultImg)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: preferredWidth, maxHeight: preferredHeight)
+                    .breathingEffect()
+                    .cornerRadius(cornerRadius)
+            } else {
+                Image(systemName: defaultImg)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: preferredWidth, maxHeight: preferredHeight)
+                    .cornerRadius(cornerRadius)
+            }
+        }
+
+    }
+    
 }
 
 struct BookDetailsView_Previews: PreviewProvider {

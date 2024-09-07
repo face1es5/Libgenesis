@@ -7,30 +7,90 @@
 
 import SwiftUI
 
-struct DownloadTaskView: View {
-    @State var dtask: DownloadTask
+
+struct PlainDownloadTaskView: View {
+    let dtask: DownloadTask
     var body: some View {
         HStack {
-            Image(systemName: "book.closed")
-            Text(dtask.book.title)
-                .lineLimit(2)
-                .help(dtask.book.title)
+            Text("\(dtask.progressPercent.toPercentageStr()) | \(dtask.book.title)")
+        }
+    }
+}
+
+struct DownloadTaskView: View {
+    @ObservedObject var dtask: DownloadTask
+    var alreadyDownloaded: Double {
+        dtask.progressPercent / 100 * Double(dtask.totalSize ?? 0)
+    }
+    var body: some View {
+        HStack {
+            ImageView(url: dtask.book.details?.coverURL, width: 50, height: 50, cornerRadius: 5, defaultImg: "tornado", breathing: false)
+                .frame(width: 50, height: 50)
+            VStack {
+                Text(dtask.book.title)
+                    .help(dtask.book.title)
+                Text("\(alreadyDownloaded.sizeFormatted()) / \(dtask.totalSize?.sizeFormatted() ?? String(Double.nan))")
+                    .font(.footnote)
+                Text(dtask.targetURL.absoluteString)
+                    .font(.footnote)
+            }
+            VStack {
+                if !dtask.loading { // task is ended.
+                    if dtask.success {
+                        Image(systemName: "checkmark.circle.fill")
+                            .frame(width: 30, height: 30)
+                            .scaledToFit()
+                            .foregroundColor(.primary)
+                    } else {
+                        Image(systemName: "exclamationmark.triangle")
+                            .frame(width: 30, height: 30)
+                            .scaledToFit()
+                            .foregroundColor(.yellow)
+                    }
+                } else {
+                    Text("\(.percentage(percent: dtask.progressPercent))")
+                }
+            }
+
+        }
+        .lineLimit(1)
+        .foregroundColor(.primary)
+        .contextMenu {
+            Button("Open in Finder") {
+                LibgenesisApp.jumpTo(dtask.localURL)
+            }
+            Button("Open in Preview") {
+                LibgenesisApp.preview(dtask.localURL)
+            }
+            Divider()
+            Button("Remove from list") {
+                fatalError("Implement remove from list")
+            }
         }
     }
 }
 
 struct DownloadListView: View {
-    @ObservedObject var downloadManager = DownloadManager.shared
+    @EnvironmentObject var downloadManager: DownloadManager
+    @State var selectedTask: DownloadTask?
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 5) {
-                ForEach(downloadManager.downloadTasks) { dtask in
-                    DownloadTaskView(dtask: dtask)
-                }
-            }
+        List(downloadManager.downloadTasks, id: \.self, selection: $selectedTask) { dtask in
+            DownloadTaskView(dtask: dtask)
         }
-        .frame(width: 200, height: 200)
+        .listStyle(.sidebar)
+        .frame(width: 400, height: 200)
         .padding()
+    }
+}
+
+struct DownloaderView: View {
+    var body: some View {
+        VStack {
+            DownloadListView()
+                .environmentObject(DownloadManager.shared)
+        }
+        .frame(width: 400, height: 400)
+        .navigationTitle("Downloader")
     }
 }
 

@@ -7,6 +7,32 @@
 
 import SwiftUI
 
+struct BookLineView: View {
+    @ObservedObject var book: BookItem
+    var body: some View {
+        Text(book.title)
+            .contextMenu {
+                Button("Download \(book.truncTitle)") {
+                    DownloadManager.shared.download(book)
+                }
+                if let links = book.details?.fileLinks {
+                    Menu("Download from") {
+                        ForEach(links, id: \.self) { link in
+                            Button(DownloadMirror.toHost(url: link).rawValue) {
+                                DownloadManager.shared.download(link, book: book)
+                            }
+                        }
+                    }
+                }
+                Button("Preview") {
+                    fatalError("Preview to implemented.")
+                }
+            }
+
+    }
+}
+
+
 struct ContentView: View {
     @AppStorage("baseURL") var mirror: ServerMirror = .m1
     @State var books: [BookItem] = []
@@ -17,35 +43,37 @@ struct ContentView: View {
     @State var connErrMsg: String = ""
     @State var showConnPopover: Bool = false
     @State var page: Int = 1
-    @State var loading: Bool = false
+    @State var loading: Bool = false    // books
     var body: some View {
         NavigationSplitView {
             ScrollView {
-                BookDetailsView(book: $selectedBook)
+                if let book = selectedBook {
+                    BookDetailsView(book: book)
+                } else {
+                    Text("No book selected.")
+                        .font(.title2)
+                }
+                
+            }
+            .contextMenu {
+                Button("Refresh") {
+                    Task.detached(priority: .background) {
+                        debugPrint("Request details manully.")
+                        await selectedBook?.loadDetails()
+                    }
+                }
+                Button("Download \(selectedBook?.truncTitle ?? "")") {
+                    if let book = selectedBook {
+                        DownloadManager.shared.download(book)
+                    }
+                }
             }
             .padding()
         } detail: {
             ZStack {
                 List(selection: $selectedBook) {
                     ForEach(books, id: \.self) { book in
-                        Text(book.title)
-                            .contextMenu {
-                                Button("Download \(book.truncTitle)") {
-                                    askDownload()
-                                }
-                                if let links = book.details?.fileLinks {
-                                    Menu("Download from") {
-                                        ForEach(links, id: \.self) { link in
-                                            Button(DownloadMirror.fromURL(url: link).rawValue) {
-                                                DownloadManager.shared.download(link, book: book)
-                                            }
-                                        }
-                                    }
-                                }
-                                Button("Preview") {
-                                    fatalError("Preview to implemented.")
-                                }
-                            }
+                        BookLineView(book: book)
                     }
                     if books.count > 0, searchString.count < 2 {
                         HStack {
@@ -126,9 +154,12 @@ struct ContentView: View {
         }
     }
     
+    /// Handle a series of downloading.
+    ///
+    /// TODO...
     func askDownload() {
+        fatalError("Implement askDownload for downloading s lists of books.")
         guard let selectedBook = selectedBook else { return }
-        print("Try to download: \(selectedBook.title)")
         DownloadManager.shared.download(selectedBook)
     }
     

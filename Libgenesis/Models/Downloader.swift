@@ -7,29 +7,11 @@
 
 import Foundation
 
-class DownloadTask: ObservableObject, Identifiable {
-    let id = UUID().uuidString
-    let book: BookItem
-    var targetURL: URL?
-    
-    @Published var started: Bool = false
-    
-    init(_ book: BookItem) {
-        self.book = book
-        self.targetURL = book.details?.fileLinks.randomElement()
-    }
-    
-    init(_ url: URL, book: BookItem) {
-        self.targetURL = url
-        self.book = book
-    }
-}
-
 /// Book downloader, hold download queue
 class DownloadManager: ObservableObject {
     static let shared = DownloadManager()
     
-    @Published var downloadTasks: [DownloadTask] = []
+    @Published private(set) var downloadTasks: [DownloadTask] = []
     private let downloadTaskQueue = DispatchQueue(label: "com.F1sh.downloadmanager.taskqueue", qos: .background)
     private let condition = NSCondition()
     
@@ -37,12 +19,29 @@ class DownloadManager: ObservableObject {
         starting()
     }
     
-    func download(_ from: URL, book: BookItem) {
-        downloadTasks.append(DownloadTask(from, book: book))
+    /// Download book from url **targetURL**.
+    ///
+    func download(_ targetURL: URL, book: BookItem) {
+        addDownloadTask(DownloadTask(targetURL, book: book))
     }
     
+    /// Download book from random server, could fail.
+    ///
+    /// If no download link available, emit this task.
     func download(_ book: BookItem) {
-        downloadTasks.append(DownloadTask(book))
+        guard
+            let dtask = DownloadTask(book)
+        else {
+            print("Invalid download task of \(book.truncTitle), check url")
+            return
+        }
+        addDownloadTask(dtask)
+    }
+    
+    /// TODO: Download selected book.
+    ///
+    func downloadSelected() {
+        fatalError("Implement download selected book.")
     }
     
     func addDownloadTask(_ dtask: DownloadTask) {
@@ -67,9 +66,8 @@ class DownloadManager: ObservableObject {
                     condition.unlock()
                     continue
                 }
-                task.started = true
-                //TODO: real download...
                 print("Starting download: \(task.book.title)")
+                task.join()
                 condition.unlock()
             }
         }

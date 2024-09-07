@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BookDetailsItem: Codable {
+struct BookDetailsItem: Codable, Equatable {
     var description: String
     var fileLinks: [URL] = []
     var coverURL: URL?
@@ -28,13 +28,7 @@ class BookItem: Identifiable, Hashable, Equatable, ObservableObject {
         authors.components(separatedBy: ",")
     }
     let title: String
-    var truncTitle: String {
-        if title.count <= 15 {
-            return title
-        } else {
-            return String(title[..<title.index(title.startIndex, offsetBy: 12)])+"..."
-        }
-    }
+    var truncTitle: String
     let publisher: String
     let year: Int
     let pages: Int
@@ -65,6 +59,7 @@ class BookItem: Identifiable, Hashable, Equatable, ObservableObject {
         self.href = href
         self.isbn = isbn
         self.edition = edition
+        self.truncTitle = String(title.prefix(15))+"..."
     }
     
     func loadDetails() async {

@@ -20,7 +20,7 @@ enum DownloadMirror: String, CaseIterable, Identifiable, Equatable {
     case libgen, cloudflare, tor, ipfs, unknown
     var id: Self { self }
     
-    static func fromURL(url: URL) -> DownloadMirror {
+    static func toHost(url: URL) -> DownloadMirror {
         guard
             let suffix = url.domainSuffix(),
             let domain = url.domain()
@@ -42,7 +42,7 @@ enum DownloadMirror: String, CaseIterable, Identifiable, Equatable {
     }
     
     static func fromURLs(urls: [URL]) -> [DownloadMirror] {
-        return urls.map{ fromURL(url: $0) }
+        return urls.map{ toHost(url: $0) }
     }
     
     static func toMenus(urls: [URL]) -> some View {
@@ -63,7 +63,7 @@ enum DownloadMirror: String, CaseIterable, Identifiable, Equatable {
     }
     
     static func toIcon(_ url: URL) -> some View {
-        return toIcon(host: fromURL(url: url))
+        return toIcon(host: toHost(url: url))
     }
     
     static func toIcon(host: DownloadMirror) -> some View {

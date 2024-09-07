@@ -13,6 +13,13 @@
 		CFDEC15D2C7D6AA000FDF3E4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFDEC15C2C7D6AA000FDF3E4 /* Preview Assets.xcassets */; };
 		CFDEC1642C7D6EB600FDF3E4 /* ServerMirror.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDEC1632C7D6EB600FDF3E4 /* ServerMirror.swift */; };
 		CFDEC1662C7D722100FDF3E4 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDEC1652C7D722100FDF3E4 /* APIService.swift */; };
+		CFE2977C2C8B2388007C403A /* GeneralCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE2977B2C8B2388007C403A /* GeneralCommands.swift */; };
+		CFE2977E2C8B31F5007C403A /* DownloadTaskModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE2977D2C8B31F5007C403A /* DownloadTaskModel.swift */; };
+		CFE297802C8B3C5A007C403A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE2977F2C8B3C5A007C403A /* SettingsView.swift */; };
+		CFE297832C8B5428007C403A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = CFE297822C8B5428007C403A /* Alamofire */; };
+		CFE297852C8B7AAA007C403A /* MenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE297842C8B7AAA007C403A /* MenuBar.swift */; };
+		CFF4F3232C8C338E00396BD7 /* Base.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF4F3222C8C338E00396BD7 /* Base.swift */; };
+		CFF4F3252C8C478A00396BD7 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF4F3242C8C478A00396BD7 /* Animations.swift */; };
 		CFFCB4B62C897B2600996675 /* LibgenAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCB4B52C897B2600996675 /* LibgenAPI.swift */; };
 		CFFCB4B92C89814B00996675 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = CFFCB4B82C89814B00996675 /* SwiftSoup */; };
 		CFFCB4BC2C89815B00996675 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = CFFCB4BB2C89815B00996675 /* Kingfisher */; };
@@ -32,6 +39,12 @@
 		CFDEC1632C7D6EB600FDF3E4 /* ServerMirror.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerMirror.swift; sourceTree = "<group>"; };
 		CFDEC1652C7D722100FDF3E4 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 		CFE297792C8A8F58007C403A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		CFE2977B2C8B2388007C403A /* GeneralCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralCommands.swift; sourceTree = "<group>"; };
+		CFE2977D2C8B31F5007C403A /* DownloadTaskModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadTaskModel.swift; sourceTree = "<group>"; };
+		CFE2977F2C8B3C5A007C403A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CFE297842C8B7AAA007C403A /* MenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBar.swift; sourceTree = "<group>"; };
+		CFF4F3222C8C338E00396BD7 /* Base.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base.swift; sourceTree = "<group>"; };
+		CFF4F3242C8C478A00396BD7 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		CFFCB4B52C897B2600996675 /* LibgenAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibgenAPI.swift; sourceTree = "<group>"; };
 		CFFCB4BE2C89989D00996675 /* BookModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookModel.swift; sourceTree = "<group>"; };
 		CFFCB4C02C89A1FA00996675 /* BookDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailsView.swift; sourceTree = "<group>"; };
@@ -44,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFE297832C8B5428007C403A /* Alamofire in Frameworks */,
 				CFFCB4BC2C89815B00996675 /* Kingfisher in Frameworks */,
 				CFFCB4B92C89814B00996675 /* SwiftSoup in Frameworks */,
 			);
@@ -71,6 +85,8 @@
 		CFDEC1532C7D6A9F00FDF3E4 /* Libgenesis */ = {
 			isa = PBXGroup;
 			children = (
+				CFF4F3212C8C337E00396BD7 /* Extension */,
+				CFE2977A2C8B2363007C403A /* Commands */,
 				CFE297792C8A8F58007C403A /* Info.plist */,
 				CFFCB4BD2C89988D00996675 /* Models */,
 				CFDEC1542C7D6A9F00FDF3E4 /* LibgenesisApp.swift */,
@@ -83,6 +99,9 @@
 				CFDEC15A2C7D6AA000FDF3E4 /* Libgenesis.entitlements */,
 				CFDEC15B2C7D6AA000FDF3E4 /* Preview Content */,
 				CFFCB4C22C89B53200996675 /* DownloadListView.swift */,
+				CFE2977F2C8B3C5A007C403A /* SettingsView.swift */,
+				CFE297842C8B7AAA007C403A /* MenuBar.swift */,
+				CFF4F3242C8C478A00396BD7 /* Animations.swift */,
 			);
 			path = Libgenesis;
 			sourceTree = "<group>";
@@ -95,11 +114,28 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		CFE2977A2C8B2363007C403A /* Commands */ = {
+			isa = PBXGroup;
+			children = (
+				CFE2977B2C8B2388007C403A /* GeneralCommands.swift */,
+			);
+			path = Commands;
+			sourceTree = "<group>";
+		};
+		CFF4F3212C8C337E00396BD7 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				CFF4F3222C8C338E00396BD7 /* Base.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
 		CFFCB4BD2C89988D00996675 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				CFFCB4BE2C89989D00996675 /* BookModel.swift */,
 				CFFCB4C42C89B70700996675 /* Downloader.swift */,
+				CFE2977D2C8B31F5007C403A /* DownloadTaskModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -123,6 +159,7 @@
 			packageProductDependencies = (
 				CFFCB4B82C89814B00996675 /* SwiftSoup */,
 				CFFCB4BB2C89815B00996675 /* Kingfisher */,
+				CFE297822C8B5428007C403A /* Alamofire */,
 			);
 			productName = Libgenesis;
 			productReference = CFDEC1512C7D6A9F00FDF3E4 /* Libgenesis.app */;
@@ -155,6 +192,7 @@
 			packageReferences = (
 				CFFCB4B72C89814B00996675 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				CFFCB4BA2C89815B00996675 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				CFE297812C8B5428007C403A /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			productRefGroup = CFDEC1522C7D6A9F00FDF3E4 /* Products */;
 			projectDirPath = "";
@@ -182,14 +220,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFE2977E2C8B31F5007C403A /* DownloadTaskModel.swift in Sources */,
 				CFFCB4C32C89B53200996675 /* DownloadListView.swift in Sources */,
 				CFFCB4BF2C89989D00996675 /* BookModel.swift in Sources */,
 				CFFCB4C12C89A1FA00996675 /* BookDetailsView.swift in Sources */,
 				CFDEC1572C7D6A9F00FDF3E4 /* ContentView.swift in Sources */,
+				CFE2977C2C8B2388007C403A /* GeneralCommands.swift in Sources */,
+				CFE297852C8B7AAA007C403A /* MenuBar.swift in Sources */,
+				CFE297802C8B3C5A007C403A /* SettingsView.swift in Sources */,
 				CFFCB4B62C897B2600996675 /* LibgenAPI.swift in Sources */,
 				CFFCB4C52C89B70700996675 /* Downloader.swift in Sources */,
 				CFDEC1552C7D6A9F00FDF3E4 /* LibgenesisApp.swift in Sources */,
+				CFF4F3252C8C478A00396BD7 /* Animations.swift in Sources */,
 				CFDEC1662C7D722100FDF3E4 /* APIService.swift in Sources */,
+				CFF4F3232C8C338E00396BD7 /* Base.swift in Sources */,
 				CFDEC1642C7D6EB600FDF3E4 /* ServerMirror.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -408,6 +452,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		CFE297812C8B5428007C403A /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
 		CFFCB4B72C89814B00996675 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
@@ -427,6 +479,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		CFE297822C8B5428007C403A /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CFE297812C8B5428007C403A /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
 		CFFCB4B82C89814B00996675 /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CFFCB4B72C89814B00996675 /* XCRemoteSwiftPackageReference "SwiftSoup" */;

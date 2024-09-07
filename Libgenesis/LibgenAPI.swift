@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftSoup
+import Alamofire
 
 class LibgenAPI {
     static let shared = LibgenAPI()
@@ -206,5 +207,16 @@ class LibgenAPI {
         }
         url.queryItems = query.map { k, v in URLQueryItem(name: k, value: v) }
         return url.url
+    }
+    
+    /// Get file size of url by content length.
+    func fileSize(url: URL, completion: @escaping (Int64?) -> Void) {
+        AF.request(url, method: .head).response { resp in
+            if let totalBytes = resp.response?.expectedContentLength {
+                completion(totalBytes)
+            } else {
+                completion(nil)
+            }
+        }
     }
 }
