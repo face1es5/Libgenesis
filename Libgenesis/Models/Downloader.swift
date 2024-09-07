@@ -25,6 +25,13 @@ class DownloadManager: ObservableObject {
         addDownloadTask(DownloadTask(targetURL, book: book))
     }
     
+    /// Download a list of books.
+    func download(_ books: [BookItem]) {
+        addDownloadTasks(
+            books.compactMap { DownloadTask($0) }
+        )
+    }
+    
     /// Download book from random server, could fail.
     ///
     /// If no download link available, emit this task.
@@ -44,6 +51,15 @@ class DownloadManager: ObservableObject {
         fatalError("Implement download selected book.")
     }
     
+    /// Add a list of tasks.
+    func addDownloadTasks(_ dtasks: [DownloadTask]) {
+        condition.lock()
+        downloadTasks += dtasks
+        condition.unlock()
+        condition.signal()
+    }
+    
+    /// Add tasks.
     func addDownloadTask(_ dtask: DownloadTask) {
         condition.lock()
         downloadTasks.append(dtask)
