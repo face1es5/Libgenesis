@@ -67,6 +67,64 @@ class DownloadManager: ObservableObject {
         condition.signal()
     }
     
+    /// Remove task.
+    func removeDownloadTask(_ dtask: DownloadTask) {
+        // lock lock
+        condition.lock()
+        downloadTasks.removeAll(where: { $0 == dtask })
+        condition.unlock()
+        condition.signal()
+    }
+    
+    /// Remove tasks.
+    func removeDownloadTasks(_ dtasks: [DownloadTask]) {
+        // lock lock
+        condition.lock()
+        let taskSet = Set(dtasks)
+        downloadTasks = downloadTasks.filter { !taskSet.contains($0) }
+        condition.unlock()
+        condition.signal()
+    }
+    
+    /// Suspend all tasks(if in progress)
+    func pauseAll() {
+        // lock lock
+        condition.lock()
+        for dtask in downloadTasks {
+            if dtask.loading {  // don't pause completed tasks.
+                dtask.pause()
+            }
+        }
+        condition.unlock()
+        condition.signal()
+    }
+    
+    /// Resume all suspended tasks.
+    func resumeAll() {
+        // lock lock
+        condition.lock()
+        for dtask in downloadTasks {
+            if dtask.suspending {
+                dtask.resume()
+            }
+        }
+        condition.unlock()
+        condition.signal()
+    }
+    
+    /// Remove all tasks.
+    func clear() {
+        // lock lock
+        condition.lock()
+        // we should cancel all
+        for dtask in downloadTasks {
+            dtask.pause()
+        }
+        downloadTasks = []
+        condition.unlock()
+        condition.signal()
+    }
+    
     private func starting() {
         downloadTaskQueue.async { [weak self] in
             guard let self = self else { return }

@@ -55,7 +55,6 @@ struct SharedContextView: View {
                     Label(m.serverName, image: m.rawValue.lowercased())
                 }
             }
-                .scaledToFit()
         )
 
     }

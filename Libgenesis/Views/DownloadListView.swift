@@ -62,7 +62,7 @@ struct DownloadTaskView: View {
                     .font(.footnote)
             }
             VStack {
-                if !dtask.loading { // task is ended.
+                if !dtask.loading, !dtask.suspending { // task is ended.
                     if dtask.success {
                         Image(systemName: "checkmark.circle.fill")
                             .frame(width: 30, height: 30)
@@ -74,7 +74,15 @@ struct DownloadTaskView: View {
                             .scaledToFit()
                             .foregroundColor(.yellow)
                     }
-                } else {
+                } else if !dtask.loading, dtask.suspending { // suspending
+                    Image(systemName: "play.circle.fill")
+                        .frame(width: 30, height: 30)
+                        .scaledToFit()
+                        .foregroundColor(.blue)
+                        .onTapGesture {
+                            dtask.resume()
+                        }
+                } else {    // downloading
                     Text("\(.percentage(percent: dtask.progressPercent))")
                 }
             }
@@ -83,6 +91,21 @@ struct DownloadTaskView: View {
         .lineLimit(1)
         .foregroundColor(.primary)
         .contextMenu {
+            if dtask.loading, !dtask.suspending {
+                Button("Pause") {
+                    dtask.pause()
+                }
+            } else if !dtask.loading, dtask.suspending {
+                Button("Resume") {
+                    dtask.resume()
+                }
+            } else if !dtask.loading, !dtask.suspending {
+                Button("Re-download") {
+                    dtask.resume()
+                }
+            }
+            Divider()
+
             Button("Open in Finder") {
                 LibgenesisApp.jumpTo(dtask.localURL)
             }
@@ -90,8 +113,18 @@ struct DownloadTaskView: View {
                 recentManager.preview(dtask.localURL)
             }
             Divider()
+            Button("Resume all") {
+                DownloadManager.shared.resumeAll()
+            }
+            Button("Pause all") {
+                DownloadManager.shared.pauseAll()
+            }
+            Divider()
             Button("Remove from list") {
-                fatalError("Implement remove from list")
+                DownloadManager.shared.removeDownloadTask(dtask)
+            }
+            Button("Remove all(this will also cancel any tasks in progress!)") {
+                DownloadManager.shared.clear()
             }
         }
     }
