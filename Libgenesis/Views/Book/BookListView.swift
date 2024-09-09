@@ -28,13 +28,19 @@ struct BookListView: View {
     @State var showDownload: Bool = false
     @State var showAddSheet: Bool = false
     @State var showDelAlert = false
+    @State var showBookmarks: Bool = false
     @AppStorage("preferredFormats") var formatFilters: Set<FormatFilter> = [.def]
+    @AppStorage("bookLineDisplayMode") var bookDisplayMode: BookLineDisplayMode = .list
     
     var body: some View {
         ZStack {
             List(selection: $selBooksVM.books) {
                 ForEach(books, id: \.self) { book in
-                    BookLineView(book: book)
+                    if bookDisplayMode == .list {
+                        BookLineView(book: book)
+                    } else {
+                        BookCoverView(book: book)
+                    }
                 }
                 if books.count > 0 {
                     HStack {
@@ -74,7 +80,7 @@ struct BookListView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 128, height: 128)
-                    Text("No books available, check connection or filters.")
+                    Text("No books available, check connection or filters(maybe you're blocked by server).")
                         .font(.title)
                 }
             }
@@ -99,6 +105,21 @@ struct BookListView: View {
                 MirrorDelAlert()
             }
             MirrorPicker()
+            Button(action: {
+                showBookmarks.toggle()
+            }) {
+                HStack {
+                    Label("bookmarks", systemImage: "books.vertical.fill")
+                        .foregroundColor(.blue)
+                    Image(systemName: "chevron.compact.down")
+                        .resizable()
+                        .scaledToFit()
+                }
+            }
+            .popover(isPresented: $showBookmarks, arrowEdge: .bottom) {
+                BookmarkGallery()
+            }
+
         }
     }
     
@@ -110,24 +131,31 @@ struct BookListView: View {
                 Spacer()
             }
             ToolbarItemGroup(placement: .primaryAction) {
+                Picker("Display mode", selection: $bookDisplayMode) {
+                    ForEach(BookLineDisplayMode.allCases, id: \.self) { mode in
+                        Label(mode.rawValue.capitalized, systemImage: mode.icon).tag(mode)
+                    }
+                }
+                .pickerStyle(.inline)
+                .help("Change display mode to gallery/list")
+                
                 Button(action: {
                     showDownload.toggle()
                 }) {
                     Image(systemName: "arrow.down.circle")
                         .foregroundColor(downloadManager.downloadTasks.count == 0 ? Color.secondary : Color.blue)
                         .imageScale(.large)
-                        .help("Downloads")
                         .popover(isPresented: $showDownload, arrowEdge: .bottom) {
                             DownloadListView()
                         }
                 }
+                .help("Downloads")
 
                 Button(action: { forceFetching() }) {
                     Image(systemName: "network")
                         .foregroundColor(connErr ? .yellow : .accentColor)
                         .imageScale(.large)
                 }
-                .help("Click to refresh")
                 .keyboardShortcut("r")
                 .popover(isPresented: $showConnPopover) {
                     Text(connErrMsg)
@@ -142,7 +170,8 @@ struct BookListView: View {
                         showConnPopover = false
                     }
                 }
-                
+                .help("Click to refresh")
+
                 Button(action: {
                     showFilter.toggle()
                 }) {
@@ -152,6 +181,7 @@ struct BookListView: View {
                 .popover(isPresented: $showFilter, arrowEdge: .bottom) {
                     FilterContextView(formatFilters: $formatFilters, columnFilter: $columnFilter)
                 }
+                
                 SearchBar($searchString, prompt: "Search len must > 2") {
                     forceFetching()
                 }

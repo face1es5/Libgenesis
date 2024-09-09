@@ -9,6 +9,15 @@
 /* Begin PBXBuildFile section */
 		CF0C61192C8EBA8300503879 /* MirrorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61182C8EBA8300503879 /* MirrorPicker.swift */; };
 		CF0C611B2C8EEDA100503879 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CF0C611A2C8EEDA100503879 /* Credits.rtf */; };
+		CF0C61252C8F0B7000503879 /* LibgenesisHelperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61242C8F0B7000503879 /* LibgenesisHelperApp.swift */; };
+		CF0C61272C8F0B7000503879 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61262C8F0B7000503879 /* ContentView.swift */; };
+		CF0C61292C8F0B7200503879 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF0C61282C8F0B7200503879 /* Assets.xcassets */; };
+		CF0C612C2C8F0B7200503879 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF0C612B2C8F0B7200503879 /* Preview Assets.xcassets */; };
+		CF0C61322C8F0CBE00503879 /* LibgenesisHelper.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = CF0C61222C8F0B7000503879 /* LibgenesisHelper.app */; platformFilters = (macos, ); settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CF0C61352C8F423A00503879 /* BookDetailsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61342C8F423A00503879 /* BookDetailsToolbar.swift */; };
+		CF0C61372C8F42C700503879 /* BookDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61362C8F42C700503879 /* BookDisplayMode.swift */; };
+		CF0C61392C8F528500503879 /* BookmarksModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61382C8F528500503879 /* BookmarksModel.swift */; };
+		CF0C613B2C8F571C00503879 /* BookmarkGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C613A2C8F571C00503879 /* BookmarkGallery.swift */; };
 		CFDEC1552C7D6A9F00FDF3E4 /* LibgenesisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDEC1542C7D6A9F00FDF3E4 /* LibgenesisApp.swift */; };
 		CFDEC1572C7D6A9F00FDF3E4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDEC1562C7D6A9F00FDF3E4 /* ContentView.swift */; };
 		CFDEC1592C7D6AA000FDF3E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFDEC1582C7D6AA000FDF3E4 /* Assets.xcassets */; };
@@ -20,6 +29,22 @@
 		CFE297802C8B3C5A007C403A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE2977F2C8B3C5A007C403A /* SettingsView.swift */; };
 		CFE297832C8B5428007C403A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = CFE297822C8B5428007C403A /* Alamofire */; };
 		CFE297852C8B7AAA007C403A /* MenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE297842C8B7AAA007C403A /* MenuBar.swift */; };
+		CFE602862C905F8000086F24 /* main.png in Resources */ = {isa = PBXBuildFile; fileRef = CFE602852C905F8000086F24 /* main.png */; };
+		CFE602962C906B2600086F24 /* covermode.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602872C906B2500086F24 /* covermode.jpg */; };
+		CFE602972C906B2600086F24 /* details.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602882C906B2500086F24 /* details.jpg */; };
+		CFE602982C906B2600086F24 /* bookmark2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602892C906B2500086F24 /* bookmark2.jpg */; };
+		CFE602992C906B2600086F24 /* listmode.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE6028A2C906B2500086F24 /* listmode.jpg */; };
+		CFE6029A2C906B2600086F24 /* search2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE6028B2C906B2500086F24 /* search2.jpg */; };
+		CFE6029B2C906B2600086F24 /* bookmark1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE6028C2C906B2500086F24 /* bookmark1.jpg */; };
+		CFE6029C2C906B2600086F24 /* download1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE6028D2C906B2500086F24 /* download1.jpg */; };
+		CFE6029D2C906B2600086F24 /* download4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE6028E2C906B2500086F24 /* download4.jpg */; };
+		CFE6029E2C906B2600086F24 /* search3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE6028F2C906B2500086F24 /* search3.jpg */; };
+		CFE6029F2C906B2600086F24 /* downloader.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602902C906B2500086F24 /* downloader.jpg */; };
+		CFE602A02C906B2600086F24 /* search4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602912C906B2500086F24 /* search4.jpg */; };
+		CFE602A12C906B2600086F24 /* search1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602922C906B2500086F24 /* search1.jpg */; };
+		CFE602A22C906B2600086F24 /* bookmark3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602932C906B2500086F24 /* bookmark3.jpg */; };
+		CFE602A32C906B2600086F24 /* download3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602942C906B2500086F24 /* download3.jpg */; };
+		CFE602A42C906B2600086F24 /* download2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602952C906B2600086F24 /* download2.jpg */; };
 		CFF4F3232C8C338E00396BD7 /* Base.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF4F3222C8C338E00396BD7 /* Base.swift */; };
 		CFF4F3252C8C478A00396BD7 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF4F3242C8C478A00396BD7 /* Animations.swift */; };
 		CFFCB4B62C897B2600996675 /* LibgenAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCB4B52C897B2600996675 /* LibgenAPI.swift */; };
@@ -39,10 +64,33 @@
 		CFFF124C2C8DC64D00DC4240 /* SharedContextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF124B2C8DC64D00DC4240 /* SharedContextView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		CF0C61312C8F0C7C00503879 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LoginItems;
+			dstSubfolderSpec = 1;
+			files = (
+				CF0C61322C8F0CBE00503879 /* LibgenesisHelper.app in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		CF0C61182C8EBA8300503879 /* MirrorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorPicker.swift; sourceTree = "<group>"; };
 		CF0C611A2C8EEDA100503879 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		CF0C611C2C8EEDFB00503879 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		CF0C61222C8F0B7000503879 /* LibgenesisHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LibgenesisHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF0C61242C8F0B7000503879 /* LibgenesisHelperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibgenesisHelperApp.swift; sourceTree = "<group>"; };
+		CF0C61262C8F0B7000503879 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		CF0C61282C8F0B7200503879 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CF0C612B2C8F0B7200503879 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		CF0C612D2C8F0B7200503879 /* LibgenesisHelper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LibgenesisHelper.entitlements; sourceTree = "<group>"; };
+		CF0C61342C8F423A00503879 /* BookDetailsToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailsToolbar.swift; sourceTree = "<group>"; };
+		CF0C61362C8F42C700503879 /* BookDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDisplayMode.swift; sourceTree = "<group>"; };
+		CF0C61382C8F528500503879 /* BookmarksModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksModel.swift; sourceTree = "<group>"; };
+		CF0C613A2C8F571C00503879 /* BookmarkGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkGallery.swift; sourceTree = "<group>"; };
 		CFDEC1512C7D6A9F00FDF3E4 /* Libgenesis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Libgenesis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFDEC1542C7D6A9F00FDF3E4 /* LibgenesisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibgenesisApp.swift; sourceTree = "<group>"; };
 		CFDEC1562C7D6A9F00FDF3E4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -56,6 +104,22 @@
 		CFE2977D2C8B31F5007C403A /* DownloadTaskModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadTaskModel.swift; sourceTree = "<group>"; };
 		CFE2977F2C8B3C5A007C403A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		CFE297842C8B7AAA007C403A /* MenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBar.swift; sourceTree = "<group>"; };
+		CFE602852C905F8000086F24 /* main.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = main.png; sourceTree = "<group>"; };
+		CFE602872C906B2500086F24 /* covermode.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = covermode.jpg; sourceTree = "<group>"; };
+		CFE602882C906B2500086F24 /* details.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = details.jpg; sourceTree = "<group>"; };
+		CFE602892C906B2500086F24 /* bookmark2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bookmark2.jpg; sourceTree = "<group>"; };
+		CFE6028A2C906B2500086F24 /* listmode.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = listmode.jpg; sourceTree = "<group>"; };
+		CFE6028B2C906B2500086F24 /* search2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = search2.jpg; sourceTree = "<group>"; };
+		CFE6028C2C906B2500086F24 /* bookmark1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bookmark1.jpg; sourceTree = "<group>"; };
+		CFE6028D2C906B2500086F24 /* download1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = download1.jpg; sourceTree = "<group>"; };
+		CFE6028E2C906B2500086F24 /* download4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = download4.jpg; sourceTree = "<group>"; };
+		CFE6028F2C906B2500086F24 /* search3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = search3.jpg; sourceTree = "<group>"; };
+		CFE602902C906B2500086F24 /* downloader.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = downloader.jpg; sourceTree = "<group>"; };
+		CFE602912C906B2500086F24 /* search4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = search4.jpg; sourceTree = "<group>"; };
+		CFE602922C906B2500086F24 /* search1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = search1.jpg; sourceTree = "<group>"; };
+		CFE602932C906B2500086F24 /* bookmark3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bookmark3.jpg; sourceTree = "<group>"; };
+		CFE602942C906B2500086F24 /* download3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = download3.jpg; sourceTree = "<group>"; };
+		CFE602952C906B2600086F24 /* download2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = download2.jpg; sourceTree = "<group>"; };
 		CFF4F3222C8C338E00396BD7 /* Base.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base.swift; sourceTree = "<group>"; };
 		CFF4F3242C8C478A00396BD7 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		CFFCB4B52C897B2600996675 /* LibgenAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibgenAPI.swift; sourceTree = "<group>"; };
@@ -74,6 +138,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		CF0C611F2C8F0B7000503879 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CFDEC14E2C7D6A9F00FDF3E4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -90,8 +161,54 @@
 		CF0C611D2C8EEF3600503879 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				CFE6028C2C906B2500086F24 /* bookmark1.jpg */,
+				CFE602892C906B2500086F24 /* bookmark2.jpg */,
+				CFE602932C906B2500086F24 /* bookmark3.jpg */,
+				CFE602872C906B2500086F24 /* covermode.jpg */,
+				CFE602882C906B2500086F24 /* details.jpg */,
+				CFE6028D2C906B2500086F24 /* download1.jpg */,
+				CFE602952C906B2600086F24 /* download2.jpg */,
+				CFE602942C906B2500086F24 /* download3.jpg */,
+				CFE6028E2C906B2500086F24 /* download4.jpg */,
+				CFE602902C906B2500086F24 /* downloader.jpg */,
+				CFE6028A2C906B2500086F24 /* listmode.jpg */,
+				CFE602922C906B2500086F24 /* search1.jpg */,
+				CFE6028B2C906B2500086F24 /* search2.jpg */,
+				CFE6028F2C906B2500086F24 /* search3.jpg */,
+				CFE602912C906B2500086F24 /* search4.jpg */,
+				CFE602852C905F8000086F24 /* main.png */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		CF0C61232C8F0B7000503879 /* LibgenesisHelper */ = {
+			isa = PBXGroup;
+			children = (
+				CF0C61242C8F0B7000503879 /* LibgenesisHelperApp.swift */,
+				CF0C61262C8F0B7000503879 /* ContentView.swift */,
+				CF0C61282C8F0B7200503879 /* Assets.xcassets */,
+				CF0C612D2C8F0B7200503879 /* LibgenesisHelper.entitlements */,
+				CF0C612A2C8F0B7200503879 /* Preview Content */,
+			);
+			path = LibgenesisHelper;
+			sourceTree = "<group>";
+		};
+		CF0C612A2C8F0B7200503879 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				CF0C612B2C8F0B7200503879 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		CF0C61332C8F421700503879 /* Toolbar */ = {
+			isa = PBXGroup;
+			children = (
+				CF0C61342C8F423A00503879 /* BookDetailsToolbar.swift */,
+				CF0C61182C8EBA8300503879 /* MirrorPicker.swift */,
+				CFFF12432C8DB35700DC4240 /* FilterView.swift */,
+			);
+			path = Toolbar;
 			sourceTree = "<group>";
 		};
 		CFDEC1482C7D6A9E00FDF3E4 = {
@@ -100,6 +217,7 @@
 				CF0C611D2C8EEF3600503879 /* Resources */,
 				CF0C611C2C8EEDFB00503879 /* README.md */,
 				CFDEC1532C7D6A9F00FDF3E4 /* Libgenesis */,
+				CF0C61232C8F0B7000503879 /* LibgenesisHelper */,
 				CFDEC1522C7D6A9F00FDF3E4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -108,6 +226,7 @@
 			isa = PBXGroup;
 			children = (
 				CFDEC1512C7D6A9F00FDF3E4 /* Libgenesis.app */,
+				CF0C61222C8F0B7000503879 /* LibgenesisHelper.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,7 +236,6 @@
 			children = (
 				CFFF124D2C8DCED700DC4240 /* Service */,
 				CFFF12402C8DB32A00DC4240 /* Views */,
-				CFFF123B2C8D90DA00DC4240 /* Filter */,
 				CFF4F3212C8C337E00396BD7 /* Extension */,
 				CFE2977A2C8B2363007C403A /* Commands */,
 				CFFCB4BD2C89988D00996675 /* Models */,
@@ -148,6 +266,40 @@
 			path = Commands;
 			sourceTree = "<group>";
 		};
+		CFE602802C9048F100086F24 /* Book */ = {
+			isa = PBXGroup;
+			children = (
+				CFFF12452C8DB3B400DC4240 /* BookListView.swift */,
+				CFFF12412C8DB33E00DC4240 /* BookView.swift */,
+				CFFCB4C02C89A1FA00996675 /* BookDetailsView.swift */,
+			);
+			path = Book;
+			sourceTree = "<group>";
+		};
+		CFE602822C90494200086F24 /* Context */ = {
+			isa = PBXGroup;
+			children = (
+				CFFF124B2C8DC64D00DC4240 /* SharedContextView.swift */,
+			);
+			path = Context;
+			sourceTree = "<group>";
+		};
+		CFE602832C90496B00086F24 /* Bookmark */ = {
+			isa = PBXGroup;
+			children = (
+				CF0C613A2C8F571C00503879 /* BookmarkGallery.swift */,
+			);
+			path = Bookmark;
+			sourceTree = "<group>";
+		};
+		CFE602842C90497E00086F24 /* Download */ = {
+			isa = PBXGroup;
+			children = (
+				CFFCB4C22C89B53200996675 /* DownloadListView.swift */,
+			);
+			path = Download;
+			sourceTree = "<group>";
+		};
 		CFF4F3212C8C337E00396BD7 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
@@ -160,37 +312,30 @@
 		CFFCB4BD2C89988D00996675 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				CFFF123C2C8D90EB00DC4240 /* Filter.swift */,
 				CFDEC1632C7D6EB600FDF3E4 /* ServiceMirror.swift */,
 				CFFCB4BE2C89989D00996675 /* BookModel.swift */,
 				CFFCB4C42C89B70700996675 /* Downloader.swift */,
 				CFE2977D2C8B31F5007C403A /* DownloadTaskModel.swift */,
 				CFFF12472C8DB5AB00DC4240 /* BooksViewModel.swift */,
+				CF0C61362C8F42C700503879 /* BookDisplayMode.swift */,
+				CF0C61382C8F528500503879 /* BookmarksModel.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		CFFF123B2C8D90DA00DC4240 /* Filter */ = {
-			isa = PBXGroup;
-			children = (
-				CFFF123C2C8D90EB00DC4240 /* Filter.swift */,
-			);
-			path = Filter;
 			sourceTree = "<group>";
 		};
 		CFFF12402C8DB32A00DC4240 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				CFFCB4C02C89A1FA00996675 /* BookDetailsView.swift */,
-				CFFF12412C8DB33E00DC4240 /* BookView.swift */,
-				CFFF12432C8DB35700DC4240 /* FilterView.swift */,
-				CFFF12452C8DB3B400DC4240 /* BookListView.swift */,
-				CFFCB4C22C89B53200996675 /* DownloadListView.swift */,
+				CFE602842C90497E00086F24 /* Download */,
+				CFE602832C90496B00086F24 /* Bookmark */,
+				CFE602822C90494200086F24 /* Context */,
+				CFE602802C9048F100086F24 /* Book */,
+				CF0C61332C8F421700503879 /* Toolbar */,
 				CFFF12492C8DC04600DC4240 /* ImageView.swift */,
 				CFE2977F2C8B3C5A007C403A /* SettingsView.swift */,
 				CFF4F3242C8C478A00396BD7 /* Animations.swift */,
-				CFFF124B2C8DC64D00DC4240 /* SharedContextView.swift */,
 				CFE297842C8B7AAA007C403A /* MenuBar.swift */,
-				CF0C61182C8EBA8300503879 /* MirrorPicker.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -207,6 +352,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		CF0C61212C8F0B7000503879 /* LibgenesisHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CF0C612E2C8F0B7200503879 /* Build configuration list for PBXNativeTarget "LibgenesisHelper" */;
+			buildPhases = (
+				CF0C611E2C8F0B7000503879 /* Sources */,
+				CF0C611F2C8F0B7000503879 /* Frameworks */,
+				CF0C61202C8F0B7000503879 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LibgenesisHelper;
+			productName = LibgenesisHelper;
+			productReference = CF0C61222C8F0B7000503879 /* LibgenesisHelper.app */;
+			productType = "com.apple.product-type.application";
+		};
 		CFDEC1502C7D6A9F00FDF3E4 /* Libgenesis */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CFDEC1602C7D6AA000FDF3E4 /* Build configuration list for PBXNativeTarget "Libgenesis" */;
@@ -214,6 +376,7 @@
 				CFDEC14D2C7D6A9F00FDF3E4 /* Sources */,
 				CFDEC14E2C7D6A9F00FDF3E4 /* Frameworks */,
 				CFDEC14F2C7D6A9F00FDF3E4 /* Resources */,
+				CF0C61312C8F0C7C00503879 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -239,6 +402,9 @@
 				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					CF0C61212C8F0B7000503879 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
 					CFDEC1502C7D6A9F00FDF3E4 = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
@@ -263,17 +429,43 @@
 			projectRoot = "";
 			targets = (
 				CFDEC1502C7D6A9F00FDF3E4 /* Libgenesis */,
+				CF0C61212C8F0B7000503879 /* LibgenesisHelper */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		CF0C61202C8F0B7000503879 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CF0C612C2C8F0B7200503879 /* Preview Assets.xcassets in Resources */,
+				CF0C61292C8F0B7200503879 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CFDEC14F2C7D6A9F00FDF3E4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFE602A42C906B2600086F24 /* download2.jpg in Resources */,
+				CFE602A22C906B2600086F24 /* bookmark3.jpg in Resources */,
+				CFE602972C906B2600086F24 /* details.jpg in Resources */,
+				CFE602A12C906B2600086F24 /* search1.jpg in Resources */,
+				CFE6029B2C906B2600086F24 /* bookmark1.jpg in Resources */,
+				CFE602862C905F8000086F24 /* main.png in Resources */,
+				CFE602A32C906B2600086F24 /* download3.jpg in Resources */,
 				CFDEC15D2C7D6AA000FDF3E4 /* Preview Assets.xcassets in Resources */,
+				CFE602982C906B2600086F24 /* bookmark2.jpg in Resources */,
+				CFE6029E2C906B2600086F24 /* search3.jpg in Resources */,
+				CFE602992C906B2600086F24 /* listmode.jpg in Resources */,
 				CF0C611B2C8EEDA100503879 /* Credits.rtf in Resources */,
+				CFE6029A2C906B2600086F24 /* search2.jpg in Resources */,
+				CFE6029D2C906B2600086F24 /* download4.jpg in Resources */,
+				CFE6029C2C906B2600086F24 /* download1.jpg in Resources */,
+				CFE602962C906B2600086F24 /* covermode.jpg in Resources */,
+				CFE602A02C906B2600086F24 /* search4.jpg in Resources */,
+				CFE6029F2C906B2600086F24 /* downloader.jpg in Resources */,
 				CFDEC1592C7D6AA000FDF3E4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -281,12 +473,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		CF0C611E2C8F0B7000503879 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CF0C61272C8F0B7000503879 /* ContentView.swift in Sources */,
+				CF0C61252C8F0B7000503879 /* LibgenesisHelperApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CFDEC14D2C7D6A9F00FDF3E4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				CFFF123F2C8DA89B00DC4240 /* AppStorage.swift in Sources */,
 				CFE2977E2C8B31F5007C403A /* DownloadTaskModel.swift in Sources */,
+				CF0C613B2C8F571C00503879 /* BookmarkGallery.swift in Sources */,
 				CFFCB4C32C89B53200996675 /* DownloadListView.swift in Sources */,
 				CFFCB4BF2C89989D00996675 /* BookModel.swift in Sources */,
 				CFFF124A2C8DC04600DC4240 /* ImageView.swift in Sources */,
@@ -298,15 +500,18 @@
 				CFE297802C8B3C5A007C403A /* SettingsView.swift in Sources */,
 				CFFF12482C8DB5AB00DC4240 /* BooksViewModel.swift in Sources */,
 				CF0C61192C8EBA8300503879 /* MirrorPicker.swift in Sources */,
+				CF0C61392C8F528500503879 /* BookmarksModel.swift in Sources */,
 				CFFF12422C8DB33E00DC4240 /* BookView.swift in Sources */,
 				CFFCB4B62C897B2600996675 /* LibgenAPI.swift in Sources */,
 				CFFCB4C52C89B70700996675 /* Downloader.swift in Sources */,
 				CFDEC1552C7D6A9F00FDF3E4 /* LibgenesisApp.swift in Sources */,
+				CF0C61372C8F42C700503879 /* BookDisplayMode.swift in Sources */,
 				CFFF124C2C8DC64D00DC4240 /* SharedContextView.swift in Sources */,
 				CFF4F3252C8C478A00396BD7 /* Animations.swift in Sources */,
 				CFDEC1662C7D722100FDF3E4 /* APIService.swift in Sources */,
 				CFFF123D2C8D90EB00DC4240 /* Filter.swift in Sources */,
 				CFFF12442C8DB35700DC4240 /* FilterView.swift in Sources */,
+				CF0C61352C8F423A00503879 /* BookDetailsToolbar.swift in Sources */,
 				CFF4F3232C8C338E00396BD7 /* Base.swift in Sources */,
 				CFDEC1642C7D6EB600FDF3E4 /* ServiceMirror.swift in Sources */,
 			);
@@ -315,6 +520,72 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		CF0C612F2C8F0B7200503879 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LibgenesisHelper/LibgenesisHelper.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LibgenesisHelper/Preview Content\"";
+				DEVELOPMENT_TEAM = GY29NY469M;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_LSBackgroundOnly = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Paramecium.LibgenesisHelper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		CF0C61302C8F0B7200503879 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LibgenesisHelper/LibgenesisHelper.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LibgenesisHelper/Preview Content\"";
+				DEVELOPMENT_TEAM = GY29NY469M;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_LSBackgroundOnly = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Paramecium.LibgenesisHelper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		CFDEC15E2C7D6AA000FDF3E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -438,6 +709,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Libgenesis/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -477,6 +749,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Libgenesis/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -505,6 +778,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		CF0C612E2C8F0B7200503879 /* Build configuration list for PBXNativeTarget "LibgenesisHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CF0C612F2C8F0B7200503879 /* Debug */,
+				CF0C61302C8F0B7200503879 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		CFDEC14C2C7D6A9E00FDF3E4 /* Build configuration list for PBXProject "Libgenesis" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

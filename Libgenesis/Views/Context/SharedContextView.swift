@@ -55,9 +55,28 @@ struct SharedContextView: View {
                     Label(m.serverName, image: m.rawValue.lowercased())
                 }
             }
-                .scaledToFit()
         )
 
+    }
+}
+
+struct BookMarkMenuView: View {
+    @ObservedObject var book: BookItem
+    @EnvironmentObject var bookmarksManager: BookmarksModel
+    var isBookmarked: Bool {
+        bookmarksManager.contain(book)
+    }
+    var body: some View {
+        Button(action: {
+            if isBookmarked {
+                bookmarksManager.remove(book)
+            } else {
+                bookmarksManager.insert(book)
+            }
+        }) {
+            Label(isBookmarked ? "Remove bookmark" : "Add bookmark", systemImage: isBookmarked ? "bookmark.fill" : "bookmark")
+        }
+        .labelStyle(.titleAndIcon)
     }
 }
 

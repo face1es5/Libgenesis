@@ -11,26 +11,43 @@ import Kingfisher
 
 
 struct BookDetailsView: View {
+    @AppStorage("bookDetailsDisplayMode") var displayMode: BookDetailsDislayMode = .complex
     @ObservedObject var book: BookItem
     @State var detailsLoaded: Bool = false
+    let fixedKeyWidth: CGFloat = 80
     
     var body: some View {
         VStack(spacing: 5) {
             VStack(alignment: .leading, spacing: 5) {
                 TitleView
-                    .lineLimit(2)
 #if DEBUG
                 DebugView
 #endif
-                HStack {
-                    CoverView
+                if displayMode == .complex {
+                    HStack {
+                        CoverView()
+                        InfoView
+                            .lineLimit(1)
+                    }
+                } else {
+                    HStack {
+                        Spacer()
+                        CoverView(width: 123.6, height: 200, radius: 15)
+                        Spacer()
+                    }
                     InfoView
-                        .lineLimit(2)
                 }
-                DownloadsView
+                if displayMode != .simple {
+                    DownloadsView
+                }
                 MiscView
+                    .lineLimit(1)
             }
-            AttrView
+            if displayMode != .simple {
+                AttrView
+                    .lineLimit(1)
+            }
+            DescriptionView
             Spacer()
         }
         .task {
@@ -52,11 +69,6 @@ struct BookDetailsView: View {
             await book.loadDetails()
             await MainActor.run {
                 detailsLoaded = true
-                if book.details == nil {
-                    debugPrint("Load details of book \(String(describing: book.truncTitle)) failed.")
-                } else {
-                    debugPrint("Load details of book \(String(describing: book.truncTitle)) succeed.")
-                }
             }
         }
     }
@@ -67,24 +79,29 @@ struct BookDetailsView: View {
                 VStack(alignment: .leading) {
                     HStack(alignment: .top) {
                         if detailsLoaded, book.details != nil {    // load success
-                            if (book.details?.description.count ?? 0) > 0 {
-                                Text(book.details?.description ?? "Failed to load description.")
-                                    .lineLimit(15)
-                            }
-                        } else if !detailsLoaded {  // loading...
-                            ProgressView()
-                                .frame(width: 20, height: 20)
-                                .aspectRatio(contentMode: .fit)
+                            Text(book.details?.description ?? "Failed to load description.")
+                                .lineLimit(.max)
+                                .textSelection(.enabled)
+                        } else if !detailsLoaded, book.details == nil {  // loading...
+                            Text("Loading description now...")
                         } else {    // loading failed.
-                            Text("None.")
+                            Text("N/A")
                         }
                         Spacer()
                     }
                 }
                 .padding()
             } label: {
-                Label("Description", systemImage: "books.vertical")
-                    .bold()
+                HStack {
+                    Label("Description", systemImage: "books.vertical")
+                        .bold()
+                    if !detailsLoaded, book.details == nil {
+                        ProgressView()
+                            .frame(width: 15, height: 15)
+                            .scaledToFit()
+                            .scaleEffect(x: 0.5, y: 0.5)
+                    }
+                }
             }
         }
     }
@@ -96,20 +113,26 @@ struct BookDetailsView: View {
                     HStack(alignment: .top) {
                         Text("Md5: ")
                             .bold()
-                        Spacer()
                         Text(book.md5)
+                            .help(book.md5)
+                            .textSelection(.enabled)
+                        Spacer()
                     }
                     HStack(alignment: .top) {
                         Text("ISBN: ")
                             .bold()
-                        Spacer()
                         Text(book.isbn)
+                            .help(book.isbn)
+                            .textSelection(.enabled)
+                        Spacer()
                     }
                     HStack(alignment: .top) {
                         Text("Edition: ")
                             .bold()
-                        Spacer()
                         Text(book.edition)
+                            .help("Edition of this book")
+                            .textSelection(.enabled)
+                        Spacer()
                     }
                 }
                 .padding()
@@ -117,7 +140,6 @@ struct BookDetailsView: View {
                 Text("More")
                     .bold()
             }
-            DescriptionView
         }
         
     }
@@ -164,46 +186,54 @@ struct BookDetailsView: View {
             HStack(alignment: .top) {
                 Text("Author(s): ")
                     .bold()
-                Spacer()
+                    .leftAlign(width: fixedKeyWidth)
                 Text(book.authors)
+                    .textSelection(.enabled)
                     .help(book.authors)
             }
             HStack(alignment: .top) {
                 Text("Language: ")
                     .bold()
-                Spacer()
+                    .leftAlign(width: fixedKeyWidth)
                 Text(book.language)
+                    .textSelection(.enabled)
             }
             HStack(alignment: .top) {
                 Text("Size: ")
                     .bold()
-                Spacer()
+                    .leftAlign(width: fixedKeyWidth)
                 Text("\(book.size)")
+                    .textSelection(.enabled)
             }
             HStack(alignment: .top) {
                 Text("Format: ")
                     .bold()
-                Spacer()
+                    .leftAlign(width: fixedKeyWidth)
                 Text("\(book.format)")
+                    .textSelection(.enabled)
             }
         }
     }
     
     private var MiscView: some View {
         VStack(alignment: .leading, spacing: 5) {
-            HStack(alignment: .top) {
-                Text("Download link pages: ")
-                    .bold()
-                ForEach(book.mirrors.indices, id: \.self) { idx in
-                    Link(destination: book.mirrors[idx]) {
-                        Text("[\(idx+1)]")
-                    }.help(book.mirrors[idx].absoluteString)
+            if displayMode == .complex {
+                HStack(alignment: .top) {
+                    Text("Download link pages: ")
+                        .bold()
+                    ForEach(book.mirrors.indices, id: \.self) { idx in
+                        Link(destination: book.mirrors[idx]) {
+                            Text("[\(idx+1)]")
+                        }.help(book.mirrors[idx].absoluteString)
+                    }
                 }
             }
+
             HStack(alignment: .top) {
                 Text("Publisher: ")
                     .bold()
                 Text(book.publisher)
+                    .textSelection(.enabled)
             }
             HStack(alignment: .top) {
                 Text("Year: ")
@@ -223,35 +253,41 @@ struct BookDetailsView: View {
             Text("ID: ")
                 .bold()
             Text("\(book.id)")
+                .leftAlign(width: fixedKeyWidth)
         }
     }
     
     private var TitleView: some View {
         VStack {
-            if let dhref = book.detailHerf {
+            if let dhref = book.detailURL {
                 Link(destination: dhref) {
                     Text(book.title)
-                        .lineLimit(2)
+                        .textSelection(.enabled)
+                        .lineLimit(1)
                 }
-            } else if let href = book.href {
+            } else if let href = book.searchURL {
                 Link(destination: href) {
                     Text(book.title)
-                        .lineLimit(2)
+                        .textSelection(.enabled)
+                        .lineLimit(1)
                 }
             } else {
                 Text(book.title)
+                    .textSelection(.enabled)
+                    .lineLimit(1)
             }
         }
         .help(book.title)
         .font(.title2)
     }
     
-    private var CoverView: some View {
+    private func CoverView(width: CGFloat = 100, height: CGFloat = 161.8, radius: CGFloat = 10) -> some View {
         VStack {
-            ImageView(url: book.details?.coverURL, width: 100, height: 161.8, cornerRadius: 10, defaultImg: "books.vertical", breathing: true)
-                .frame(width: 100, height: 161.8)
+            ImageView(url: book.details?.coverURL, width: width, height: height, cornerRadius: radius, defaultImg: "books.vertical", breathing: true)
+                .frame(width: width, height: height)
         }
     }
+
 }
 
 

@@ -27,7 +27,7 @@ enum FileError: Error, LocalizedError {
 
 class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
     static func == (lhs: DownloadTask, rhs: DownloadTask) -> Bool {
-        return lhs.id == rhs.id && lhs.progressPercent == rhs.progressPercent
+        return lhs.id == rhs.id
     }
     
     func hash(into hasher: inout Hasher) {
@@ -43,6 +43,9 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
     @Published var loading: Bool = false
     @Published var success: Bool = false
     @Published var progressPercent: Double = 0
+    @Published var suspending: Bool = false
+    var downloadReq: DownloadRequest?
+    
     var errorStr: String?
     var totalSize: Int64?
     var saveDir: String = UserDefaults.standard.string(forKey: "saveDir") ?? "/tmp"
@@ -117,11 +120,103 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
     func setStartStatus() {
         self.started = true
         self.loading = true
-    }
-    func setEndStatus() {
-        self.loading = false
+        self.suspending = false
     }
     
+    func setEndStatus() {
+        self.loading = false
+        self.suspending = false
+    }
+    
+    /// set status when paused.
+    func setPauseStatus() {
+        self.loading = false
+        self.suspending = true
+    }
+    
+    /// Set status when task succeed.
+    func setSuccessStatus() {
+        self.loading = false
+        self.suspending = false
+        self.success = true
+    }
+    
+    /// Set status when task indeed failed(not by cancelled).
+    func setFailureStatus() {
+        self.loading = false
+        self.suspending = false
+        self.success = false
+    }
+    
+    
+    /// Create and return download request
+    ///
+    private func createDownloadReq() -> DownloadRequest {
+        // download
+        let destination: DownloadRequest.Destination = { _, _ in
+            return (self.localURL!, [.removePreviousFile, .createIntermediateDirectories])
+        }
+        return (
+            AF.download(self.targetURL, to: destination)
+                .downloadProgress(queue: .main) { progress in
+                    self.progressPercent = progress.fractionCompleted.toPercentage()
+    //                            print("Download progress frac: \(progress.fractionCompleted)")
+                }
+                .response(queue: .main) { resp in
+                    if let err = resp.error {   // fail
+                        self.errorStr = err.localizedDescription
+                        if err.isExplicitlyCancelledError {   // cancelled
+                            print("Request explicitly cancelled by user")
+                        } else {    // just fail
+                            print("download \(self.name) failed: \(resp.error?.localizedDescription ?? "???")")
+                            self.setFailureStatus()
+                        }
+                    } else {    // success
+                        self.setSuccessStatus()
+                        print("download \(self.name) success.")
+                    }
+                }
+        )
+    }
+    
+    private func makeLocalURL() throws {
+        // make&check url
+        self.localURL = try DownloadTask.makeLocalURL(path: self.saveDir, filename: "\(self.book.title).\(self.book.format)")
+    }
+    
+    /// Prepare to download, get total file size
+    private func prepareToStart() {
+        // get total size
+        LibgenAPI.shared.fileSize(url: self.targetURL) { totalBytes in
+            self.totalSize = totalBytes
+        }
+    }
+    
+    /// Suspend download task.
+    func pause() {
+        self.setPauseStatus()
+        downloadReq?.cancel()
+    }
+    
+    /// Just an alias for pausing
+    func cancel() {
+        self.pause()
+    }
+    
+    /// Resume from suspending
+    func resume() {
+        /// We need to clear previous status and then, restart downloading
+        /// re downloading.
+        self.setStartStatus()
+        // reset progress
+        self.progressPercent = 0
+        // if total size isn't loaded, reload
+        if self.totalSize == nil {
+            self.prepareToStart()
+        }
+        // and then, create download request, over
+        self.downloadReq = createDownloadReq()
+    }
     /// Start/Restart downloding
     ///
     func join() {
@@ -129,41 +224,24 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
         setStartStatus()
         Task.detached(priority: .background) {
             do {
-                // make&check url
-                self.localURL = try DownloadTask.makeLocalURL(path: self.saveDir, filename: "\(self.book.title).\(self.book.format)")
+                // generate save location
+                try await MainActor.run {
+                    try self.makeLocalURL()
+                }
+
                 debugPrint("ready to download into \(self.localURL!.absoluteString)")
-                // get total size
-                LibgenAPI.shared.fileSize(url: self.targetURL) { totalBytes in
-                    self.totalSize = totalBytes
+                self.prepareToStart()
+                
+                await MainActor.run {
+                    self.downloadReq = self.createDownloadReq()
                 }
-                // download
-                let destination: DownloadRequest.Destination = { _, _ in
-                    return (self.localURL!, [.removePreviousFile, .createIntermediateDirectories])
-                }
-                AF.download(self.targetURL, to: destination)
-                    .downloadProgress(queue: .main) { progress in
-                        self.progressPercent = progress.fractionCompleted.toPercentage()
-//                            print("Download progress frac: \(progress.fractionCompleted)")
-                    }
-                    .response(queue: .main) { resp in
-                        if resp.error == nil {
-                            self.success = true // set success
-                            debugPrint("download \(self.name) success.")
-                        } else {
-                            self.errorStr = resp.error?.localizedDescription
-                            debugPrint("download \(self.name) failed: \(resp.error?.localizedDescription ?? "???")")
-                        }
-//                        debugPrint(resp)
-                        self.setEndStatus()
-                    }
             } catch FileError.write {
                 fatalError("Handle directory wirte permission.")
                 
             } catch {
                 debugPrint("download \(self.name) failed: \(error.localizedDescription)")
             }
-            
-            /// make status
         }
     }
+    
 }

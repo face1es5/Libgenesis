@@ -15,6 +15,7 @@ struct LibgenesisApp: App {
     @StateObject var selBooksVM: BooksSelectionModel = BooksSelectionModel()
     @StateObject var booksVM: BooksViewModel = BooksViewModel()
     @StateObject var recentManager: RecentlyFilesManager = RecentlyFilesManager()
+    @StateObject var bookmarksManager: BookmarksModel = BookmarksModel()
     
     var body: some Scene {
         WindowGroup {
@@ -34,9 +35,14 @@ struct LibgenesisApp: App {
                 .environmentObject(booksVM)
                 .environmentObject(downloadManager)
                 .environmentObject(recentManager)
+                .environmentObject(bookmarksManager)
         }
         Window("Downloader", id: "downloader-window") {
             DownloaderView()
+        }
+        Window("Bookmarks", id: "bookmarks-window") {
+            BookmarkGallery()
+                .environmentObject(bookmarksManager)
         }
         #if !os(watchOS)
         .commands {

@@ -16,6 +16,12 @@ extension View {
     }
 }
 
+extension Text {
+    func leftAlign(width: Double) -> some View {
+        self.frame(width: width, alignment: .leading)
+    }
+}
+
 struct BreathingEffect: ViewModifier {
     @State private var isOpaque = false
     let factor: Double
@@ -140,8 +146,8 @@ struct SearchBar: View {
             }) {
                 Image(systemName: "magnifyingglass")
             }
-
         }
+        .frame(minWidth: 150)
     }
 }
 

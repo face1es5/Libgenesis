@@ -11,12 +11,23 @@ import Alamofire
 
 class LibgenAPI {
     static let shared = LibgenAPI()
+
     var baseURL: String {
         UserDefaults.standard.string(forKey: "baseURL")  ?? "what:????"
     }
     var perPageN: Int {
         UserDefaults.standard.integer(forKey: "perPageN")
     }
+    
+    /// TODO: auto switch mirror if current mirror could be unavailable(reach maximum retry times).
+    let mutex = NSLock()
+    let maxRetryN = 10          // maximum retry times
+    let currentRetryTimes = 0   // current retry times
+    private func autoSwitch() {
+        fatalError("Implement auto switch operations.")
+    }
+    /// End
+    
     private init() {
         //...
     }
@@ -36,23 +47,23 @@ class LibgenAPI {
     /// [id, authors, title, publisher, year, pages, language, size, format, mirros, edit link]
     func parseTableContents(_ ele: Element) throws -> BookItem {
         var colIndex: Int = 0
-        var id: String = "NON"
-        var authors: String = "NON"
-        var title: String = "NON"
-        var publisher: String = "NON"
+        var id: String = "N/A"
+        var authors: String = "N/A"
+        var title: String = "N/A"
+        var publisher: String = "N/A"
         var year: Int = 0
         var pages: Int = 0
-        var language: String = "NON"
-        var size: String = "NON"
-        var format: String = "NON"
+        var language: String = "N/A"
+        var size: String = "N/A"
+        var format: String = "N/A"
         var mirrors: [URL] = []
-        var edit: String = "NON"
-        var edition: String = "NON"
-        var isbn: String = "NON"
-        var md5: String = "NON"
-        var hrefstr: String = "NON"
-        var hrefURL: URL?
-        var detailHref: URL?
+        var edit: String = "N/A"
+        var edition: String = "N/A"
+        var isbn: String = "N/A"
+        var md5: String = "N/A"
+        var hrefstr: String = "N/A"
+        var searchURL: URL?
+        var detailURL: URL?
         let md5reg = try NSRegularExpression(pattern: "md5=([A-Fa-f0-9]{32})")
         
         try ele.select("tr td").forEach { col in
@@ -72,11 +83,11 @@ class LibgenAPI {
                         if let range = Range(match.range(at: 1), in: hrefstr) {
                             md5 = String(hrefstr[range])
                             // if md5 valid, then parse detail url of this book
-                            detailHref = makeURL(baseURL: baseURL, path: "book/index.php", query: ["md5": "\(md5)"])
+                            detailURL = makeURL(baseURL: baseURL, path: "book/index.php", query: ["md5": "\(md5)"])
                         }
                     }
                     // make href url
-                    hrefURL = URL(string: "\(baseURL)/\(hrefstr)")
+                    searchURL = URL(string: "\(baseURL)/\(hrefstr)")
                     // extract edtion and isbn
                     let fonts = try titleTag.select("a font")
                     if fonts.count == 2 {
@@ -120,26 +131,31 @@ class LibgenAPI {
             }
             colIndex += 1
         }
-        return BookItem(id: id, authors: authors, title: title, publisher: publisher, year: year, pages: pages, language: language, size: size, format: format, mirrors: mirrors, edit: edit, md5: md5, detailHref: detailHref, href: hrefURL, isbn: isbn, edition: edition)
+        return BookItem(
+            id: id, authors: authors, title: title, publisher: publisher, year: year,
+            pages: pages, language: language, size: size, format: format, mirrors: mirrors, edit: edit,
+            md5: md5, detailURL: detailURL, searchURL: searchURL, isbn: isbn, edition: edition)
     }
     
     /// Parse description, download links, cover url
     ///
     /// - Parameters:
-    ///   - md5: md5 string of this book, to get details html page.
-    ///   - links: mirror links, for direct download links
+    ///   - book: Book to load details( 2 field needed, firstly is detail url, second is mirror urls
     /// - Returns: details item
-    func parseBookDetails(_ md5: String?, links: [URL]) async throws -> BookDetailsItem? {
-        if md5 == nil {
+    func parseBookDetails(book: BookItem) async throws -> BookDetailsItem? {
+        #if DEBUG
+        print("parse book details of \(book.truncTitle)")
+        #endif
+        guard
+            let url = book.detailURL
+        else {
+            print("Parse book \(book.truncTitle) details failed: nil book url")
             return nil
         }
-        #if DEBUG
-        print("parse book details.")
-        #endif
-        var desc: String = ""
+        var desc: String = "N/A"
         var coverURL: String = ""
-        async let doc = try SwiftSoup.parse(try await APIService(to: "\(baseURL)/book/index.php?md5=\(md5!)").getHtml())
-        async let urls = try parseDirectDownloadLinks(links)
+        async let doc = try SwiftSoup.parse(try await APIService(to: url).getHtml())
+        async let urls = try parseDirectDownloadLinks(book.mirrors)
         if let table = try await doc.body()?.select("table > tbody").first() {
             desc = try table.select("tr > td[colspan='4']").text()
             if let coverPath = try table.select("tr > td[rowspan='22'] > a[href] > img[src]").first()?.attr("src") {
@@ -170,6 +186,7 @@ class LibgenAPI {
         return urls
     }
 
+    /// Helper function for query a series of books, get lastest books or search books
     func queryBooks(url: URL?) async throws -> [BookItem] {
         guard
             let url = url
@@ -219,7 +236,7 @@ class LibgenAPI {
         // results num
         query["res"] = "\(perPageN)"
         // column filter
-        query["col"] = col.queryKey
+        query["column"] = col.queryKey
         
         let books = try await queryBooks(url: makeURL(baseURL: baseURL, path: "search.php", query: query))
         

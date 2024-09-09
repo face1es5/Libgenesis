@@ -30,7 +30,7 @@ struct AdvanceFilterView: View {
             .padding(.top, 5)
         } label: {
             HStack {
-                Text("Format filters")
+                Text("Format")
                 Image(systemName: "hammer")
                     .foregroundColor(.blue)
             }
@@ -39,39 +39,62 @@ struct AdvanceFilterView: View {
     }
 }
 
+struct PageNumPicker: View {
+    @AppStorage("perPageN") var perPageN: Int = 25
+    var body: some View {
+        Picker("", selection: $perPageN) {
+            Text("25").tag(25)
+            Text("50").tag(50)
+            Text("100").tag(100)
+        }
+        .help("Switch results num of per searching.")
+        .pickerStyle(.segmented)
+        .padding(.top, 5)
+    }
+}
+
 struct FilterContextView: View {
     @Binding var formatFilters: Set<FormatFilter>
     @Binding var columnFilter: ColumnFilter
-    @AppStorage("perPageN") var perPageN: Int = 25
+
+    private var ColumnFilterView: some View {
+        ForEach(ColumnFilter.allCases) { filter in
+            Toggle(filter.desc, isOn: Binding(
+                get: { columnFilter == filter },
+                set: {
+                    if $0 {
+                        columnFilter = filter
+                    } else {
+                        columnFilter = .def
+                    }
+                }
+            ))
+            .frame(height: 30)
+            .toggleStyle(.checkmark)
+        }
+    }
+    
     
     var body: some View {
         Form {
             Button("Clear filters") {
                 clearFilter()
             }
-            ForEach(ColumnFilter.allCases) { filter in
-                Toggle(filter.desc, isOn: Binding(
-                    get: { columnFilter == filter },
-                    set: {
-                        if $0 {
-                            columnFilter = filter
-                        } else {
-                            columnFilter = .def
-                        }
+            PageNumPicker()
+            HStack(alignment: .top, spacing: 10) {
+                DisclosureGroup {
+                    ColumnFilterView
+                } label: {
+                    HStack {
+                        Text("Column")
+                        Image(systemName: "tortoise")
+                            .foregroundColor(.blue)
                     }
-                ))
-                .frame(height: 30)
-                .toggleStyle(.checkmark)
+                    .help("Once any column choosed except Default, search string will be applied into that field only.")
+                }
+                AdvanceFilterView(formatFilters: $formatFilters)
             }
-            AdvanceFilterView(formatFilters: $formatFilters)
-            Picker("", selection: $perPageN) {
-                Text("25").tag(25)
-                Text("50").tag(50)
-                Text("100").tag(100)
-            }
-            .help("Switch results num of per searching.")
-            .pickerStyle(.segmented)
-            .padding(.top, 5)
+            .frame(width: 250)
         }
         .padding()
     }

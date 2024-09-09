@@ -51,11 +51,6 @@ struct ImageView: View {
                 }
                 .resizable()
                 .scaledToFit()
-//                .background(Color.clear)
-//                .overlay(
-//                    RoundedRectangle(cornerRadius: cornerRadius)
-//                        .stroke(.clear, lineWidth: 1)
-//                )
         } else {
             if breathing {
                 Image(systemName: defaultImg)
@@ -72,9 +67,7 @@ struct ImageView: View {
                     .cornerRadius(cornerRadius)
             }
         }
-
     }
-    
 }
 
 struct ImageView_Previews: PreviewProvider {

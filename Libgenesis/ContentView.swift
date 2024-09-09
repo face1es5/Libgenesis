@@ -11,9 +11,9 @@ struct ContentView: View {
     @EnvironmentObject var selBooksVM: BooksSelectionModel
     @EnvironmentObject var booksVM: BooksViewModel
     
-    var body: some View {
-        NavigationSplitView {
-            ScrollView {
+    var BookDetailsContainer: some View {
+        ScrollView {
+            VStack {
                 if let book = selBooksVM.firstBook {
                     BookDetailsView(book: book)
                 } else {
@@ -21,21 +21,32 @@ struct ContentView: View {
                         .font(.title2)
                 }
             }
-            .contextMenu {
-                Button("Refresh") {
-                    selBooksVM.loadDetails()
-                }
-                if let book = selBooksVM.firstBook {
-                    Divider()
-                    SharedContextView(book: book)
-                }
+        }
+        .contextMenu {
+            Button("Refresh") {
+                selBooksVM.loadDetails()
             }
-            .padding()
+            .keyboardShortcut("r")
+            if let book = selBooksVM.firstBook {
+                Divider()
+                SharedContextView(book: book)
+            }
+        }
+        .toolbar {
+            BookDetailsToolbar()
+        }
+        .padding()
+    }
+    
+    var body: some View {
+        NavigationSplitView {
+            BookDetailsContainer
         } detail: {
             BookListView()
                 .environmentObject(booksVM)
                 .environmentObject(selBooksVM)
         }
+
     }
     
     /// Handle a series of downloading.

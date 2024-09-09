@@ -46,6 +46,7 @@ struct PlainDownloadListView: View {
 struct DownloadTaskView: View {
     @ObservedObject var dtask: DownloadTask
     @EnvironmentObject var recentManager: RecentlyFilesManager
+    @State var showErr: Bool = false
     var alreadyDownloaded: Double {
         dtask.progressPercent / 100 * Double(dtask.totalSize ?? 0)
     }
@@ -62,7 +63,7 @@ struct DownloadTaskView: View {
                     .font(.footnote)
             }
             VStack {
-                if !dtask.loading { // task is ended.
+                if !dtask.loading, !dtask.suspending { // task is ended.
                     if dtask.success {
                         Image(systemName: "checkmark.circle.fill")
                             .frame(width: 30, height: 30)
@@ -72,9 +73,27 @@ struct DownloadTaskView: View {
                         Image(systemName: "exclamationmark.triangle")
                             .frame(width: 30, height: 30)
                             .scaledToFit()
+                            .onTapGesture {
+                                showErr.toggle()
+                            }
+                            .popover(isPresented: $showErr) {
+                                if let err = dtask.errorStr {
+                                    Text(err)
+                                        .padding()
+                                }
+                            }
                             .foregroundColor(.yellow)
+
                     }
-                } else {
+                } else if !dtask.loading, dtask.suspending { // suspending
+                    Image(systemName: "play.circle.fill")
+                        .frame(width: 30, height: 30)
+                        .scaledToFit()
+                        .foregroundColor(.blue)
+                        .onTapGesture {
+                            dtask.resume()
+                        }
+                } else {    // downloading
                     Text("\(.percentage(percent: dtask.progressPercent))")
                 }
             }
@@ -83,15 +102,40 @@ struct DownloadTaskView: View {
         .lineLimit(1)
         .foregroundColor(.primary)
         .contextMenu {
-            Button("Open in Finder") {
+            if dtask.loading, !dtask.suspending {
+                Button("Pause") {
+                    dtask.pause()
+                }
+            } else if !dtask.loading, dtask.suspending {
+                Button("Resume") {
+                    dtask.resume()
+                }
+            } else if !dtask.loading, !dtask.suspending {
+                Button("Re-download") {
+                    dtask.resume()
+                }
+            }
+            Divider()
+
+            Button("Reveal in Finder") {
                 LibgenesisApp.jumpTo(dtask.localURL)
             }
             Button("Open in Preview") {
                 recentManager.preview(dtask.localURL)
             }
             Divider()
+            Button("Resume all") {
+                DownloadManager.shared.resumeAll()
+            }
+            Button("Pause all") {
+                DownloadManager.shared.pauseAll()
+            }
+            Divider()
             Button("Remove from list") {
-                fatalError("Implement remove from list")
+                DownloadManager.shared.removeDownloadTask(dtask)
+            }
+            Button("Remove all(this will also cancel any tasks in progress!)") {
+                DownloadManager.shared.clear()
             }
         }
     }
