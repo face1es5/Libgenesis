@@ -7,7 +7,7 @@ Enjoy the smooth experience of Aqua.
 # So, what can this app do?
 1. Display available books on libgen.  
 2. Search books from libgen, currently support column filter and formart filters.  
-3. Obiviously, download.  
+3. Obviously, download.  
 4. That's it, maybe suport more features in future(.e.g, directly preview before download?)
 
 

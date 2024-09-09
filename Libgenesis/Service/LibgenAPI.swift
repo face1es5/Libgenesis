@@ -219,7 +219,7 @@ class LibgenAPI {
         // results num
         query["res"] = "\(perPageN)"
         // column filter
-        query["col"] = col.queryKey
+        query["column"] = col.queryKey
         
         let books = try await queryBooks(url: makeURL(baseURL: baseURL, path: "search.php", query: query))
         
