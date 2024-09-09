@@ -48,7 +48,7 @@ class DownloadManager: ObservableObject {
     /// TODO: Download selected book.
     ///
     func downloadSelected() {
-        fatalError("Implement download selected book.")
+        fatalError("Implement download selected book globally.")
     }
     
     /// Add a list of tasks.
@@ -89,3 +89,5 @@ class DownloadManager: ObservableObject {
         }
     }
 }
+
+

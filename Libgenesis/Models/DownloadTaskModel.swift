@@ -54,7 +54,7 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
     init?(_ book: BookItem) {
         self.book = book
         guard
-            let url = book.details?.fileLinks.first(where: { DownloadMirror.toHost(url: $0) != .tor })
+            let url = book.details?.fileLinks.first(where: { !DownloadMirror.isTor($0) })
         else {
             return nil
         }

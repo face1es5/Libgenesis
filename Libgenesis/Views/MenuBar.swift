@@ -8,21 +8,9 @@
 import SwiftUI
 
 struct MenuBar: View {
-    @EnvironmentObject var downloadManager: DownloadManager
-    
     var body: some View {
         Menu("Downloads") {
-            if downloadManager.downloadTasks.count == 0 {
-                Button("<No download task>") {}
-            } else {
-                ForEach(downloadManager.downloadTasks) { dtask in
-                    Button("\(dtask.book.title)") {
-                        if !dtask.loading, dtask.success {
-                            LibgenesisApp.preview(dtask.localURL)
-                        }
-                    }
-                }
-            }
+            PlainDownloadListView()
         }
         Divider()
         Button("Settings") {

@@ -17,24 +17,56 @@ struct DownloadCommands: Commands {
     @ObservedObject var downloadManager: DownloadManager
     var body: some Commands {
         CommandMenu("Download") {
-            if downloadManager.downloadTasks.count == 0 {
-                Button("<No download task>") {
-                }
-                .disabled(true)
-            } else {
-                VStack {
-                    ForEach(downloadManager.downloadTasks, id: \.self) { dtask in
-                        Button(dtask.book.title) {
-                            if !dtask.loading, dtask.success {
-                                LibgenesisApp.preview(dtask.localURL)
-                            }
-                        }
+            PlainDownloadListView()
+                .environmentObject(downloadManager)
+        }
+    }
+}
+
+
+
+/// Manager for recently opened files.
+class RecentlyFilesManager: ObservableObject {
+    @AppStorage("recentlyOpened") var recentlyOpened = Set<URL>()
+    
+    /// Open preview for destination file.
+    func preview(_ destination: URL?) {
+        guard
+            let url = destination
+        else {
+            print("Warning: try to open an nonexsistent file.")
+            return
+        }
+        if NSWorkspace.shared.open(url) {
+            recentlyOpened.insert(url)
+        }
+    }
+    
+    /// Clear recent opened files
+    func clear() {
+        recentlyOpened = []
+    }
+}
+
+struct RecentFilesCommands: Commands {
+    @ObservedObject var recentManager: RecentlyFilesManager
+    var recentCount: Int {
+        recentManager.recentlyOpened.count
+    }
+    var body: some Commands {
+        CommandGroup(after: .newItem) {
+            Divider()
+            Menu("Open Recent") {
+                ForEach(recentManager.recentlyOpened.toArray(), id: \.self) { url in
+                    Button("\(url.lastPathComponent)") {
+                        recentManager.preview(url)
                     }
-                    Divider()
-                    Button("Clear") {
-                        fatalError("Implement clear download menu")
-                    }
                 }
+                Divider()
+                Button("Clear Menu") {
+                    recentManager.clear()
+                }
+                .disabled(recentCount == 0)
             }
         }
     }

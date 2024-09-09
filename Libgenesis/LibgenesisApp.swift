@@ -12,6 +12,9 @@ import Kingfisher
 struct LibgenesisApp: App {
     @StateObject var downloadManager: DownloadManager = DownloadManager.shared
     @AppStorage("theme") var theme: Theme = .system
+    @StateObject var selBooksVM: BooksSelectionModel = BooksSelectionModel()
+    @StateObject var booksVM: BooksViewModel = BooksViewModel()
+    @StateObject var recentManager: RecentlyFilesManager = RecentlyFilesManager()
     
     var body: some Scene {
         WindowGroup {
@@ -27,6 +30,10 @@ struct LibgenesisApp: App {
                     }
                     #endif
                 }
+                .environmentObject(selBooksVM)
+                .environmentObject(booksVM)
+                .environmentObject(downloadManager)
+                .environmentObject(recentManager)
         }
         Window("Downloader", id: "downloader-window") {
             DownloaderView()
@@ -34,8 +41,8 @@ struct LibgenesisApp: App {
         #if !os(watchOS)
         .commands {
             GeneralCommands()
-//            WindowCommands()
             DownloadCommands(downloadManager: downloadManager)
+            RecentFilesCommands(recentManager: recentManager)
         }
         #endif
         #if os(macOS)
@@ -83,15 +90,5 @@ struct LibgenesisApp: App {
         }
         NSWorkspace.shared.open(url.deletingLastPathComponent())
     }
-    
-    /// Open preview for destination file.
-    static func preview(_ destination: URL?) {
-        guard
-            let url = destination
-        else {
-            print("Warning: try to open an nonexsistent file.")
-            return
-        }
-        NSWorkspace.shared.open(url)
-    }
+   
 }

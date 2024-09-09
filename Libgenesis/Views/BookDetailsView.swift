@@ -17,20 +17,20 @@ struct BookDetailsView: View {
     var body: some View {
         VStack(spacing: 5) {
             VStack(alignment: .leading, spacing: 5) {
-                TitleView()
+                TitleView
                     .lineLimit(2)
 #if DEBUG
-                DebugView()
+                DebugView
 #endif
                 HStack {
-                    CoverView()
-                    InfoView()
+                    CoverView
+                    InfoView
                         .lineLimit(2)
                 }
-                DownloadsView()
-                MiscView()
+                DownloadsView
+                MiscView
             }
-            AttrView()
+            AttrView
             Spacer()
         }
         .task {
@@ -39,7 +39,6 @@ struct BookDetailsView: View {
             }
         }
         .onChange(of: book) { newbook in
-            debugPrint("\(newbook.id) md5: \(newbook.md5)")
             if newbook.details == nil {
                 print("Detect book changes and new book's details is nil, load details.")
                 loadDetails(newbook)
@@ -62,8 +61,8 @@ struct BookDetailsView: View {
         }
     }
     
-    private func DescriptionView() -> some View {
-        return (
+    private var DescriptionView: some View {
+        Group {
             DisclosureGroup {
                 VStack(alignment: .leading) {
                     HStack(alignment: .top) {
@@ -87,10 +86,10 @@ struct BookDetailsView: View {
                 Label("Description", systemImage: "books.vertical")
                     .bold()
             }
-        )
+        }
     }
     
-    private func AttrView() -> some View {
+    private var AttrView: some View {
         VStack(alignment: .leading, spacing: 5) {
             DisclosureGroup {
                 VStack(alignment: .leading) {
@@ -118,46 +117,49 @@ struct BookDetailsView: View {
                 Text("More")
                     .bold()
             }
-            DescriptionView()
+            DescriptionView
         }
+        
     }
     
-    private func DownloadsView() -> some View {
-        DisclosureGroup {
-            VStack(alignment: .leading, spacing: 20) {
-                if let links = book.details?.fileLinks {
-                    ForEach(links, id: \.self) { link in
-                        HStack {
-                            DownloadMirror.toIcon(link)
-                                .frame(width: 20, height: 20)
-                                .scaledToFit()
-                            Text(link.urlDecode())
-                                .lineLimit(1)
-                            Spacer()
-                        }
-                        .onTapGesture {
-                            DownloadManager.shared.download(link, book: book)
-                        }
-                        .hoveringEffect(0.5, duration: 1)
-                        .contextMenu {
-                            Button("Download \(book.truncTitle) from this mirror") {
+    private var DownloadsView: some View {
+        Group {
+            DisclosureGroup {
+                VStack(alignment: .leading, spacing: 20) {
+                    if let links = book.details?.fileLinks {
+                        ForEach(links, id: \.self) { link in
+                            HStack {
+                                DownloadMirror(link).toImage()
+                                    .frame(width: 20, height: 20)
+                                    .scaledToFit()
+                                Text(link.urlDecode())
+                                    .lineLimit(1)
+                                Spacer()
+                            }
+                            .onTapGesture {
                                 DownloadManager.shared.download(link, book: book)
                             }
+                            .hoveringEffect(0.5, duration: 1, radius: 5)
+                            .contextMenu {
+                                Button("Download \(book.truncTitle) from this mirror") {
+                                    DownloadManager.shared.download(link, book: book)
+                                }
+                            }
+                            .help("Click to download this book")
                         }
-                        .help("Click to download this book")
+                    } else {
+                        Text("No available download links.")
                     }
-                } else {
-                    Text("No available download links.")
                 }
+                .padding(5)
+            } label: {
+                Label("Downloads", systemImage: "square.and.arrow.down.on.square.fill")
+                    .bold()
             }
-            .padding(5)
-        } label: {
-            Label("Downloads", systemImage: "square.and.arrow.down.on.square.fill")
-                .bold()
         }
     }
     
-    private func InfoView() -> some View {
+    private var InfoView: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .top) {
                 Text("Author(s): ")
@@ -187,7 +189,7 @@ struct BookDetailsView: View {
         }
     }
     
-    private func MiscView() -> some View {
+    private var MiscView: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .top) {
                 Text("Download link pages: ")
@@ -216,7 +218,7 @@ struct BookDetailsView: View {
         }
     }
     
-    private func DebugView() -> some View {
+    private var DebugView: some View {
         HStack {
             Text("ID: ")
                 .bold()
@@ -224,9 +226,14 @@ struct BookDetailsView: View {
         }
     }
     
-    private func TitleView() -> some View {
+    private var TitleView: some View {
         VStack {
-            if let href = book.href {
+            if let dhref = book.detailHerf {
+                Link(destination: dhref) {
+                    Text(book.title)
+                        .lineLimit(2)
+                }
+            } else if let href = book.href {
                 Link(destination: href) {
                     Text(book.title)
                         .lineLimit(2)
@@ -239,82 +246,15 @@ struct BookDetailsView: View {
         .font(.title2)
     }
     
-    private func CoverView() -> some View {
+    private var CoverView: some View {
         VStack {
-            ImageView(url: book.details?.coverURL, width: 100, height: 161.8, cornerRadius: 10, defaultImg: "books.vertical")
+            ImageView(url: book.details?.coverURL, width: 100, height: 161.8, cornerRadius: 10, defaultImg: "books.vertical", breathing: true)
                 .frame(width: 100, height: 161.8)
         }
     }
 }
 
-struct ImageView: View {
-    let url: URL?
-    var preferredWidth: CGFloat = 150
-    var preferredHeight: CGFloat = 150
-    var cornerRadius: CGFloat = 20
-    var defaultImg: String
-    var breathing: Bool = false
-    
-    init(url: URL?, defaultImg: String = "eye", breathing: Bool = false) {
-        self.url = url
-        self.defaultImg = defaultImg
-        self.breathing = false
-    }
-    
-    init(url: URL?, width: CGFloat = 150, height: CGFloat = 150, cornerRadius: CGFloat = 20, defaultImg: String = "eye", breathing: Bool = false) {
-        self.url = url
-        self.preferredWidth = width
-        self.preferredHeight = height
-        self.cornerRadius = cornerRadius
-        self.defaultImg = defaultImg
-        self.breathing = breathing
-    }
-    
-    var body: some View {
-        if let url = self.url {
-            KFImage(url)
-                .placeholder {
-                    ProgressView()
-                        .scaledToFit()
-                }
-                .setProcessor(DownsamplingImageProcessor(size: CGSize(width: preferredWidth, height: preferredHeight))
-                              |> RoundCornerImageProcessor(cornerRadius: cornerRadius))
-                .cacheMemoryOnly()
-                .retry(maxCount: 3, interval: .seconds(5))
-                .fade(duration: 1)
-                .onSuccess { result in
-//                    print("Load image succeed: \(result.source.url?.absoluteString ?? "")")
-                }
-                .onFailure { error in
-                    print("Load image failed: \(error.localizedDescription)")
-                }
-                .resizable()
-                .scaledToFit()
-//                .background(Color.clear)
-//                .overlay(
-//                    RoundedRectangle(cornerRadius: cornerRadius)
-//                        .stroke(.clear, lineWidth: 1)
-//                )
-        } else {
-            if breathing {
-                Image(systemName: defaultImg)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: preferredWidth, maxHeight: preferredHeight)
-                    .breathingEffect()
-                    .cornerRadius(cornerRadius)
-            } else {
-                Image(systemName: defaultImg)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: preferredWidth, maxHeight: preferredHeight)
-                    .cornerRadius(cornerRadius)
-            }
-        }
 
-    }
-    
-}
 
 struct BookDetailsView_Previews: PreviewProvider {
     static var previews: some View {

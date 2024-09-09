@@ -17,8 +17,35 @@ struct PlainDownloadTaskView: View {
     }
 }
 
+struct PlainDownloadListView: View {
+    @EnvironmentObject var downloadManager: DownloadManager
+    @EnvironmentObject var recentManager: RecentlyFilesManager
+    var body: some View {
+        if downloadManager.downloadTasks.count == 0 {
+            Button("<No download task>") {
+            }
+            .disabled(true)
+        } else {
+            VStack {
+                ForEach(downloadManager.downloadTasks, id: \.self) { dtask in
+                    Button(dtask.book.title) {
+                        if !dtask.loading, dtask.success {
+                            recentManager.preview(dtask.localURL)
+                        }
+                    }
+                }
+            }
+            Divider()
+            Button("Clear Menu") {
+                fatalError("Implement clear download menu")
+            }
+        }
+    }
+}
+
 struct DownloadTaskView: View {
     @ObservedObject var dtask: DownloadTask
+    @EnvironmentObject var recentManager: RecentlyFilesManager
     var alreadyDownloaded: Double {
         dtask.progressPercent / 100 * Double(dtask.totalSize ?? 0)
     }
@@ -60,7 +87,7 @@ struct DownloadTaskView: View {
                 LibgenesisApp.jumpTo(dtask.localURL)
             }
             Button("Open in Preview") {
-                LibgenesisApp.preview(dtask.localURL)
+                recentManager.preview(dtask.localURL)
             }
             Divider()
             Button("Remove from list") {

@@ -38,12 +38,13 @@ class BookItem: Identifiable, Hashable, Equatable, ObservableObject {
     let mirrors: [URL]
     let edit: String
     let md5: String
-    let href: URL?
-    let isbn: String
+    let detailHerf: URL?    // detail URL of this book
+    let href: URL?  // URL to search this book
+    let isbn: String    // ISBN number
     let edition: String
     var downloadLinks: [String] = []
     
-    init(id: String, authors: String, title: String, publisher: String, year: Int, pages: Int, language: String, size: String, format: String, mirrors: [URL], edit: String, md5: String, href: URL?, isbn: String, edition: String) {
+    init(id: String, authors: String, title: String, publisher: String, year: Int, pages: Int, language: String, size: String, format: String, mirrors: [URL], edit: String, md5: String, detailHref: URL?, href: URL?, isbn: String, edition: String) {
         self.id = id
         self.authors = authors
         self.title = title
@@ -56,6 +57,7 @@ class BookItem: Identifiable, Hashable, Equatable, ObservableObject {
         self.mirrors = mirrors
         self.edit = edit
         self.md5 = md5
+        self.detailHerf = detailHref
         self.href = href
         self.isbn = isbn
         self.edition = edition
