@@ -51,6 +51,11 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
     var saveDir: String = UserDefaults.standard.string(forKey: "saveDir") ?? "/tmp"
     var localURL: URL?
     
+    /// Whether to user kepubify to convert epub to kepub, according to user prefercence and owned file format
+    var useConverter: Bool {
+        UserDefaults.standard.bool(forKey: "useKepubify") && book.format == "epub"
+    }
+    
     /// Choose first link except tor.
     ///
     /// Maybe support tor in future...
@@ -148,7 +153,6 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
         self.success = false
     }
     
-    
     /// Create and return download request
     ///
     private func createDownloadReq() -> DownloadRequest {
@@ -172,8 +176,27 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
                             self.setFailureStatus()
                         }
                     } else {    // success
-                        self.setSuccessStatus()
                         print("download \(self.name) success.")
+                        if self.useConverter {   // convert from epub to kepub
+#if os(macOS)
+                            print("Use converter.")
+                            KepubConverter.shared.convert(src: self.localURL!.absoluteURL) { res in
+                                switch res {
+                                case .success(let msg):
+                                    print(msg)
+                                    self.setSuccessStatus()
+                                    break
+                                case .failure(let err):
+                                    self.setFailureStatus()
+                                    print("Convertion error occured: \(err)")
+                                    self.errorStr = err.localizedDescription
+                                    break
+                                }
+                            }
+#endif
+                        } else {
+                            self.setSuccessStatus()
+                        }
                     }
                 }
         )
@@ -229,7 +252,7 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
                     try self.makeLocalURL()
                 }
 
-                debugPrint("ready to download into \(self.localURL!.absoluteString)")
+                print("ready to download into \(self.localURL!.absoluteString)")
                 self.prepareToStart()
                 
                 await MainActor.run {
@@ -239,7 +262,8 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
                 fatalError("Handle directory wirte permission.")
                 
             } catch {
-                debugPrint("download \(self.name) failed: \(error.localizedDescription)")
+                self.setFailureStatus()
+                print("download \(self.name) failed: \(error)")
             }
         }
     }

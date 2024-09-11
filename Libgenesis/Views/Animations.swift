@@ -14,6 +14,9 @@ extension View {
     func hoveringEffect(_ factor: Double = 0.1, duration: Double = 1, radius: Double = 0) -> some View {
         self.modifier(HoveringEffect(factor, duration: duration, radius: radius))
     }
+    func textSelectable(_ scheme: ColorScheme) -> some View {
+        self.modifier(SelectableViewModifier(scheme: scheme))
+    }
 }
 
 extension Text {
@@ -150,6 +153,17 @@ struct SearchBar: View {
         .frame(minWidth: 150)
     }
 }
+
+struct SelectableViewModifier: ViewModifier {
+    var scheme: ColorScheme
+
+    func body(content: Content) -> some View {
+        content
+            .textSelection(.enabled)
+            .foregroundColor(scheme == .light ? .black : .white)
+    }
+}
+
 
 struct Animations_Previews: PreviewProvider {
     static var previews: some View {

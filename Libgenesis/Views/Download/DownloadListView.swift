@@ -62,14 +62,14 @@ struct DownloadTaskView: View {
                 Text(dtask.targetURL.absoluteString)
                     .font(.footnote)
             }
-            VStack {
+            VStack {    // status
                 if !dtask.loading, !dtask.suspending { // task is ended.
-                    if dtask.success {
+                    if dtask.success {  //  success
                         Image(systemName: "checkmark.circle.fill")
                             .frame(width: 30, height: 30)
                             .scaledToFit()
                             .foregroundColor(.primary)
-                    } else {
+                    } else {    // error occured
                         Image(systemName: "exclamationmark.triangle")
                             .frame(width: 30, height: 30)
                             .scaledToFit()
@@ -77,9 +77,16 @@ struct DownloadTaskView: View {
                                 showErr.toggle()
                             }
                             .popover(isPresented: $showErr) {
-                                if let err = dtask.errorStr {
-                                    Text(err)
-                                        .padding()
+                                if let err = dtask.errorStr?.urlDecode() {
+                                    ScrollView {
+                                        Text(err)
+                                            .foregroundColor(.primary)
+                                            .padding()
+                                            .lineLimit(.max)
+                                            .frame(alignment: .leading)
+                                    }
+                                    .frame(width: 400)
+                                    .frame(maxHeight: 200)
                                 }
                             }
                             .foregroundColor(.yellow)
@@ -89,7 +96,7 @@ struct DownloadTaskView: View {
                     Image(systemName: "play.circle.fill")
                         .frame(width: 30, height: 30)
                         .scaledToFit()
-                        .foregroundColor(.blue)
+                        .foregroundColor(.green)
                         .onTapGesture {
                             dtask.resume()
                         }
@@ -97,6 +104,7 @@ struct DownloadTaskView: View {
                     Text("\(.percentage(percent: dtask.progressPercent))")
                 }
             }
+            .frame(width: 60)
 
         }
         .lineLimit(1)
@@ -150,7 +158,7 @@ struct DownloadListView: View {
         }
         .listStyle(.sidebar)
         .frame(width: 400, height: 200)
-        .padding()
+        .padding(5)
     }
 }
 

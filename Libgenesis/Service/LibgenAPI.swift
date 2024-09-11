@@ -19,6 +19,7 @@ class LibgenAPI {
         UserDefaults.standard.integer(forKey: "perPageN")
     }
     
+    #if DEBUG
     /// TODO: auto switch mirror if current mirror could be unavailable(reach maximum retry times).
     let mutex = NSLock()
     let maxRetryN = 10          // maximum retry times
@@ -26,7 +27,7 @@ class LibgenAPI {
     private func autoSwitch() {
         fatalError("Implement auto switch operations.")
     }
-    /// End
+    #endif
     
     private init() {
         //...
@@ -157,7 +158,7 @@ class LibgenAPI {
         async let doc = try SwiftSoup.parse(try await APIService(to: url).getHtml())
         async let urls = try parseDirectDownloadLinks(book.mirrors)
         if let table = try await doc.body()?.select("table > tbody").first() {
-            desc = try table.select("tr > td[colspan='4']").text()
+            desc = try table.select("tr > td[colspan='4'][style]").text()
             if let coverPath = try table.select("tr > td[rowspan='22'] > a[href] > img[src]").first()?.attr("src") {
                 coverURL = "\(baseURL)/\(coverPath)"
             }

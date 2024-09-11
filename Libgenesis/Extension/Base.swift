@@ -52,9 +52,13 @@ extension Int64 {
 }
 
 extension Double {
+    func truncate(places: Int) -> Double {
+        let factor = pow(10.0, Double(places))
+        return (self * factor).rounded(.towardZero) / factor
+    }
     /// It's rounded.
     func toPercentage() -> Double {
-        return (self*100).rounded()
+        return self.truncate(places: 4)*100
     }
     func toPercentageStr() -> String {
         return String(format: "%.2f %%", self)

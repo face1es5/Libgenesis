@@ -9,6 +9,11 @@ import SwiftUI
 import Combine
 import Cocoa
 
+enum Theme: String, CaseIterable, Identifiable {
+    case system, light, dark
+    var id: Self { self }
+}
+
 struct SettingsView: View {
     var body: some View {
         TabView {
@@ -24,32 +29,53 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Advance", systemImage: "hammer")
                 }
+            IntegrationSettingsView()
+                .tabItem {
+                    Label("Plugin", systemImage: "puzzlepiece.extension")
+                }
         }
         .padding()
         .frame(maxWidth: .infinity)
-
     }
 }
 
-enum Theme: String, CaseIterable, Identifiable {
-    case system, light, dark
-    var id: Self { self }
-}
-
-
 struct GeneralView: View {
     @AppStorage("saveDir") var saveDir: String = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.path(percentEncoded: true) ?? "/tmp"
-    @AppStorage("defaultSaveDir") var defaultSaveDir: String = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.path(percentEncoded: true) ?? "/tmp"
     @AppStorage("theme") var theme: Theme = .system
-    @AppStorage("autoStart") var autoStart: Bool = false
     @AppStorage("preferredFormats") var preferredFormats: Set<FormatFilter> = [.def]
+    @State var showFileSelector: Bool = false
 
     var body: some View {
         VStack {
             Form {
-                Toggle("Start with system: ", isOn: $autoStart)
-                    .toggleStyle(.switch)
-                TextField("Save location: ", text: $saveDir)
+                HStack {
+                    TextField("Save location: ", text: $saveDir)
+                    Button(action: {
+                        showFileSelector.toggle()
+                    }) {
+                        Image(systemName: "folder")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(.blue)
+                            .frame(width: 20, height: 20)
+                    }
+                    .fileImporter(isPresented: $showFileSelector, allowedContentTypes: [.directory]) { res in
+                        switch res {
+                        case .success(let url):
+                            if url.startAccessingSecurityScopedResource() {
+                                saveDir = url.path(percentEncoded: false)
+                                print("Access save location success: \(url.path(percentEncoded: true))")
+                            } else {
+                                print("Try to access save location failed: \(url.path(percentEncoded: false))")
+                            }
+                            break
+                        case .failure(let err):
+                            print("Select directory failed: \(err)")
+                            break
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
                 Picker("Appearance: ", selection: $theme) {
                     ForEach(Theme.allCases, id: \.self) { th in
                         Text(th.rawValue.lowercased()).tag(th.id)
@@ -57,7 +83,7 @@ struct GeneralView: View {
                 }
             }
             HStack(alignment: .top) {
-                Label("Preferred formats:", systemImage: "line.3.horizontal.decrease.circle")
+                Text("Preferred formats:")
                 VStack {
                     ForEach(FormatFilter.allCases, id: \.self) { format in
                         Toggle(format.desc, isOn: Binding(
@@ -76,7 +102,6 @@ struct GeneralView: View {
                 }
             }
         }
-        
     }
 }
 
@@ -128,7 +153,7 @@ struct NetworkSettigsView: View {
             }
             VStack {
                 Stepper(value: $maxDownloadConnNum,
-                        in: 1...33,
+                        in: 1...32,
                         step: 1) {
                     HStack {
                         Text("Maximum download connections: ")
@@ -148,6 +173,37 @@ struct NetworkSettigsView: View {
         }
     }
     
+}
+
+struct IntegrationSettingsView: View {
+    @AppStorage("useKepubify") var useKepubify: Bool = false
+    @State var kepubPopover: Bool = false
+    @Environment(\.colorScheme) var scheme: ColorScheme
+    var body: some View {
+        Form {
+            Toggle(isOn: $useKepubify) {
+                HStack {
+                    Text("Enable kepubify(only supported on macOS)")
+                    Image(systemName: "info.circle.fill")
+                        .foregroundColor(.blue)
+                        .onTapGesture {
+                            kepubPopover.toggle()
+                        }
+                        .popover(isPresented: $kepubPopover, arrowEdge: .trailing) {
+                            VStack(alignment: .leading) {
+                                Text("Kepubify is the fastest tool for converting EPUBs to Kobo's enhanced KEPUB format for use on Kobo eReaders.")
+                                    .textSelectable(scheme)
+                                Text("It works with malformed e-books, doesn't modify the book's layout more than absolutely necessary, doesn't depend on any external software, and works from the command-line.")
+                                    .textSelectable(scheme)
+                                Link("homepage", destination: URL(string: "https://pgaskin.net/kepubify/")!)
+                            }
+                            .frame(width: 200)
+                            .padding()
+                        }
+                }
+            }
+        }
+    }
 }
 
 struct Settings_Previews: PreviewProvider {

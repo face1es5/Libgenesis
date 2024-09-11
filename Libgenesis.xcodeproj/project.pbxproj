@@ -9,11 +9,6 @@
 /* Begin PBXBuildFile section */
 		CF0C61192C8EBA8300503879 /* MirrorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61182C8EBA8300503879 /* MirrorPicker.swift */; };
 		CF0C611B2C8EEDA100503879 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CF0C611A2C8EEDA100503879 /* Credits.rtf */; };
-		CF0C61252C8F0B7000503879 /* LibgenesisHelperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61242C8F0B7000503879 /* LibgenesisHelperApp.swift */; };
-		CF0C61272C8F0B7000503879 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61262C8F0B7000503879 /* ContentView.swift */; };
-		CF0C61292C8F0B7200503879 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF0C61282C8F0B7200503879 /* Assets.xcassets */; };
-		CF0C612C2C8F0B7200503879 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF0C612B2C8F0B7200503879 /* Preview Assets.xcassets */; };
-		CF0C61322C8F0CBE00503879 /* LibgenesisHelper.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = CF0C61222C8F0B7000503879 /* LibgenesisHelper.app */; platformFilters = (macos, ); settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CF0C61352C8F423A00503879 /* BookDetailsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61342C8F423A00503879 /* BookDetailsToolbar.swift */; };
 		CF0C61372C8F42C700503879 /* BookDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61362C8F42C700503879 /* BookDisplayMode.swift */; };
 		CF0C61392C8F528500503879 /* BookmarksModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61382C8F528500503879 /* BookmarksModel.swift */; };
@@ -45,6 +40,9 @@
 		CFE602A22C906B2600086F24 /* bookmark3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602932C906B2500086F24 /* bookmark3.jpg */; };
 		CFE602A32C906B2600086F24 /* download3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602942C906B2500086F24 /* download3.jpg */; };
 		CFE602A42C906B2600086F24 /* download2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602952C906B2600086F24 /* download2.jpg */; };
+		CFF2535A2C918497001C8144 /* Kepubify.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF253592C918497001C8144 /* Kepubify.swift */; };
+		CFF2535D2C919ECE001C8144 /* kepubify in Resources */ = {isa = PBXBuildFile; fileRef = CFF2535C2C919ECE001C8144 /* kepubify */; platformFilters = (macos, ); };
+		CFF2535F2C919F5D001C8144 /* kepubify in CopyFiles */ = {isa = PBXBuildFile; fileRef = CFF2535C2C919ECE001C8144 /* kepubify */; platformFilters = (macos, ); settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		CFF4F3232C8C338E00396BD7 /* Base.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF4F3222C8C338E00396BD7 /* Base.swift */; };
 		CFF4F3252C8C478A00396BD7 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF4F3242C8C478A00396BD7 /* Animations.swift */; };
 		CFFCB4B62C897B2600996675 /* LibgenAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCB4B52C897B2600996675 /* LibgenAPI.swift */; };
@@ -65,13 +63,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		CF0C61312C8F0C7C00503879 /* CopyFiles */ = {
+		CFF2535E2C919F48001C8144 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = Contents/Library/LoginItems;
-			dstSubfolderSpec = 1;
+			dstPath = "";
+			dstSubfolderSpec = 6;
 			files = (
-				CF0C61322C8F0CBE00503879 /* LibgenesisHelper.app in CopyFiles */,
+				CFF2535F2C919F5D001C8144 /* kepubify in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,12 +79,6 @@
 		CF0C61182C8EBA8300503879 /* MirrorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorPicker.swift; sourceTree = "<group>"; };
 		CF0C611A2C8EEDA100503879 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		CF0C611C2C8EEDFB00503879 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		CF0C61222C8F0B7000503879 /* LibgenesisHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LibgenesisHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		CF0C61242C8F0B7000503879 /* LibgenesisHelperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibgenesisHelperApp.swift; sourceTree = "<group>"; };
-		CF0C61262C8F0B7000503879 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		CF0C61282C8F0B7200503879 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		CF0C612B2C8F0B7200503879 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		CF0C612D2C8F0B7200503879 /* LibgenesisHelper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LibgenesisHelper.entitlements; sourceTree = "<group>"; };
 		CF0C61342C8F423A00503879 /* BookDetailsToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailsToolbar.swift; sourceTree = "<group>"; };
 		CF0C61362C8F42C700503879 /* BookDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDisplayMode.swift; sourceTree = "<group>"; };
 		CF0C61382C8F528500503879 /* BookmarksModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksModel.swift; sourceTree = "<group>"; };
@@ -120,6 +112,8 @@
 		CFE602932C906B2500086F24 /* bookmark3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bookmark3.jpg; sourceTree = "<group>"; };
 		CFE602942C906B2500086F24 /* download3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = download3.jpg; sourceTree = "<group>"; };
 		CFE602952C906B2600086F24 /* download2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = download2.jpg; sourceTree = "<group>"; };
+		CFF253592C918497001C8144 /* Kepubify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kepubify.swift; sourceTree = "<group>"; };
+		CFF2535C2C919ECE001C8144 /* kepubify */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = kepubify; sourceTree = "<group>"; };
 		CFF4F3222C8C338E00396BD7 /* Base.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base.swift; sourceTree = "<group>"; };
 		CFF4F3242C8C478A00396BD7 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		CFFCB4B52C897B2600996675 /* LibgenAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibgenAPI.swift; sourceTree = "<group>"; };
@@ -138,13 +132,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		CF0C611F2C8F0B7000503879 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		CFDEC14E2C7D6A9F00FDF3E4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -158,7 +145,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		CF0C611D2C8EEF3600503879 /* Resources */ = {
+		CF0C611D2C8EEF3600503879 /* resources */ = {
 			isa = PBXGroup;
 			children = (
 				CFE6028C2C906B2500086F24 /* bookmark1.jpg */,
@@ -178,27 +165,7 @@
 				CFE602912C906B2500086F24 /* search4.jpg */,
 				CFE602852C905F8000086F24 /* main.png */,
 			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		CF0C61232C8F0B7000503879 /* LibgenesisHelper */ = {
-			isa = PBXGroup;
-			children = (
-				CF0C61242C8F0B7000503879 /* LibgenesisHelperApp.swift */,
-				CF0C61262C8F0B7000503879 /* ContentView.swift */,
-				CF0C61282C8F0B7200503879 /* Assets.xcassets */,
-				CF0C612D2C8F0B7200503879 /* LibgenesisHelper.entitlements */,
-				CF0C612A2C8F0B7200503879 /* Preview Content */,
-			);
-			path = LibgenesisHelper;
-			sourceTree = "<group>";
-		};
-		CF0C612A2C8F0B7200503879 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				CF0C612B2C8F0B7200503879 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
+			path = resources;
 			sourceTree = "<group>";
 		};
 		CF0C61332C8F421700503879 /* Toolbar */ = {
@@ -214,10 +181,9 @@
 		CFDEC1482C7D6A9E00FDF3E4 = {
 			isa = PBXGroup;
 			children = (
-				CF0C611D2C8EEF3600503879 /* Resources */,
+				CF0C611D2C8EEF3600503879 /* resources */,
 				CF0C611C2C8EEDFB00503879 /* README.md */,
 				CFDEC1532C7D6A9F00FDF3E4 /* Libgenesis */,
-				CF0C61232C8F0B7000503879 /* LibgenesisHelper */,
 				CFDEC1522C7D6A9F00FDF3E4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -226,7 +192,6 @@
 			isa = PBXGroup;
 			children = (
 				CFDEC1512C7D6A9F00FDF3E4 /* Libgenesis.app */,
-				CF0C61222C8F0B7000503879 /* LibgenesisHelper.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -234,6 +199,7 @@
 		CFDEC1532C7D6A9F00FDF3E4 /* Libgenesis */ = {
 			isa = PBXGroup;
 			children = (
+				CFF253582C91847F001C8144 /* Integrations */,
 				CFFF124D2C8DCED700DC4240 /* Service */,
 				CFFF12402C8DB32A00DC4240 /* Views */,
 				CFF4F3212C8C337E00396BD7 /* Extension */,
@@ -300,6 +266,23 @@
 			path = Download;
 			sourceTree = "<group>";
 		};
+		CFF253582C91847F001C8144 /* Integrations */ = {
+			isa = PBXGroup;
+			children = (
+				CFF2535B2C919E98001C8144 /* binaries */,
+				CFF253592C918497001C8144 /* Kepubify.swift */,
+			);
+			path = Integrations;
+			sourceTree = "<group>";
+		};
+		CFF2535B2C919E98001C8144 /* binaries */ = {
+			isa = PBXGroup;
+			children = (
+				CFF2535C2C919ECE001C8144 /* kepubify */,
+			);
+			path = binaries;
+			sourceTree = "<group>";
+		};
 		CFF4F3212C8C337E00396BD7 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
@@ -352,23 +335,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		CF0C61212C8F0B7000503879 /* LibgenesisHelper */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = CF0C612E2C8F0B7200503879 /* Build configuration list for PBXNativeTarget "LibgenesisHelper" */;
-			buildPhases = (
-				CF0C611E2C8F0B7000503879 /* Sources */,
-				CF0C611F2C8F0B7000503879 /* Frameworks */,
-				CF0C61202C8F0B7000503879 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = LibgenesisHelper;
-			productName = LibgenesisHelper;
-			productReference = CF0C61222C8F0B7000503879 /* LibgenesisHelper.app */;
-			productType = "com.apple.product-type.application";
-		};
 		CFDEC1502C7D6A9F00FDF3E4 /* Libgenesis */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CFDEC1602C7D6AA000FDF3E4 /* Build configuration list for PBXNativeTarget "Libgenesis" */;
@@ -376,7 +342,7 @@
 				CFDEC14D2C7D6A9F00FDF3E4 /* Sources */,
 				CFDEC14E2C7D6A9F00FDF3E4 /* Frameworks */,
 				CFDEC14F2C7D6A9F00FDF3E4 /* Resources */,
-				CF0C61312C8F0C7C00503879 /* CopyFiles */,
+				CFF2535E2C919F48001C8144 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -402,9 +368,6 @@
 				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					CF0C61212C8F0B7000503879 = {
-						CreatedOnToolsVersion = 14.3.1;
-					};
 					CFDEC1502C7D6A9F00FDF3E4 = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
@@ -429,21 +392,11 @@
 			projectRoot = "";
 			targets = (
 				CFDEC1502C7D6A9F00FDF3E4 /* Libgenesis */,
-				CF0C61212C8F0B7000503879 /* LibgenesisHelper */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		CF0C61202C8F0B7000503879 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				CF0C612C2C8F0B7200503879 /* Preview Assets.xcassets in Resources */,
-				CF0C61292C8F0B7200503879 /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		CFDEC14F2C7D6A9F00FDF3E4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -459,6 +412,7 @@
 				CFE602982C906B2600086F24 /* bookmark2.jpg in Resources */,
 				CFE6029E2C906B2600086F24 /* search3.jpg in Resources */,
 				CFE602992C906B2600086F24 /* listmode.jpg in Resources */,
+				CFF2535D2C919ECE001C8144 /* kepubify in Resources */,
 				CF0C611B2C8EEDA100503879 /* Credits.rtf in Resources */,
 				CFE6029A2C906B2600086F24 /* search2.jpg in Resources */,
 				CFE6029D2C906B2600086F24 /* download4.jpg in Resources */,
@@ -473,15 +427,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		CF0C611E2C8F0B7000503879 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				CF0C61272C8F0B7000503879 /* ContentView.swift in Sources */,
-				CF0C61252C8F0B7000503879 /* LibgenesisHelperApp.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		CFDEC14D2C7D6A9F00FDF3E4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -512,6 +457,7 @@
 				CFFF123D2C8D90EB00DC4240 /* Filter.swift in Sources */,
 				CFFF12442C8DB35700DC4240 /* FilterView.swift in Sources */,
 				CF0C61352C8F423A00503879 /* BookDetailsToolbar.swift in Sources */,
+				CFF2535A2C918497001C8144 /* Kepubify.swift in Sources */,
 				CFF4F3232C8C338E00396BD7 /* Base.swift in Sources */,
 				CFDEC1642C7D6EB600FDF3E4 /* ServiceMirror.swift in Sources */,
 			);
@@ -520,72 +466,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		CF0C612F2C8F0B7200503879 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LibgenesisHelper/LibgenesisHelper.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LibgenesisHelper/Preview Content\"";
-				DEVELOPMENT_TEAM = GY29NY469M;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
-				INFOPLIST_KEY_LSBackgroundOnly = YES;
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Paramecium.LibgenesisHelper;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		CF0C61302C8F0B7200503879 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LibgenesisHelper/LibgenesisHelper.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LibgenesisHelper/Preview Content\"";
-				DEVELOPMENT_TEAM = GY29NY469M;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
-				INFOPLIST_KEY_LSBackgroundOnly = YES;
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Paramecium.LibgenesisHelper;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
 		CFDEC15E2C7D6AA000FDF3E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -778,15 +658,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		CF0C612E2C8F0B7200503879 /* Build configuration list for PBXNativeTarget "LibgenesisHelper" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				CF0C612F2C8F0B7200503879 /* Debug */,
-				CF0C61302C8F0B7200503879 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		CFDEC14C2C7D6A9E00FDF3E4 /* Build configuration list for PBXProject "Libgenesis" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

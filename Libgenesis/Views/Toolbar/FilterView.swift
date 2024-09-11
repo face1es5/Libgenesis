@@ -31,7 +31,7 @@ struct AdvanceFilterView: View {
         } label: {
             HStack {
                 Text("Format")
-                Image(systemName: "hammer")
+                Image(systemName: "doc.text")
                     .foregroundColor(.blue)
             }
             .help("Choose expected formats")
@@ -87,7 +87,7 @@ struct FilterContextView: View {
                 } label: {
                     HStack {
                         Text("Column")
-                        Image(systemName: "tortoise")
+                        Image(systemName: "eyeglasses")
                             .foregroundColor(.blue)
                     }
                     .help("Once any column choosed except Default, search string will be applied into that field only.")

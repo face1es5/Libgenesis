@@ -96,5 +96,21 @@ struct LibgenesisApp: App {
         }
         NSWorkspace.shared.open(url.deletingLastPathComponent())
     }
-   
+    
+    init() {
+        // restore bookmark access
+        guard
+            let path = UserDefaults.standard.string(forKey: "saveDir")
+        else {
+            print("Failed to restore bookmark access: can't find save dir")
+            return
+        }
+        let dir = URL(filePath: path)
+        if dir.startAccessingSecurityScopedResource() {
+            print("Restore access to save dir success: \(path)")
+        } else {
+            print("Restore access to save dir failed: \(path)")
+        }
+    }
 }
+

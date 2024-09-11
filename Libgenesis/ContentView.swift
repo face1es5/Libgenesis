@@ -13,11 +13,15 @@ struct ContentView: View {
     
     var BookDetailsContainer: some View {
         ScrollView {
-            VStack {
-                if let book = selBooksVM.firstBook {
-                    BookDetailsView(book: book)
-                } else {
-                    Text("No book selected.")
+            if let book = selBooksVM.firstBook {
+                BookDetailsView(book: book)
+            } else {
+                VStack {
+                    Image("stewie")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 100)
+                    Text("Hey brian.")
                         .font(.title2)
                 }
             }
@@ -30,6 +34,13 @@ struct ContentView: View {
             if let book = selBooksVM.firstBook {
                 Divider()
                 SharedContextView(book: book)
+            }
+            Divider()
+            Button(action: {
+                selBooksVM.clear()
+            }) {
+                Label("Prefer to watch cute stewie?", image: "stewie.little")
+                    .labelStyle(.titleAndIcon)
             }
         }
         .toolbar {
