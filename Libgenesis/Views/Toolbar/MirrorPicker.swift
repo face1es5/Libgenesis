@@ -7,14 +7,31 @@
 
 import SwiftUI
 
+struct MirrorStatView: View {
+    @ObservedObject var mirror: ObservableMirror
+    var body: some View {
+        Label(mirror.domain, systemImage: mirror.stat ? "checkmark.icloud.fill" : "exclamationmark.icloud.fill")
+            .task(priority: .background) {
+                #if DEBUG
+                print("Check server conn: \(mirror.url)")
+                #endif
+                let stat = await LibgenAPI.shared.checkConn(mirror.url)
+                await MainActor.run {
+                    mirror.stat = stat
+                }
+            }
+    }
+}
+
 struct MirrorPicker: View {
     @AppStorage("libgenMirrors") var libgenMirrors: [ServerMirror] = ServerMirror.defaults
     @AppStorage("baseURL") var selection: String = ServerMirror.defaultMirror.description
 
     var body: some View {
         Picker("Server:", selection: $selection) {
-            ForEach(libgenMirrors, id: \.self) { m in
-                Text(m.domain).tag(m.url.absoluteString)
+            ForEach(libgenMirrors.map { ObservableMirror($0) }, id: \.self) { m in
+                MirrorStatView(mirror: m)
+                    .tag(m.url.absoluteString)
             }
         }
         .help("Choose mirrors.")

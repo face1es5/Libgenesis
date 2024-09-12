@@ -19,18 +19,7 @@ class LibgenAPI {
         UserDefaults.standard.integer(forKey: "perPageN")
     }
     
-    #if DEBUG
-    /// TODO: auto switch mirror if current mirror could be unavailable(reach maximum retry times).
-    let mutex = NSLock()
-    let maxRetryN = 10          // maximum retry times
-    let currentRetryTimes = 0   // current retry times
-    private func autoSwitch() {
-        fatalError("Implement auto switch operations.")
-    }
-    #endif
-    
     private init() {
-        //...
     }
     
     func parseTableHeader(_ ele: Element) throws -> [String] {
@@ -304,5 +293,45 @@ class LibgenAPI {
                 completion(nil)
             }
         }
+    }
+    
+    func checkConn(_ url: URL) async -> Bool {
+        guard let req = try? URLRequest(url: url, method: .head)
+        else {
+            print("Libgenesis.LibgenAPI.checkConn(URL): Create Request Failed.")
+            return false
+        }
+        let maxRetry = 3
+        var cnt = 1
+        while cnt <= maxRetry {
+            do {
+                let (_, resp) = try await URLSession.shared.data(for: req)
+                if let httpResp = resp as? HTTPURLResponse,
+                   (200...299) ~= httpResp.statusCode {
+                    print("Server: \(url) is online.")
+                    return true
+                }
+            } catch {
+                print("Libgenesis.LibgenAPI.checkConn(URL): Request failed with: \(error.localizedDescription)")
+            }
+            cnt += 1
+            do {
+                try await Task.sleep(for: .seconds(1))  // have a rest before retry
+            } catch {
+                print("\(error)")
+            }
+        }
+        // failed as reached limit retry times.
+        print("Server: \(url) is not online.")
+        return false
+    }
+    
+    func checkConn(_ urlStr: String) async -> Bool {
+        guard let url = URL(string: urlStr)
+        else {
+            print("Libgenesis.LibgenAPI.checkConn(\(urlStr): Invalid URL.")
+            return false
+        }
+        return await checkConn(url)
     }
 }

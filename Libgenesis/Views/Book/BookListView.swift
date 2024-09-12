@@ -87,6 +87,10 @@ struct BookListView: View {
                 .toolbar {
                     toolbarView
                 }
+                .searchable(text: $searchString, prompt: "Search len should >= 2.")
+                .onSubmit(of: .search) {
+                    forceFetching()
+                }
                 .task {
                     Task.detached(priority: .background) {
                         // On appear, force refreshing books.
@@ -126,7 +130,11 @@ struct BookListView: View {
             .alert(isPresented: $showDelAlert) {
                 MirrorDelAlert()
             }
+            
             MirrorPicker()
+                .labelStyle(.titleAndIcon)
+                .frame(width: 120)
+            
             Button(action: {
                 showBookmarks.toggle()
             }) {
@@ -203,11 +211,6 @@ struct BookListView: View {
                 .popover(isPresented: $showFilter, arrowEdge: .bottom) {
                     FilterContextView(formatFilters: $formatFilters, columnFilter: $columnFilter)
                 }
-                
-                SearchBar($searchString, prompt: "Search len must > 2") {
-                    forceFetching()
-                }
-                .frame(width: 200)
             }
 
         }
@@ -246,10 +249,10 @@ struct BookListView: View {
                 connErr = false
             }
         } catch {
-            print("error occured: \(error)")
+            print("Libgenesis.BookListView.fetchingBooks: \(error.localizedDescription)")
             await MainActor.run {
                 connErr = true
-                connErrMsg = "\(error)"
+                connErrMsg = "\(error.localizedDescription)"
             }
         }
         await MainActor.run {

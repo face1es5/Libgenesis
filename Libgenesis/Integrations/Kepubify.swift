@@ -42,7 +42,7 @@ class KepubConverter {
         guard
             let url = exec
         else {
-            print("Can't locate executable path for epubify, check integrality, convertion halted.")
+            print("Libgensis.Kepubify.convert: can't locate executable path for epubify, check integrality, convertion halted.")
             return
         }
         guard let base = src?.baseURL?.path(percentEncoded: false),
