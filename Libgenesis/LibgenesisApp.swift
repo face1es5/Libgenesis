@@ -12,46 +12,68 @@ import Kingfisher
 struct LibgenesisApp: App {
     @StateObject var downloadManager: DownloadManager = DownloadManager.shared
     @AppStorage("theme") var theme: Theme = .system
+    @AppStorage("toggleFinder") var showFinder = false
     @StateObject var selBooksVM: BooksSelectionModel = BooksSelectionModel()
     @StateObject var booksVM: BooksViewModel = BooksViewModel()
     @StateObject var recentManager: RecentlyFilesManager = RecentlyFilesManager()
     @StateObject var bookmarksManager: BookmarksModel = BookmarksModel()
     
+    init() {
+        // restore bookmark access
+        guard
+            let path = UserDefaults.standard.string(forKey: "saveDir")
+        else {
+            print("Failed to restore bookmark access: can't find save dir")
+            return
+        }
+        let dir = URL(filePath: path)
+        if dir.startAccessingSecurityScopedResource() {
+            print("Restore access to save dir success: \(path)")
+        } else {
+            print("Restore access to save dir failed: \(path)")
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(downloadManager)
                 .preferredColorScheme(colorScheme())
-                .onAppear {
-                    #if os(iOS) // in ios, watching
-                    NotificationCenter.default.addObserver(forName: NSApplication.didReceiveMemoryWarningNotification,
-                                                           object: nil,
-                                                           queue: .main) { _ in
-                        clearImageCache()
-                    }
-                    #endif
-                }
                 .environmentObject(selBooksVM)
                 .environmentObject(booksVM)
                 .environmentObject(downloadManager)
                 .environmentObject(recentManager)
                 .environmentObject(bookmarksManager)
         }
+        .windowToolbarStyle(UnifiedWindowToolbarStyle(showsTitle: false))
+        #if os(macOS)
         Window("Downloader", id: "downloader-window") {
-            DownloaderView()
+            GeometryReader { geo in
+                DownloaderView()
+                    .environmentObject(downloadManager)
+                    .frame(width: geo.size.width, height: geo.size.height)
+            }
         }
         Window("Bookmarks", id: "bookmarks-window") {
-            BookmarkGallery()
-                .environmentObject(bookmarksManager)
+            GeometryReader { geo in
+                BookmarkGallery()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .environmentObject(bookmarksManager)
+                    .environmentObject(selBooksVM)
+            }
+
         }
-        #if !os(watchOS)
         .commands {
             GeneralCommands()
+            CommandMenu("Find") {
+                Button("Find") {
+                    showFinder.toggle()
+                }
+                .keyboardShortcut("F")
+            }
             DownloadCommands(downloadManager: downloadManager)
             RecentFilesCommands(recentManager: recentManager)
         }
-        #endif
-        #if os(macOS)
         MenuBarExtra(content: {
             MenuBar()
                 .environmentObject(downloadManager)
@@ -70,6 +92,7 @@ struct LibgenesisApp: App {
         #endif
 
     }
+    
     private func colorScheme() -> ColorScheme? {
         switch theme {
         case .system:
@@ -88,6 +111,7 @@ struct LibgenesisApp: App {
     
     /// Jump to directory, or parent dir of it.
     static func jumpTo(_ destination: URL?) {
+        #if os(macOS)
         guard
             let url = destination
         else {
@@ -95,22 +119,7 @@ struct LibgenesisApp: App {
             return
         }
         NSWorkspace.shared.open(url.deletingLastPathComponent())
-    }
-    
-    init() {
-        // restore bookmark access
-        guard
-            let path = UserDefaults.standard.string(forKey: "saveDir")
-        else {
-            print("Failed to restore bookmark access: can't find save dir")
-            return
-        }
-        let dir = URL(filePath: path)
-        if dir.startAccessingSecurityScopedResource() {
-            print("Restore access to save dir success: \(path)")
-        } else {
-            print("Restore access to save dir failed: \(path)")
-        }
+        #endif
     }
 }
 

@@ -52,7 +52,7 @@ struct DownloadTaskView: View {
     }
     var body: some View {
         HStack {
-            ImageView(url: dtask.book.details?.coverURL, width: 50, height: 50, cornerRadius: 5, defaultImg: "tornado", breathing: false)
+            ImageView(url: dtask.book.coverURL, width: 50, height: 50, cornerRadius: 5, defaultImg: "tornado", breathing: false)
                 .frame(width: 50, height: 50)
             VStack {
                 Text(dtask.book.title)
@@ -155,21 +155,23 @@ struct DownloadListView: View {
     var body: some View {
         List(downloadManager.downloadTasks, id: \.self, selection: $selectedTask) { dtask in
             DownloadTaskView(dtask: dtask)
+            Divider()
         }
         .listStyle(.sidebar)
-        .frame(width: 400, height: 200)
         .padding(5)
     }
 }
 
 struct DownloaderView: View {
+    @EnvironmentObject var downloadManager: DownloadManager
     var body: some View {
-        VStack {
-            DownloadListView()
-                .environmentObject(DownloadManager.shared)
-        }
-        .frame(width: 400, height: 400)
-        .navigationTitle("Downloader")
+        DownloadListView()
+            .navigationTitle("Downloader")
+            .toolbar {
+                Button("Clear") {
+                    downloadManager.clear()
+                }
+            }
     }
 }
 

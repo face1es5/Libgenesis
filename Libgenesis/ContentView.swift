@@ -11,10 +11,30 @@ struct ContentView: View {
     @EnvironmentObject var selBooksVM: BooksSelectionModel
     @EnvironmentObject var booksVM: BooksViewModel
     
+    var body: some View {
+        #if !os(iOS)
+        NavigationSplitView {
+            BookDetailsContainer
+                .frame(minWidth: 320)
+        } detail: {
+            BookListView()
+                .environmentObject(booksVM)
+                .environmentObject(selBooksVM)
+        }
+        #else
+        NavigationStack {
+            BookListView()
+                .environmentObject(booksVM)
+                .environmentObject(selBooksVM)
+        }
+        #endif
+    }
+    
     var BookDetailsContainer: some View {
         ScrollView {
             if let book = selBooksVM.firstBook {
                 BookDetailsView(book: book)
+                    .padding(.trailing, 13)
             } else {
                 VStack {
                     Image("stewie")
@@ -47,24 +67,6 @@ struct ContentView: View {
             BookDetailsToolbar()
         }
         .padding()
-    }
-    
-    var body: some View {
-        NavigationSplitView {
-            BookDetailsContainer
-        } detail: {
-            BookListView()
-                .environmentObject(booksVM)
-                .environmentObject(selBooksVM)
-        }
-
-    }
-    
-    /// Handle a series of downloading.
-    ///
-    func askDownload() {
-        debugPrint("Download \(selBooksVM.books.map { $0.title })")
-        DownloadManager.shared.download(selBooksVM.booksArr)
     }
     
 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(macOS)
 struct GeneralCommands: Commands {
     var body: some Commands {
         SidebarCommands()
@@ -20,31 +21,6 @@ struct DownloadCommands: Commands {
             PlainDownloadListView()
                 .environmentObject(downloadManager)
         }
-    }
-}
-
-
-
-/// Manager for recently opened files.
-class RecentlyFilesManager: ObservableObject {
-    @AppStorage("recentlyOpened") var recentlyOpened = Set<URL>()
-    
-    /// Open preview for destination file.
-    func preview(_ destination: URL?) {
-        guard
-            let url = destination
-        else {
-            print("Warning: try to open an nonexsistent file.")
-            return
-        }
-        if NSWorkspace.shared.open(url) {
-            recentlyOpened.insert(url)
-        }
-    }
-    
-    /// Clear recent opened files
-    func clear() {
-        recentlyOpened = []
     }
 }
 
@@ -71,17 +47,33 @@ struct RecentFilesCommands: Commands {
         }
     }
 }
+#endif
 
-//struct WindowCommands: Commands {
-//    @Environment(\.openWindow) private var openDownloader
-//    var body: some Commands {
-//        CommandGroup(after: .windowArrangement) {
-//            Button("Open download window") {
-//                openDownloader(id: "downloader-window")
-//            }
-//        }
-//    }
-//}
+/// Manager for recently opened files.
+class RecentlyFilesManager: ObservableObject {
+    @AppStorage("recentlyOpened") var recentlyOpened = Set<URL>()
+    
+    /// Open preview for destination file.
+    func preview(_ destination: URL?) {
+        guard
+            let url = destination
+        else {
+            print("Warning: try to open an nonexsistent file.")
+            return
+        }
+        #if os(macOS)
+        if NSWorkspace.shared.open(url) {
+            recentlyOpened.insert(url)
+        }
+        #endif
+    }
+    
+    /// Clear recent opened files
+    func clear() {
+        recentlyOpened = []
+    }
+}
+
 
 
 struct GeneralCommands_Previews: PreviewProvider {

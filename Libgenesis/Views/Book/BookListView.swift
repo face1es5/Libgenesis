@@ -26,175 +26,244 @@ struct BookListView: View {
     @State var showFilter: Bool = false
     @State var columnFilter: ColumnFilter = .def
     @State var showDownload: Bool = false
-    @State var showAddSheet: Bool = false
-    @State var showDelAlert = false
     @State var showBookmarks: Bool = false
-    @AppStorage("preferredFormats") var formatFilters: Set<FormatFilter> = [.def]
+    @AppStorage("preferredFormats") var formatFilters: Set<FormatFilter> = [.all]
     @AppStorage("bookLineDisplayMode") var bookDisplayMode: BookLineDisplayMode = .list
-    
+    @State var firstappear: Bool = true
+    /// For finder(local filter)
+    @AppStorage("toggleFinder") var showFinder: Bool = false
+    /// AppStorage doesn't work in scroll view reader.
+    @State var fixedShowFinder: Bool = UserDefaults.standard.bool(forKey: "toggleFinder")
+    @State var extraDisplayMode: BookLineDisplayMode = BookLineDisplayMode(rawValue: UserDefaults.standard.string(forKey: "bookLineDisplayMode") ?? "list") ?? .list
+    @State var isReachingEnd: Bool = false
+    ///
+   
     var body: some View {
-        ZStack {
-            List(selection: $selBooksVM.books) {
-                ForEach(books, id: \.self) { book in
-                    if bookDisplayMode == .list {
-                        BookLineView(book: book)
-                    } else {
-                        BookCoverView(book: book)
-                    }
+        ScrollViewReader { proxy in
+            VStack(alignment: .leading, spacing: 0) {
+                if fixedShowFinder {
+                    FilterBarView(proxy: proxy)
+                        .transition(.move(edge: .top))
+                        .background(
+                            RoundedRectangle(cornerRadius: 0)
+                                .fill(Color.gray.opacity(0.2))
+                        )
+                        .frame(height: 30)
                 }
-                if books.count > 0 {
-                    HStack {
-                        Spacer()
-                        if !loading {
-                            Button("More") {
-                                page += 1
-                                Task.detached(priority: .background) {
-                                    await fetchingBooks(page)
+                ZStack(alignment: .center) {
+                    List(selection: $selBooksVM.books) {
+                        if extraDisplayMode == .list {
+                            BookHeaderView()
+                        }
+                        ForEach(books, id: \.self) { book in
+                            #if !os(iOS)
+                            BookView(book, mode: extraDisplayMode)
+                                .contextMenu {
+                                    BookContext(book: book)
                                 }
+                                .id(book)
+                                .task {
+                                    if book == books.last {
+                                        fetchingNextPage()
+                                    }
+                                }
+                            #else
+                            NavigationLink(destination: BookDetailsView(book: book)) {
+                                BookView(book, mode: extraDisplayMode)
+                                    .id(book)
+                                    .task {
+                                        if book == books.last {
+                                            fetchingNextPage()
+                                        }
+                                    }
+                            }
+                            #endif
+                        }
+                        if books.count > 0 {
+                            HStack {
+                                Spacer()
+                                if loading, !isReachingEnd {
+                                    ProgressView()
+                                        .progressViewStyle(.linear)
+                                } else if isReachingEnd {
+                                    Text("-- No more --")
+                                        .font(.title2)
+                                        .foregroundColor(.primary)
+                                }
+                                Spacer()
                             }
                         }
-                        Spacer()
+                    }
+                    .contextMenu {
+                        Button("Refresh") {
+                            forceFetching()
+                        }
+                    }
+                    .listStyle(.sidebar)
+                    .toolbar {
+                        ToolbarView
+                    }
+                    
+                    if firstappear {
+                        EmptyStateView
+
+                    } else {
+                        if loading {
+                            ProgressView()
+                        } else if books.count == 0 {
+                            NoBooksView
+                        }
                     }
                 }
             }
-            .contextMenu {
-                Button("Refresh") {
-                    forceFetching()
-                }
-            }
-            .listStyle(.sidebar)
-            .toolbar {
-                toolbarView
-            }
-            .task {
-                Task.detached(priority: .background) {
-                    // On appear, force refreshing books.
-                    await fetchingBooks(page, force: true)
-                }
-            }
-            if loading {
-                ProgressView()
-            } else if books.count == 0 {
-                VStack {
-                    Image("libgenLarge")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 128, height: 128)
-                    Text("No books available, check connection or filters(maybe you're blocked by server).")
-                        .font(.title)
-                }
+            .frame(minWidth: 600)
+        }
+        .onChange(of: showFinder) { _ in
+            withAnimation {
+                fixedShowFinder.toggle()
             }
         }
-        .navigationTitle("")
+        .onChange(of: bookDisplayMode) { mode in
+            extraDisplayMode = mode
+        }
+
     }
     
-    private var NavToolbarItem: some ToolbarContent {
-        ToolbarItemGroup(placement: .navigation) {
-            Menu {
-                MirrorAdder(showSheet: $showAddSheet)
-                MirrorDeleter(showAlert: $showDelAlert)
-            } label: {
-                Label("Library genesis", image: "libgen")
-                    .scaledToFit()
-                    .labelStyle(.iconOnly)
-            }
-            .sheet(isPresented: $showAddSheet) {
-                MirrorSubmitSheet(showSheet: $showAddSheet)
-            }
-            .alert(isPresented: $showDelAlert) {
-                MirrorDelAlert()
-            }
+    private var NavigationToolItem: some View {
+        Group {
             MirrorPicker()
+                .labelStyle(.titleAndIcon)
+                .frame(width: 120)
+            
             Button(action: {
                 showBookmarks.toggle()
             }) {
                 HStack {
-                    Label("bookmarks", systemImage: "books.vertical.fill")
+                    Label("bookmarks", systemImage: "bookmark.fill")
                         .foregroundColor(.blue)
                     Image(systemName: "chevron.compact.down")
                         .resizable()
                         .scaledToFit()
+                        .frame(width: 15)
                 }
             }
             .popover(isPresented: $showBookmarks, arrowEdge: .bottom) {
                 BookmarkGallery()
+                    .frame(width: 400, height: 300)
             }
+            .help("Bookmarks")
+        }
+    }
+    
+    private var EmptyStateView: some View {
+        VStack {
+            Text("Please search for some books first.")
+                .font(.title)
+                .foregroundColor(.secondary)
+            Image("stewie")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 200, height: 200)
+        }
+        .padding()
+    }
+    
+    private var NoBooksView: some View {
+        VStack {
+            Image("brian")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 200, height: 200)
+            Text("Oops!")
+            Text("No books available, check connection or filters (maybe you're blocked by Libgen).")
+        }
+        .font(.title)
+    }
+    
+    private var PrincipleToolItem: some View {
+        Group {
+            TextField("Search len shouldn above 3.", text: $searchString)
+                .frame(width: 300, height: 100)
+                .textFieldStyle(.roundedBorder)
+                .onSubmit {
+                    forceFetching()
+                }
+   
+            Button(action: {
+                showFilter.toggle()
+            }) {
+                Image(systemName: "line.3.horizontal.decrease.circle")
+                    .foregroundColor((columnFilter == .def && formatFilters == [.all]) ? Color.secondary : Color.blue)
+            }
+            .popover(isPresented: $showFilter, arrowEdge: .bottom) {
+                FilterContextView(formatFilters: $formatFilters, columnFilter: $columnFilter)
+            }
+        }
+    }
+    
+    private var PrimaryToolItem: some View {
+        Group {
+            Picker("Display mode", selection: $bookDisplayMode) {
+                ForEach(BookLineDisplayMode.allCases, id: \.self) { mode in
+                    Label(mode.rawValue.capitalized, systemImage: mode.icon).tag(mode)
+                }
+            }
+            .pickerStyle(.inline)
+            .help("Change display mode to gallery/list")
+            
+            Button(action: {
+                showDownload.toggle()
+            }) {
+                Image(systemName: "arrow.down.circle")
+                    .foregroundColor(downloadManager.downloadTasks.count == 0 ? Color.secondary : Color.blue)
+                    .imageScale(.large)
+                    .popover(isPresented: $showDownload, arrowEdge: .bottom) {
+                        DownloadListView()
+                            .frame(width: 400, height: 300)
+                    }
+            }
+            .help("Downloads")
 
+            Button(action: { forceFetching() }) {
+                Image(systemName: connErr ? "network" : "arrow.clockwise.circle.fill" )
+                    .foregroundColor(connErr ? .yellow : .accentColor)
+                    .imageScale(.large)
+            }
+            .keyboardShortcut("r")
+            .popover(isPresented: $showConnPopover) {
+                Text(connErrMsg)
+                    .lineLimit(10)
+                    .frame(width: 200)
+                    .padding()
+            }
+            .onHover { hover in
+                if connErr {
+                    showConnPopover = hover
+                } else {
+                    showConnPopover = false
+                }
+            }
+            .help("Click to refresh")
         }
     }
     
     /// Toolbar view
-    private var toolbarView: some ToolbarContent {
+    private var ToolbarView: some View {
         Group {
-            NavToolbarItem
-            ToolbarItem {
-                Spacer()
-            }
-            ToolbarItemGroup(placement: .primaryAction) {
-                Picker("Display mode", selection: $bookDisplayMode) {
-                    ForEach(BookLineDisplayMode.allCases, id: \.self) { mode in
-                        Label(mode.rawValue.capitalized, systemImage: mode.icon).tag(mode)
-                    }
-                }
-                .pickerStyle(.inline)
-                .help("Change display mode to gallery/list")
-                
-                Button(action: {
-                    showDownload.toggle()
-                }) {
-                    Image(systemName: "arrow.down.circle")
-                        .foregroundColor(downloadManager.downloadTasks.count == 0 ? Color.secondary : Color.blue)
-                        .imageScale(.large)
-                        .popover(isPresented: $showDownload, arrowEdge: .bottom) {
-                            DownloadListView()
-                        }
-                }
-                .help("Downloads")
-
-                Button(action: { forceFetching() }) {
-                    Image(systemName: "network")
-                        .foregroundColor(connErr ? .yellow : .accentColor)
-                        .imageScale(.large)
-                }
-                .keyboardShortcut("r")
-                .popover(isPresented: $showConnPopover) {
-                    Text(connErrMsg)
-                        .lineLimit(10)
-                        .frame(width: 200)
-                        .padding()
-                }
-                .onHover { hover in
-                    if connErr {
-                        showConnPopover = hover
-                    } else {
-                        showConnPopover = false
-                    }
-                }
-                .help("Click to refresh")
-
-                Button(action: {
-                    showFilter.toggle()
-                }) {
-                    Image(systemName: "line.3.horizontal.decrease.circle")
-                        .foregroundColor((columnFilter == .def && formatFilters == [.def]) ? Color.secondary : Color.blue)
-                }
-                .popover(isPresented: $showFilter, arrowEdge: .bottom) {
-                    FilterContextView(formatFilters: $formatFilters, columnFilter: $columnFilter)
-                }
-                
-                SearchBar($searchString, prompt: "Search len must > 2") {
-                    forceFetching()
-                }
-                .frame(width: 200)
-            }
-
+#if !os(iOS)
+            NavigationToolItem
+#endif
+            Spacer()
+            PrincipleToolItem
+            Spacer()
+            PrimaryToolItem
         }
     }
     
     /// Handle a series of downloading.
     ///
     func askDownload() {
-        debugPrint("Download \(selectedBooks.map { $0.title })")
+        print("Download \(selectedBooks.map { $0.title })")
         DownloadManager.shared.download(Array(selectedBooks))
     }
     
@@ -203,19 +272,41 @@ struct BookListView: View {
     /// Do i need to reset selections? Maybe not.
     func forceFetching() {
         page = 1
+        isReachingEnd = false
         Task.detached(priority: .background) {
             await fetchingBooks(force: true)
+        }
+    }
+    
+    /// Fetching books of next page.
+    func fetchingNextPage() {
+        if !isReachingEnd {
+#if DEBUG
+            print("Query next page: \(page).")
+#endif
+            page += 1
+            Task.detached(priority: .background) {
+                await fetchingBooks(page)
+            }
+        } else {
+            print("Already reached the end.")
         }
     }
     
     /// load books of page N, if force, clear previous books
     ///
     func fetchingBooks(_ page: Int = 1, force: Bool = false) async {
-//        if loading { return }
-        await MainActor.run { loading = true }
+        if searchString.count <= 2 {
+            return
+        }
+        await MainActor.run {
+            firstappear = false
+            loading = true
+        }
         do {
             let books = try await LibgenAPI.shared.search(searchString, page: page, col: columnFilter, formats: formatFilters)
             await MainActor.run {
+                isReachingEnd = books.count == 0 // if no books available, indicate there's an end.
                 if force {
                     self.booksVM.books = books
                 } else {
@@ -224,10 +315,10 @@ struct BookListView: View {
                 connErr = false
             }
         } catch {
-            print("error occured: \(error)")
+            print("Libgenesis.BookListView.fetchingBooks: \(error.localizedDescription)")
             await MainActor.run {
                 connErr = true
-                connErrMsg = "\(error)"
+                connErrMsg = "\(error.localizedDescription)"
             }
         }
         await MainActor.run {
@@ -238,7 +329,6 @@ struct BookListView: View {
             }
         }
     }
-
 }
 
 struct BookListView_Previews: PreviewProvider {

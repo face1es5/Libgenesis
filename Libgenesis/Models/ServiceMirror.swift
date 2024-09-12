@@ -8,7 +8,6 @@
 import Foundation
 import SwiftUI
 
-
 struct ServerMirror: Identifiable, Codable, Hashable, CustomStringConvertible {
     let url: URL
     var domain: String {
@@ -27,7 +26,7 @@ struct ServerMirror: Identifiable, Codable, Hashable, CustomStringConvertible {
     
     var id: URL { self.url }
     
-    static var defaults: [Self] {
+    static var defaults: [ServerMirror] {
         DefaultServerMirror.toServerMirrors()
     }
     
@@ -50,6 +49,36 @@ struct ServerMirror: Identifiable, Codable, Hashable, CustomStringConvertible {
         static func toServerMirrors() -> [ServerMirror] {
             return self.allCases.compactMap { ServerMirror($0.rawValue) }
         }
+    }
+}
+
+class ObservableMirror: ObservableObject, Identifiable, Hashable {
+    static func == (lhs: ObservableMirror, rhs: ObservableMirror) -> Bool {
+        lhs.url == rhs.url
+    }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(url)
+    }
+    
+
+    let url: URL
+    var id: URL { self.url }
+    var domain: String {
+        url.domain() ?? "Invalid url: \(url.absoluteString)"
+    }
+    var description: String {
+        domain
+    }
+    @Published var stat: Bool = true
+    
+    init(_ mirror: ServerMirror) {
+        self.url = mirror.url
+    }
+    init?(_ urlstr: String) {
+        guard let url = URL(string: urlstr),
+              let _ = url.domain()
+        else { return nil }
+        self.url = url
     }
 }
 

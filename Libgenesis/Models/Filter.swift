@@ -34,7 +34,7 @@ enum ColumnFilter: String, CaseIterable, Identifiable, Codable {
 }
 
 enum FormatFilter: String, CaseIterable, Identifiable, Codable {
-    case def, pdf, epub, mobi, txt, azw, azw3, chm, pdg, hlp, html, djvu
+    case all, pdf, epub, mobi, txt, azw, azw3, chm, pdg, hlp, html, djvu
     
     var id: Self { self }
     
@@ -42,8 +42,6 @@ enum FormatFilter: String, CaseIterable, Identifiable, Codable {
     
     var desc: String {
         switch self {
-        case .def:
-            return "Default"
         default:
             return self.rawValue.capitalized
         }

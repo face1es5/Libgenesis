@@ -24,7 +24,7 @@ class BooksSelectionModel: ObservableObject {
     ///
     func loadDetails() {
         Task.detached(priority: .background) {
-            debugPrint("Request details manully.")
+            print("Request details manully.")
             await withTaskGroup(of: Void.self) { taskGroup in
                 for book in self.books {
                     if book.details == nil {
@@ -39,6 +39,10 @@ class BooksSelectionModel: ObservableObject {
     
     func clear() {
         books = []
+    }
+    
+    func select(_ book: BookItem) {
+        books = [book]
     }
 }
 

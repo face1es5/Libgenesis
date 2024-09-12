@@ -47,8 +47,8 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
     var downloadReq: DownloadRequest?
     
     var errorStr: String?
-    var totalSize: Int64?
-    var saveDir: String = UserDefaults.standard.string(forKey: "saveDir") ?? "/tmp"
+    @Published var totalSize: Int64?
+    var saveDir: String = UserDefaults.standard.string(forKey: "saveDir") ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.absoluteString
     var localURL: URL?
     
     /// Whether to user kepubify to convert epub to kepub, according to user prefercence and owned file format
@@ -180,7 +180,7 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
                         if self.useConverter {   // convert from epub to kepub
 #if os(macOS)
                             print("Use converter.")
-                            KepubConverter.shared.convert(src: self.localURL!.absoluteURL) { res in
+                            KepubConverter.shared.convert(src: self.localURL) { res in
                                 switch res {
                                 case .success(let msg):
                                     print(msg)
@@ -211,7 +211,9 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
     private func prepareToStart() {
         // get total size
         LibgenAPI.shared.fileSize(url: self.targetURL) { totalBytes in
-            self.totalSize = totalBytes
+            DispatchQueue.main.async {
+                self.totalSize = totalBytes
+            }
         }
     }
     

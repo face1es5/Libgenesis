@@ -9,8 +9,9 @@ import SwiftUI
 
 struct AdvanceFilterView: View {
     @Binding var formatFilters: Set<FormatFilter>
+    @State var expand: Bool = true
     var body: some View {
-        DisclosureGroup {
+        DisclosureGroup(isExpanded: $expand) {
             Form {
                 ForEach(FormatFilter.allCases) { filter in
                     Toggle(filter.desc, isOn: Binding(
@@ -56,6 +57,7 @@ struct PageNumPicker: View {
 struct FilterContextView: View {
     @Binding var formatFilters: Set<FormatFilter>
     @Binding var columnFilter: ColumnFilter
+    @State var expand: Bool = true
 
     private var ColumnFilterView: some View {
         ForEach(ColumnFilter.allCases) { filter in
@@ -74,7 +76,6 @@ struct FilterContextView: View {
         }
     }
     
-    
     var body: some View {
         Form {
             Button("Clear filters") {
@@ -82,7 +83,7 @@ struct FilterContextView: View {
             }
             PageNumPicker()
             HStack(alignment: .top, spacing: 10) {
-                DisclosureGroup {
+                DisclosureGroup(isExpanded: $expand) {
                     ColumnFilterView
                 } label: {
                     HStack {
@@ -101,7 +102,7 @@ struct FilterContextView: View {
     
     private func clearFilter() {
         columnFilter = .def
-        formatFilters = [.def]
+        formatFilters = [.all]
     }
 
 }

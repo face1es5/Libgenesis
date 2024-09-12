@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import Combine
-import Cocoa
 
 enum Theme: String, CaseIterable, Identifiable {
     case system, light, dark
@@ -42,7 +40,7 @@ struct SettingsView: View {
 struct GeneralView: View {
     @AppStorage("saveDir") var saveDir: String = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.path(percentEncoded: true) ?? "/tmp"
     @AppStorage("theme") var theme: Theme = .system
-    @AppStorage("preferredFormats") var preferredFormats: Set<FormatFilter> = [.def]
+    @AppStorage("preferredFormats") var preferredFormats: Set<FormatFilter> = [.all]
     @State var showFileSelector: Bool = false
 
     var body: some View {
@@ -109,6 +107,8 @@ struct AdvanceSettingsView: View {
     @AppStorage("cacheEnabled") var enableCache: Bool = true
     @AppStorage("cacheDir") var cacheDir: String = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?.path ?? "/tmp"
     @AppStorage("perPageN") var perPageN: Int = 25
+    @State var showAddSheet: Bool = false
+    @State var showDelAlert: Bool = false
     
     var body: some View {
         VStack {
@@ -122,10 +122,24 @@ struct AdvanceSettingsView: View {
                 Button("Clear documents cache") {
                     fatalError("Clear documents cache to be implemented.")
                 }
-                Picker("Results per page", selection: $perPageN) {
+                Picker("Results per page:", selection: $perPageN) {
                     Text("25").tag(25)
                     Text("50").tag(50)
                     Text("100").tag(100)
+                }
+                Menu {
+                    MirrorAdder(showSheet: $showAddSheet)
+                    MirrorDeleter(showAlert: $showDelAlert)
+                } label: {
+                    Label("Library genesis", image: "libgen")
+                        .scaledToFit()
+                        .labelStyle(.titleAndIcon)
+                }
+                .sheet(isPresented: $showAddSheet) {
+                    MirrorSubmitSheet(showSheet: $showAddSheet)
+                }
+                .alert(isPresented: $showDelAlert) {
+                    MirrorDelAlert()
                 }
             }
         }

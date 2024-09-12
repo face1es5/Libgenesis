@@ -13,24 +13,13 @@ class LibgenAPI {
     static let shared = LibgenAPI()
 
     var baseURL: String {
-        UserDefaults.standard.string(forKey: "baseURL")  ?? "what:????"
+        UserDefaults.standard.string(forKey: "baseURL")  ?? ServerMirror.defaultMirror.url.absoluteString
     }
     var perPageN: Int {
         UserDefaults.standard.integer(forKey: "perPageN")
     }
     
-    #if DEBUG
-    /// TODO: auto switch mirror if current mirror could be unavailable(reach maximum retry times).
-    let mutex = NSLock()
-    let maxRetryN = 10          // maximum retry times
-    let currentRetryTimes = 0   // current retry times
-    private func autoSwitch() {
-        fatalError("Implement auto switch operations.")
-    }
-    #endif
-    
     private init() {
-        //...
     }
     
     func parseTableHeader(_ ele: Element) throws -> [String] {
@@ -138,33 +127,151 @@ class LibgenAPI {
             md5: md5, detailURL: detailURL, searchURL: searchURL, isbn: isbn, edition: edition)
     }
     
+    func queryBooksWithCover(url: URL?) async throws -> [BookItem] {
+        guard
+            let url = url
+        else {
+            throw APIError.nilURL
+        }
+        let ht = try await APIService(to: url).getHtml()
+        let doc: Document = try SwiftSoup.parse(ht)
+        var books: [BookItem] = []
+        do {
+            try doc.select("table[border='0'][rules='cols'][width='100%'] > tbody").forEach { item in
+                if let book = try? parseTableWithCover(item) {
+                    books.append(book)
+                }
+            }
+        } catch {
+            print("\(error)")
+        }
+        return books
+    }
+    
+    func parseTableWithCover(_ ele: Element) throws -> BookItem? {
+        var coverURL: URL?
+        var colIndex: Int = 0
+        var id: String = "N/A"
+        var authors: String = "N/A"
+        var series: String = "N/A"
+        var periodical: String = "N/A"
+        var title: String = "N/A"
+        var publisher: String = "N/A"
+        var year: Int = 0
+        var pages: Int = 0
+        var language: String = "N/A"
+        var size: String = "N/A"
+        var format: String = "N/A"
+        var mirrors: [URL] = []
+        var edit: String = "N/A"
+        var edition: String = "N/A"
+        var isbn: String = "N/A"
+        var md5: String = "N/A"
+        var hrefstr: String = "N/A"
+        var searchURL: URL?
+        var detailURL: URL?
+        let md5reg = /md5=([A-Fa-f0-9]{32})/
+        
+        try ele.select("tr").forEach { col in
+            switch colIndex {
+            case 0:
+                break
+            case 1:
+                if let mirror = try? URL(string: "\(baseURL)\(col.select("a").attr("href"))") {
+                    mirrors.append(mirror)
+                    if let match = try md5reg.firstMatch(in: mirror.absoluteString) {
+                        md5 = "\(match.1)"
+                        detailURL = makeURL(baseURL: baseURL, path: "book/index.php", query: ["md5": "\(md5)"])
+                        let m2 = URL(string: "http://libgen.li/ads.php?md5=\(md5)")
+                        assert(m2 != nil, "Parse error: mirror 2 is nil URL.")
+                        mirrors.append(m2!)
+                    }
+                }
+                coverURL = try? URL(string: "\(baseURL)\(col.select("img").attr("src"))")
+                title = try col.select("td[colspan='2'] > b > a").text()
+                break
+            case 2:
+                authors = try col.select("a[href]").text()
+                break
+            case 3:
+                series = try col.select("td").get(1).text()
+                periodical = try col.select("td").get(3).text()
+                break
+            case 4:
+                publisher = try col.select("td").get(1).text()
+                break
+            case 5:
+                year = try Int(col.select("td").get(1).text()) ?? 0
+                break
+            case 6:
+                language = try col.select("td").get(1).text()
+                pages = try Int(col.select("td").get(3).text()) ?? 0
+                break
+            case 7:
+                isbn = try col.select("td").get(1).text()
+                id = try col.select("td").get(3).text()
+                break
+            case 8: // add date and modify date
+                break
+            case 9:
+                let sizereg = /([\d]+\s[GgMmKk][Bb])\s\([\d]+\)/
+                if let sz = try sizereg.firstMatch(in: col.select("td").get(1).text()) {
+                    size = "\(sz.1)"
+                }
+                format = try col.select("td").get(3).text()
+                break
+            case 10:    //bibtex
+                break
+            case 11:    //topic
+                break
+            case 12:    //mirrors seems invalid
+                break
+            default:
+                break
+            }
+            colIndex += 1
+        }
+        
+        if id == "N/A" {
+            return nil
+        }
+        
+        return BookItem(
+            id: id, authors: authors, title: title, publisher: publisher, year: year,
+            pages: pages, language: language, size: size, format: format, mirrors: mirrors, edit: edit,
+            md5: md5, detailURL: detailURL, searchURL: searchURL, isbn: isbn, edition: edition, coverURL: coverURL)
+    }
+    
     /// Parse description, download links, cover url
     ///
     /// - Parameters:
     ///   - book: Book to load details( 2 field needed, firstly is detail url, second is mirror urls
     /// - Returns: details item
-    func parseBookDetails(book: BookItem) async throws -> BookDetailsItem? {
+    func parseBookDetails(book: BookItem) async -> BookDetailsItem? {
         #if DEBUG
         print("parse book details of \(book.truncTitle)")
         #endif
-        guard
-            let url = book.detailURL
-        else {
-            print("Parse book \(book.truncTitle) details failed: nil book url")
-            return nil
-        }
         var desc: String = "N/A"
-        var coverURL: String = ""
-        async let doc = try SwiftSoup.parse(try await APIService(to: url).getHtml())
-        async let urls = try parseDirectDownloadLinks(book.mirrors)
-        if let table = try await doc.body()?.select("table > tbody").first() {
-            desc = try table.select("tr > td[colspan='4'][style]").text()
-            if let coverPath = try table.select("tr > td[rowspan='22'] > a[href] > img[src]").first()?.attr("src") {
-                coverURL = "\(baseURL)/\(coverPath)"
-            }
+        if let isbn = try? /([\d]+)(,[\d+])?/.firstMatch(in: book.isbn) {
+            desc = await GoodreadsAPI.fetchingDesc(for: "\(isbn.1)") ?? "No description available"
         }
+//        var coverURL: String = ""
+        do {
+//            async let doc = try SwiftSoup.parse(try await APIService(to: url).getHtml())
+            async let urls = try parseDirectDownloadLinks(book.mirrors)
+//            desc = try await doc.body()?.select("table > tbody").first()?.select("tr > td[colspan='4'][style]").text() ?? "Book descripition is not available."
+    //        if let table = try await doc.body()?.select("table > tbody").first() {
+    //            desc = try table.select("tr > td[colspan='4'][style]").text()
+    //            if let coverPath = try table.select("tr > td[rowspan='22'] > a[href] > img[src]").first()?.attr("src") {
+    //                coverURL = "\(baseURL)/\(coverPath)"
+    //            }
+    //        }
 
-        return try await BookDetailsItem(description: desc, fileLinks: urls, coverURL: URL(string: coverURL))
+            return try await BookDetailsItem(description: desc, fileLinks: urls)
+        } catch {
+            print("Load details of book \(book.truncTitle) failed: \(error.localizedDescription)")
+        }
+        return nil
     }
     
     /// Parse downloadl url of book
@@ -219,13 +326,15 @@ class LibgenAPI {
         return books
     }
     
+    
     /// Search for books
     /// - Parameters:
     ///   - searchStr: search string, emit when string len less than 2.
     ///   - page: page offset, default 1.
     ///   - col: column filter, see enum ColumnFilter.
     /// - Returns: a list of books
-    func search(_ searchStr: String, page: Int = 1, col: ColumnFilter = .def, formats: Set<FormatFilter> = [.def]) async throws -> [BookItem] {
+    func search(_ searchStr: String, page: Int = 1,
+                col: ColumnFilter = .def, formats: Set<FormatFilter> = [.all]) async throws -> [BookItem] {
         var query: [String: String] = [:]
         if searchStr.count >= 2 {   // search for specific books
             query["req"] = searchStr
@@ -238,8 +347,11 @@ class LibgenAPI {
         query["res"] = "\(perPageN)"
         // column filter
         query["column"] = col.queryKey
+        // cover mode
+        query["view"] = "detailed"
         
-        let books = try await queryBooks(url: makeURL(baseURL: baseURL, path: "search.php", query: query))
+//        let books = try await queryBooks(url: makeURL(baseURL: baseURL, path: "search.php", query: query))
+        let books = try await queryBooksWithCover(url: makeURL(baseURL: baseURL, path: "search.php", query: query))
         
         return filter(books, formats: formats)
     }
@@ -248,10 +360,10 @@ class LibgenAPI {
     /// Filter after querying, .i.e filter books locally.
     /// - Parameter formats: format filters
     /// - Returns: filtered books
-    func filter(_ books: [BookItem], formats: Set<FormatFilter> = [.def]) -> [BookItem] {
+    func filter(_ books: [BookItem], formats: Set<FormatFilter> = [.all]) -> [BookItem] {
         if formats.count == 0 { // no filters
             return books
-        } else if formats.count == 1, formats.contains(.def) { // default, just return original data.
+        } else if formats.count == 1, formats.contains(.all) { // default, just return original data.
             return books
         }
         return books.filter { book in
@@ -285,7 +397,7 @@ class LibgenAPI {
         return try await queryBooks(url: makeURL(baseURL: baseURL, path: "search.php", query: query))
     }
     
-    func makeURL(baseURL: String, path: String, query: [String: String]) -> URL? {
+    func makeURL(baseURL: String, path: String, query: [String: String] = [:]) -> URL? {
         guard
             var url = URLComponents(string: "\(baseURL)/\(path)")
         else {
@@ -304,5 +416,45 @@ class LibgenAPI {
                 completion(nil)
             }
         }
+    }
+    
+    func checkConn(_ url: URL) async -> Bool {
+        guard let req = try? URLRequest(url: url, method: .head)
+        else {
+            print("Libgenesis.LibgenAPI.checkConn(URL): Create Request Failed.")
+            return false
+        }
+        let maxRetry = 3
+        var cnt = 1
+        while cnt <= maxRetry {
+            do {
+                let (_, resp) = try await URLSession.shared.data(for: req)
+                if let httpResp = resp as? HTTPURLResponse,
+                   (200...299) ~= httpResp.statusCode {
+                    print("Server: \(url) is online.")
+                    return true
+                }
+            } catch {
+                print("Libgenesis.LibgenAPI.checkConn(URL): Request failed with: \(error.localizedDescription)")
+            }
+            cnt += 1
+            do {
+                try await Task.sleep(for: .seconds(1))  // have a rest before retry
+            } catch {
+                print("\(error)")
+            }
+        }
+        // failed as reached limit retry times.
+        print("Server: \(url) is not online.")
+        return false
+    }
+    
+    func checkConn(_ urlStr: String) async -> Bool {
+        guard let url = URL(string: urlStr)
+        else {
+            print("Libgenesis.LibgenAPI.checkConn(\(urlStr): Invalid URL.")
+            return false
+        }
+        return await checkConn(url)
     }
 }

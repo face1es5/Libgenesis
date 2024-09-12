@@ -35,6 +35,10 @@ extension String {
     static func percentage(percent: Double) -> String {
         return String(format: "%.2f %%", percent)
     }
+    // force break warp
+    var forceCharWrapping: Self {
+      self.map({ String($0) }).joined(separator: "\u{200B}")
+    }
 }
 
 extension Int64 {
@@ -72,5 +76,11 @@ extension Double {
             scale += 1
         }
         return String(format: "%.2f %@", size, units[scale])
+    }
+}
+
+extension Set {
+    func toArray() -> [Element] {
+        return Array(self)
     }
 }

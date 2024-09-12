@@ -10,7 +10,6 @@ import Foundation
 struct BookDetailsItem: Codable, Equatable {
     var description: String
     var fileLinks: [URL] = []
-    var coverURL: URL?
 }
 
 class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
@@ -22,6 +21,14 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
     }
     
     @Published var details: BookDetailsItem?
+    var coverURL: URL?
+    /// TODO:
+    let series: String = ""
+    let tags: String = ""
+    ///
+    var text: String {
+        "\(title) \(authors) \(id) \(publisher) \(year) \(series) \(isbn) \(language) \(md5) \(tags)"
+    }
     let id: String
     let authors: String
     var authorSeqs: [String] {
@@ -43,8 +50,11 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
     let isbn: String    // ISBN number
     let edition: String
     var downloadLinks: [String] = []
+    var loadingDetails: Bool = false
     
-    init(id: String, authors: String, title: String, publisher: String, year: Int, pages: Int, language: String, size: String, format: String, mirrors: [URL], edit: String, md5: String, detailURL: URL?, searchURL: URL?, isbn: String, edition: String) {
+    init(id: String, authors: String, title: String, publisher: String, year: Int, pages: Int,
+         language: String, size: String, format: String, mirrors: [URL], edit: String, md5: String,
+         detailURL: URL?, searchURL: URL?, isbn: String, edition: String, coverURL: URL? = nil) {
         self.id = id
         self.authors = authors
         self.title = title
@@ -62,18 +72,32 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
         self.isbn = isbn
         self.edition = edition
         self.truncTitle = String(title.prefix(15))+"..."
+        self.coverURL = coverURL
     }
     
     func loadDetails() async {
-        guard
-            let details = try? await LibgenAPI.shared.parseBookDetails(book: self)
-        else {
-            print("Load details of book \(truncTitle) failed.")
+        if loadingDetails {
             return
         }
-        print("Load details of book \(truncTitle) succeed.")
         await MainActor.run {
-            self.details = details
+            loadingDetails = true
+        }
+        var cnt = 1
+        let maxRetry = 3
+        while cnt <= maxRetry{
+            if let details = await LibgenAPI.shared.parseBookDetails(book: self) {
+                print("Load details of book \(truncTitle) succeed.")
+                await MainActor.run {
+                    self.details = details
+                }
+                break
+            }
+            try? await Task.sleep(for: .seconds(1)) // have a rest
+            cnt += 1
+        }
+        
+        await MainActor.run {
+            loadingDetails = false
         }
     }
     
@@ -95,6 +119,7 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
         self.md5 = try container.decode(String.self, forKey: .md5)
         self.detailURL = try container.decodeIfPresent(URL.self, forKey: .detailHerf)
         self.searchURL = try container.decodeIfPresent(URL.self, forKey: .href)
+        self.coverURL = try container.decodeIfPresent(URL.self, forKey: .coverURL)
         self.isbn = try container.decode(String.self, forKey: .isbn)
         self.edition = try container.decode(String.self, forKey: .edition)
         self.downloadLinks = try container.decode([String].self, forKey: .downloadLinks)
@@ -117,6 +142,7 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
         try container.encode(md5, forKey: .md5)
         try container.encodeIfPresent(detailURL, forKey: .detailHerf)
         try container.encodeIfPresent(searchURL, forKey: .href)
+        try container.encodeIfPresent(coverURL, forKey: .coverURL)
         try container.encode(isbn, forKey: .isbn)
         try container.encode(edition, forKey: .edition)
         try container.encode(downloadLinks, forKey: .downloadLinks)
@@ -125,6 +151,6 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
 
 extension BookItem {
     enum CodingKeys: String, CodingKey {
-        case id, authors, title, truncTitle, publisher, year, pages, language, size, format, mirrors, edit, md5, detailHerf, href, isbn, edition, downloadLinks
+        case id, authors, title, truncTitle, publisher, year, pages, language, size, format, mirrors, edit, md5, detailHerf, href, coverURL, isbn, edition, downloadLinks
     }
 }

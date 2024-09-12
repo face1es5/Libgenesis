@@ -40,8 +40,3 @@ extension Set: RawRepresentable where Element: Codable {
     }
 }
 
-extension Set {
-    func toArray() -> [Element] {
-        return Array(self)
-    }
-}

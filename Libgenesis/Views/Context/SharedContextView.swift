@@ -15,12 +15,16 @@ struct SharedContextView: View {
     }
     var body: some View {
         Group {
-            Button("Download \(book.truncTitle)") {
-                DownloadManager.shared.download(book)
+            Button("Download") {
+                Task.detached(priority: .background) {
+                    await askDownload(book)
+                }
             }
             .keyboardShortcut("s")
             Button("Download Selected Books") {
-                askDownload()
+                Task.detached(priority: .background) {
+                    await askDownload()
+                }
             }
             .disabled(selectedBooks.count == 0)
             .keyboardShortcut("j")
@@ -36,10 +40,22 @@ struct SharedContextView: View {
         }
     }
     
+    /// Handle download targe book.
+    private func askDownload(_ book: BookItem) async {
+        if book.details == nil {
+            await book.loadDetails()
+        }
+        DownloadManager.shared.download(book)
+    }
+    
     /// Handle a series of downloading.
-    ///
-    private func askDownload() {
-        debugPrint("Download \(selectedBooks.map { $0.title })")
+    private func askDownload() async {
+        for bk in selectedBooks {
+            if bk.details == nil {
+                await bk.loadDetails()
+            }
+        }
+        print("Download \(selectedBooks.map { $0.title })")
         DownloadManager.shared.download(Array(selectedBooks))
     }
     
@@ -67,17 +83,29 @@ struct BookMarkMenuView: View {
         bookmarksManager.contain(book)
     }
     var body: some View {
-        Button(action: {
-            if isBookmarked {
-                bookmarksManager.remove(book)
-            } else {
-                bookmarksManager.insert(book)
+        Group {
+            Button(action: {
+                if isBookmarked {
+                    bookmarksManager.remove(book)
+                } else {
+                    bookmarksManager.insert(book)
+                }
+            }) {
+                Label(isBookmarked ? "Remove bookmark" : "Add bookmark", systemImage: isBookmarked ? "bookmark.fill" : "bookmark")
             }
-        }) {
-            Label(isBookmarked ? "Remove bookmark" : "Add bookmark", systemImage: isBookmarked ? "bookmark.fill" : "bookmark")
+            .labelStyle(.titleAndIcon)
+            
+            Button(action: {
+                Task.detached(priority: .background) {
+                    await book.loadDetails()
+                }
+            }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .labelStyle(.titleAndIcon)
         }
-        .labelStyle(.titleAndIcon)
     }
+
 }
 
 struct SharedContextView_Previews: PreviewProvider {
