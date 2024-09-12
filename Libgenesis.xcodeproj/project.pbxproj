@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CF0A15342C91F94000CB5B4A /* FilterBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0A15332C91F94000CB5B4A /* FilterBarView.swift */; };
 		CF0C61192C8EBA8300503879 /* MirrorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61182C8EBA8300503879 /* MirrorPicker.swift */; };
 		CF0C611B2C8EEDA100503879 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CF0C611A2C8EEDA100503879 /* Credits.rtf */; };
 		CF0C61352C8F423A00503879 /* BookDetailsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61342C8F423A00503879 /* BookDetailsToolbar.swift */; };
@@ -40,9 +41,11 @@
 		CFE602A22C906B2600086F24 /* bookmark3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602932C906B2500086F24 /* bookmark3.jpg */; };
 		CFE602A32C906B2600086F24 /* download3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602942C906B2500086F24 /* download3.jpg */; };
 		CFE602A42C906B2600086F24 /* download2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFE602952C906B2600086F24 /* download2.jpg */; };
+		CFE93A882C92B367008CE24A /* kepubify-arm in Resources */ = {isa = PBXBuildFile; fileRef = CFE93A872C92B367008CE24A /* kepubify-arm */; platformFilters = (macos, ); };
+		CFE93A892C92B369008CE24A /* kepubify-arm in CopyFiles */ = {isa = PBXBuildFile; fileRef = CFE93A872C92B367008CE24A /* kepubify-arm */; platformFilters = (macos, ); settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		CFF2535A2C918497001C8144 /* Kepubify.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF253592C918497001C8144 /* Kepubify.swift */; };
-		CFF2535D2C919ECE001C8144 /* kepubify in Resources */ = {isa = PBXBuildFile; fileRef = CFF2535C2C919ECE001C8144 /* kepubify */; platformFilters = (macos, ); };
-		CFF2535F2C919F5D001C8144 /* kepubify in CopyFiles */ = {isa = PBXBuildFile; fileRef = CFF2535C2C919ECE001C8144 /* kepubify */; platformFilters = (macos, ); settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		CFF2535D2C919ECE001C8144 /* kepubify-intel in Resources */ = {isa = PBXBuildFile; fileRef = CFF2535C2C919ECE001C8144 /* kepubify-intel */; platformFilters = (macos, ); };
+		CFF2535F2C919F5D001C8144 /* kepubify-intel in CopyFiles */ = {isa = PBXBuildFile; fileRef = CFF2535C2C919ECE001C8144 /* kepubify-intel */; platformFilters = (macos, ); settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		CFF4F3232C8C338E00396BD7 /* Base.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF4F3222C8C338E00396BD7 /* Base.swift */; };
 		CFF4F3252C8C478A00396BD7 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF4F3242C8C478A00396BD7 /* Animations.swift */; };
 		CFFCB4B62C897B2600996675 /* LibgenAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCB4B52C897B2600996675 /* LibgenAPI.swift */; };
@@ -69,13 +72,15 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				CFF2535F2C919F5D001C8144 /* kepubify in CopyFiles */,
+				CFF2535F2C919F5D001C8144 /* kepubify-intel in CopyFiles */,
+				CFE93A892C92B369008CE24A /* kepubify-arm in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		CF0A15332C91F94000CB5B4A /* FilterBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterBarView.swift; sourceTree = "<group>"; };
 		CF0C61182C8EBA8300503879 /* MirrorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorPicker.swift; sourceTree = "<group>"; };
 		CF0C611A2C8EEDA100503879 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		CF0C611C2C8EEDFB00503879 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -112,8 +117,9 @@
 		CFE602932C906B2500086F24 /* bookmark3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bookmark3.jpg; sourceTree = "<group>"; };
 		CFE602942C906B2500086F24 /* download3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = download3.jpg; sourceTree = "<group>"; };
 		CFE602952C906B2600086F24 /* download2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = download2.jpg; sourceTree = "<group>"; };
+		CFE93A872C92B367008CE24A /* kepubify-arm */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "kepubify-arm"; sourceTree = "<group>"; };
 		CFF253592C918497001C8144 /* Kepubify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kepubify.swift; sourceTree = "<group>"; };
-		CFF2535C2C919ECE001C8144 /* kepubify */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = kepubify; sourceTree = "<group>"; };
+		CFF2535C2C919ECE001C8144 /* kepubify-intel */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "kepubify-intel"; sourceTree = "<group>"; };
 		CFF4F3222C8C338E00396BD7 /* Base.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base.swift; sourceTree = "<group>"; };
 		CFF4F3242C8C478A00396BD7 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		CFFCB4B52C897B2600996675 /* LibgenAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibgenAPI.swift; sourceTree = "<group>"; };
@@ -238,6 +244,7 @@
 				CFFF12452C8DB3B400DC4240 /* BookListView.swift */,
 				CFFF12412C8DB33E00DC4240 /* BookView.swift */,
 				CFFCB4C02C89A1FA00996675 /* BookDetailsView.swift */,
+				CF0A15332C91F94000CB5B4A /* FilterBarView.swift */,
 			);
 			path = Book;
 			sourceTree = "<group>";
@@ -278,7 +285,8 @@
 		CFF2535B2C919E98001C8144 /* binaries */ = {
 			isa = PBXGroup;
 			children = (
-				CFF2535C2C919ECE001C8144 /* kepubify */,
+				CFF2535C2C919ECE001C8144 /* kepubify-intel */,
+				CFE93A872C92B367008CE24A /* kepubify-arm */,
 			);
 			path = binaries;
 			sourceTree = "<group>";
@@ -412,9 +420,10 @@
 				CFE602982C906B2600086F24 /* bookmark2.jpg in Resources */,
 				CFE6029E2C906B2600086F24 /* search3.jpg in Resources */,
 				CFE602992C906B2600086F24 /* listmode.jpg in Resources */,
-				CFF2535D2C919ECE001C8144 /* kepubify in Resources */,
+				CFF2535D2C919ECE001C8144 /* kepubify-intel in Resources */,
 				CF0C611B2C8EEDA100503879 /* Credits.rtf in Resources */,
 				CFE6029A2C906B2600086F24 /* search2.jpg in Resources */,
+				CFE93A882C92B367008CE24A /* kepubify-arm in Resources */,
 				CFE6029D2C906B2600086F24 /* download4.jpg in Resources */,
 				CFE6029C2C906B2600086F24 /* download1.jpg in Resources */,
 				CFE602962C906B2600086F24 /* covermode.jpg in Resources */,
@@ -435,6 +444,7 @@
 				CFE2977E2C8B31F5007C403A /* DownloadTaskModel.swift in Sources */,
 				CF0C613B2C8F571C00503879 /* BookmarkGallery.swift in Sources */,
 				CFFCB4C32C89B53200996675 /* DownloadListView.swift in Sources */,
+				CF0A15342C91F94000CB5B4A /* FilterBarView.swift in Sources */,
 				CFFCB4BF2C89989D00996675 /* BookModel.swift in Sources */,
 				CFFF124A2C8DC04600DC4240 /* ImageView.swift in Sources */,
 				CFFCB4C12C89A1FA00996675 /* BookDetailsView.swift in Sources */,

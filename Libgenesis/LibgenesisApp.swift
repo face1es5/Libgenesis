@@ -12,11 +12,28 @@ import Kingfisher
 struct LibgenesisApp: App {
     @StateObject var downloadManager: DownloadManager = DownloadManager.shared
     @AppStorage("theme") var theme: Theme = .system
+    @AppStorage("togglerFinder") var showFinder = false
     @StateObject var selBooksVM: BooksSelectionModel = BooksSelectionModel()
     @StateObject var booksVM: BooksViewModel = BooksViewModel()
     @StateObject var recentManager: RecentlyFilesManager = RecentlyFilesManager()
     @StateObject var bookmarksManager: BookmarksModel = BookmarksModel()
     
+    init() {
+        // restore bookmark access
+        guard
+            let path = UserDefaults.standard.string(forKey: "saveDir")
+        else {
+            print("Failed to restore bookmark access: can't find save dir")
+            return
+        }
+        let dir = URL(filePath: path)
+        if dir.startAccessingSecurityScopedResource() {
+            print("Restore access to save dir success: \(path)")
+        } else {
+            print("Restore access to save dir failed: \(path)")
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -47,6 +64,14 @@ struct LibgenesisApp: App {
         #if !os(watchOS)
         .commands {
             GeneralCommands()
+            CommandMenu("Find") {
+                Button("Find") {
+                    withAnimation {
+                        showFinder.toggle()
+                    }
+                }
+                .keyboardShortcut("F")
+            }
             DownloadCommands(downloadManager: downloadManager)
             RecentFilesCommands(recentManager: recentManager)
         }
@@ -70,6 +95,7 @@ struct LibgenesisApp: App {
         #endif
 
     }
+    
     private func colorScheme() -> ColorScheme? {
         switch theme {
         case .system:
@@ -95,22 +121,6 @@ struct LibgenesisApp: App {
             return
         }
         NSWorkspace.shared.open(url.deletingLastPathComponent())
-    }
-    
-    init() {
-        // restore bookmark access
-        guard
-            let path = UserDefaults.standard.string(forKey: "saveDir")
-        else {
-            print("Failed to restore bookmark access: can't find save dir")
-            return
-        }
-        let dir = URL(filePath: path)
-        if dir.startAccessingSecurityScopedResource() {
-            print("Restore access to save dir success: \(path)")
-        } else {
-            print("Restore access to save dir failed: \(path)")
-        }
     }
 }
 

@@ -23,8 +23,6 @@ struct DownloadCommands: Commands {
     }
 }
 
-
-
 /// Manager for recently opened files.
 class RecentlyFilesManager: ObservableObject {
     @AppStorage("recentlyOpened") var recentlyOpened = Set<URL>()
@@ -71,18 +69,6 @@ struct RecentFilesCommands: Commands {
         }
     }
 }
-
-//struct WindowCommands: Commands {
-//    @Environment(\.openWindow) private var openDownloader
-//    var body: some Commands {
-//        CommandGroup(after: .windowArrangement) {
-//            Button("Open download window") {
-//                openDownloader(id: "downloader-window")
-//            }
-//        }
-//    }
-//}
-
 
 struct GeneralCommands_Previews: PreviewProvider {
     static var previews: some View {

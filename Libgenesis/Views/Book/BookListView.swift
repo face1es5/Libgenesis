@@ -25,6 +25,14 @@ struct BookListView: View {
     @State var showConnPopover: Bool = false
     @State var showFilter: Bool = false
     @State var columnFilter: ColumnFilter = .def
+    /// For finder(local filter)
+    @AppStorage("togglerFinder") var showFinder: Bool = false
+    @State var filterString: String = ""
+    @State var colFilter_Finder: ColumnFilter = .def
+    @State var matchMode: MatchMode = .contains
+    @State var dofilter: Bool = false
+    @State var caseSensitive: Bool = false
+    ///
     @State var showDownload: Bool = false
     @State var showAddSheet: Bool = false
     @State var showDelAlert = false
@@ -33,55 +41,70 @@ struct BookListView: View {
     @AppStorage("bookLineDisplayMode") var bookDisplayMode: BookLineDisplayMode = .list
     
     var body: some View {
-        ZStack {
-            List(selection: $selBooksVM.books) {
-                ForEach(books, id: \.self) { book in
-                    if bookDisplayMode == .list {
-                        BookLineView(book: book)
-                    } else {
-                        BookCoverView(book: book)
+        VStack(spacing: 0) {
+            if showFinder {
+                FilterBarView(filterString: $filterString, column: $colFilter_Finder,
+                              matchMode: $matchMode, caseSensitive: $caseSensitive,
+                              dofilter: $dofilter)
+                    .transition(.move(edge: .top))
+                    .background(
+                        RoundedRectangle(cornerRadius: 0)
+                            .fill(Color.gray.opacity(0.2))
+                    )
+                    .frame(height: 30)
+            }
+            ZStack {
+                List(selection: $selBooksVM.books) {
+                    ForEach(books, id: \.self) { book in
+                        if dofilter {
+                            if conform(book) {
+                                BookView(book, mode: bookDisplayMode)
+                            }
+                        } else {
+                            BookView(book, mode: bookDisplayMode)
+                        }
                     }
-                }
-                if books.count > 0 {
-                    HStack {
-                        Spacer()
-                        if !loading {
-                            Button("More") {
-                                page += 1
-                                Task.detached(priority: .background) {
-                                    await fetchingBooks(page)
+                    if books.count > 0 {
+                        HStack {
+                            Spacer()
+                            if !loading {
+                                Button("More") {
+                                    page += 1
+                                    Task.detached(priority: .background) {
+                                        await fetchingBooks(page)
+                                    }
                                 }
                             }
+                            Spacer()
                         }
-                        Spacer()
                     }
                 }
-            }
-            .contextMenu {
-                Button("Refresh") {
-                    forceFetching()
+                .contextMenu {
+                    Button("Refresh") {
+                        forceFetching()
+                    }
                 }
-            }
-            .listStyle(.sidebar)
-            .toolbar {
-                toolbarView
-            }
-            .task {
-                Task.detached(priority: .background) {
-                    // On appear, force refreshing books.
-                    await fetchingBooks(page, force: true)
+                .listStyle(.sidebar)
+                .toolbar {
+                    toolbarView
                 }
-            }
-            if loading {
-                ProgressView()
-            } else if books.count == 0 {
-                VStack {
-                    Image("libgenLarge")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 128, height: 128)
-                    Text("No books available, check connection or filters(maybe you're blocked by server).")
-                        .font(.title)
+                .task {
+                    Task.detached(priority: .background) {
+                        // On appear, force refreshing books.
+                        await fetchingBooks(page, force: true)
+                    }
+                }
+                if loading {
+                    ProgressView()
+                } else if books.count == 0 {
+                    VStack {
+                        Image("libgenLarge")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 128, height: 128)
+                        Text("No books available, check connection or filters(maybe you're blocked by server).")
+                            .font(.title)
+                    }
                 }
             }
         }
@@ -239,6 +262,21 @@ struct BookListView: View {
         }
     }
 
+    /// Filter by finder
+    func conform(_ book: BookItem) -> Bool {
+        //TODO: ...
+        print("\(book.authors)")
+        if colFilter_Finder == .author {
+            if matchMode == .contains {
+                if caseSensitive {
+                    return book.authors.contains(filterString)
+                } else {
+                    return book.authors.lowercased().contains(filterString.lowercased())
+                }
+            }
+        }
+        return false
+    }
 }
 
 struct BookListView_Previews: PreviewProvider {

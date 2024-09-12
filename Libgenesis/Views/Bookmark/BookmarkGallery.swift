@@ -37,6 +37,7 @@ struct BookMarkView: View {
         HStack(alignment: .center, spacing: 10) {
             CoverView
             TitleView
+            Spacer()
         }
         .task {
             if book.details == nil {
@@ -53,13 +54,13 @@ struct BookMarkView: View {
     }
     private var TitleView: some View {
         VStack {
-            if let dhref = book.detailURL {
-                Link(destination: dhref) {
+            if let detailURL = book.detailURL {
+                Link(destination: detailURL) {
                     Text(book.title)
                         .lineLimit(2)
                 }
-            } else if let href = book.searchURL {
-                Link(destination: href) {
+            } else if let searchURL = book.searchURL {
+                Link(destination: searchURL) {
                     Text(book.title)
                         .lineLimit(2)
                 }

@@ -14,16 +14,22 @@ struct BookLineView: View {
     var body: some View {
         Text(book.title)
             .contextMenu {
-                BookLineContext(book: book)
+                BookContext(book: book)
             }
     }
     
 }
 
-struct BookLineContext: View {
+struct BookContext: View {
     @ObservedObject var book: BookItem
     var body: some View {
         Group {
+            Button("Refresh") {
+                Task.detached(priority: .background) {
+                    await book.loadDetails()
+                }
+            }
+            Divider()
             SharedContextView(book: book)
             Divider()
             Button("Preview") {
@@ -31,6 +37,22 @@ struct BookLineContext: View {
             }
             Divider()
             BookMarkMenuView(book: book)
+        }
+    }
+}
+
+struct BookView: View {
+    @ObservedObject var book: BookItem
+    let mode: BookLineDisplayMode
+    init(_ book: BookItem, mode: BookLineDisplayMode) {
+        self.book = book
+        self.mode = mode
+    }
+    var body: some View {
+        if mode == .list {
+            BookLineView(book: book)
+        } else if mode == .gallery {
+            BookCoverView(book: book)
         }
     }
 }
@@ -58,7 +80,7 @@ struct BookCoverView: View {
             }
         }
         .contextMenu {
-            BookLineContext(book: book)
+            BookContext(book: book)
         }
         .task(priority: .background) {
             // try query details if there isn't.

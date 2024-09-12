@@ -63,7 +63,7 @@ struct ContentView: View {
     /// Handle a series of downloading.
     ///
     func askDownload() {
-        debugPrint("Download \(selBooksVM.books.map { $0.title })")
+        print("Download \(selBooksVM.books.map { $0.title })")
         DownloadManager.shared.download(selBooksVM.booksArr)
     }
     

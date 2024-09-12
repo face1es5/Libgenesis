@@ -180,7 +180,7 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
                         if self.useConverter {   // convert from epub to kepub
 #if os(macOS)
                             print("Use converter.")
-                            KepubConverter.shared.convert(src: self.localURL!.absoluteURL) { res in
+                            KepubConverter.shared.convert(src: self.localURL) { res in
                                 switch res {
                                 case .success(let msg):
                                     print(msg)
