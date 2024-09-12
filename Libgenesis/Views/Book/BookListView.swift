@@ -30,8 +30,11 @@ struct BookListView: View {
     @State var filterString: String = ""
     @State var colFilter_Finder: ColumnFilter = .def
     @State var matchMode: MatchMode = .contains
-    @State var dofilter: Bool = false
+    @State var doFilter: Bool = true
     @State var caseSensitive: Bool = false
+    var filteredBooks: [BookItem] {
+        books.filter { conform($0) }
+    }
     ///
     @State var showDownload: Bool = false
     @State var showAddSheet: Bool = false
@@ -44,25 +47,21 @@ struct BookListView: View {
         VStack(spacing: 0) {
             if showFinder {
                 FilterBarView(filterString: $filterString, column: $colFilter_Finder,
-                              matchMode: $matchMode, caseSensitive: $caseSensitive,
-                              dofilter: $dofilter)
+                              matchMode: $matchMode, caseSensitive: $caseSensitive)
                     .transition(.move(edge: .top))
                     .background(
                         RoundedRectangle(cornerRadius: 0)
                             .fill(Color.gray.opacity(0.2))
                     )
                     .frame(height: 30)
+                    .onDisappear {
+                        doFilter = false
+                    }
             }
             ZStack {
                 List(selection: $selBooksVM.books) {
-                    ForEach(books, id: \.self) { book in
-                        if dofilter {
-                            if conform(book) {
-                                BookView(book, mode: bookDisplayMode)
-                            }
-                        } else {
-                            BookView(book, mode: bookDisplayMode)
-                        }
+                    ForEach(filteredBooks, id: \.self) { book in
+                        BookView(book, mode: bookDisplayMode)
                     }
                     if books.count > 0 {
                         HStack {
@@ -264,18 +263,69 @@ struct BookListView: View {
 
     /// Filter by finder
     func conform(_ book: BookItem) -> Bool {
-        //TODO: ...
-        print("\(book.authors)")
-        if colFilter_Finder == .author {
-            if matchMode == .contains {
-                if caseSensitive {
-                    return book.authors.contains(filterString)
-                } else {
-                    return book.authors.lowercased().contains(filterString.lowercased())
-                }
-            }
+        if !doFilter || filterString.count == 0{
+            return true
         }
-        return false
+        var str: String
+
+        var filter: String
+        if matchMode == .re {
+            filter = filterString
+        } else {    // if not re mode, escape special chars
+            filter = NSRegularExpression.escapedPattern(for: filterString)
+        }
+
+        switch colFilter_Finder {
+        case .def:
+            str = book.text
+            break
+        case .author:
+            str = book.authors
+            break
+        case .title:
+            str = book.title
+            break
+        case .publisher:
+            str = book.publisher
+            break
+        case .year:
+            str = "\(book.year)"
+            break
+        case .series:
+            str = book.series
+            break
+        case .ISBN:
+            str = book.isbn
+            break
+        case .language:
+            str = book.language
+            break
+        case .MD5:
+            str = book.md5
+            break
+        case .tags:
+            str = book.tags
+            break
+        }
+        
+        if !caseSensitive, matchMode != .re {
+            str = str.lowercased()
+            filter = filter.lowercased()
+        }
+        
+        var re: String
+        switch matchMode {
+        case .start:
+            re = "^\(filter)"
+        case .end:
+            re = "\(filter)$"
+        case .word:
+            re = "\\b\(filter)\\b"
+        default:
+            re = filter
+        }
+        guard let reg = try? Regex(re) else { return false }
+        return str.contains(reg)
     }
 }
 

@@ -32,17 +32,14 @@ struct FilterBarView: View {
     @Binding var filterString: String
     @Binding var caseSensitive: Bool
     @Binding var matchMode: MatchMode
-    @Binding var dofilter: Bool
     @AppStorage("togglerFinder") var showFinder: Bool = false
     
     init(filterString: Binding<String>, column: Binding<ColumnFilter>,
-         matchMode: Binding<MatchMode>, caseSensitive: Binding<Bool>,
-         dofilter: Binding<Bool>) {
+         matchMode: Binding<MatchMode>, caseSensitive: Binding<Bool>) {
         _filterString = filterString
         _column = column
         _matchMode = matchMode
         _caseSensitive = caseSensitive
-        _dofilter = dofilter
     }
     
     var body: some View {
@@ -53,43 +50,35 @@ struct FilterBarView: View {
                 }
             } label: {}
             .frame(width: 100)
+            
             TextField("Filter(press Enter to search, not press done)", text: $filterString)
                 .textFieldStyle(.roundedBorder)
-                .onSubmit {
-                    if filterString.count == 0, dofilter {
-                        dofilter = false
-                    } else {
-                        if dofilter {
-                            dofilter = false
-                            dofilter = true
-                        } else {
-                            dofilter = true
-                        }
-                    }
-                }
             Divider()
+            
             Button("Aa") {
                 caseSensitive.toggle()
             }
-            .font(.title3)
             .buttonStyle(.plain)
-            .foregroundColor(caseSensitive ? .blue : .primary)
+            .foregroundColor(caseSensitive ? .blue : .secondary)
             .help("Case sensitive")
+            
             Divider()
+            
             Picker(selection: $matchMode) {
                 ForEach(MatchMode.allCases, id: \.self) { mode in
                     Text("\(mode.desc)")
                 }
             } label: {}
             .frame(width: 120)
+            
             Divider()
+            
             Button("Done") {
                 withAnimation {
                     showFinder.toggle()
-                    dofilter = false
                 }
             }
-            .buttonStyle(.plain)
+            .foregroundColor(.secondary)
         }
         .padding(.horizontal, 10)
     }

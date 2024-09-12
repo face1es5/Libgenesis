@@ -22,6 +22,13 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
     }
     
     @Published var details: BookDetailsItem?
+    /// TODO:
+    let series: String = ""
+    let tags: String = ""
+    ///
+    var text: String {
+        "\(title) \(authors) \(id) \(publisher) \(year) \(series) \(isbn) \(language) \(md5) \(tags)"
+    }
     let id: String
     let authors: String
     var authorSeqs: [String] {
