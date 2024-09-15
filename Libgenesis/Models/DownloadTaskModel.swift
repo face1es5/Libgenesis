@@ -48,7 +48,7 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
     
     var errorStr: String?
     var totalSize: Int64?
-    var saveDir: String = UserDefaults.standard.string(forKey: "saveDir") ?? "/tmp"
+    var saveDir: String = UserDefaults.standard.string(forKey: "saveDir") ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.absoluteString
     var localURL: URL?
     
     /// Whether to user kepubify to convert epub to kepub, according to user prefercence and owned file format

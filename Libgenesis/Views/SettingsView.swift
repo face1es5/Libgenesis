@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import Combine
-import Cocoa
 
 enum Theme: String, CaseIterable, Identifiable {
     case system, light, dark

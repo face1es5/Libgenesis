@@ -79,9 +79,6 @@ struct BookCoverView: View {
                 }
             }
         }
-        .contextMenu {
-            BookContext(book: book)
-        }
         .task(priority: .background) {
             // try query details if there isn't.
             if book.details == nil {

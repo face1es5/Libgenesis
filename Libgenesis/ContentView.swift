@@ -11,6 +11,24 @@ struct ContentView: View {
     @EnvironmentObject var selBooksVM: BooksSelectionModel
     @EnvironmentObject var booksVM: BooksViewModel
     
+    var body: some View {
+        #if !os(iOS)
+        NavigationSplitView {
+            BookDetailsContainer
+        } detail: {
+            BookListView()
+                .environmentObject(booksVM)
+                .environmentObject(selBooksVM)
+        }
+        #else
+        NavigationStack {
+            BookListView()
+                .environmentObject(booksVM)
+                .environmentObject(selBooksVM)
+        }
+        #endif
+    }
+    
     var BookDetailsContainer: some View {
         ScrollView {
             if let book = selBooksVM.firstBook {
@@ -47,17 +65,6 @@ struct ContentView: View {
             BookDetailsToolbar()
         }
         .padding()
-    }
-    
-    var body: some View {
-        NavigationSplitView {
-            BookDetailsContainer
-        } detail: {
-            BookListView()
-                .environmentObject(booksVM)
-                .environmentObject(selBooksVM)
-        }
-
     }
     
     /// Handle a series of downloading.

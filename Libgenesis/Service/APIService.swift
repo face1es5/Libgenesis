@@ -21,10 +21,13 @@ class APIService {
         do {
             let (data, resp) = try await URLSession.shared.data(from: url)
             guard
-                let resp = resp as? HTTPURLResponse,
-                (200 ... 299) ~= resp.statusCode
+                let httpresp = resp as? HTTPURLResponse
             else {
                 throw APIError.invalidResponse
+            }
+            guard (200 ... 299) ~= httpresp.statusCode
+            else {
+                throw APIError.badResponse(httpresp.statusCode)
             }
             guard let res = String(data: data, encoding: .utf8)
             else {
@@ -56,10 +59,25 @@ class APIService {
     }
 }
 
-enum APIError: Error {
+enum APIError: Error, LocalizedError {
     case invalidURL
     case invalidResponse
+    case badResponse(Int)
     case decodingError
     case nilURL
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL:
+            return "Invalid URL"
+        case .invalidResponse:
+            return "Invalid response."
+        case .badResponse(let code):
+            return "Invalid response: \(code)"
+        case .decodingError:
+            return "Decoding error"
+        case .nilURL:
+            return "Nil URL"
+        }
+    }
     
 }

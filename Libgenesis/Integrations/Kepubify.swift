@@ -7,6 +7,7 @@
 
 import Foundation
 
+#if os(macOS)
 class KepubConverter {
     static let shared = KepubConverter()
     private var exec: URL?
@@ -80,3 +81,4 @@ class KepubConverter {
         }
     }
 }
+#endif

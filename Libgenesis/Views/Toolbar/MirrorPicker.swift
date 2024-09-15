@@ -15,9 +15,14 @@ struct MirrorStatView: View {
                 #if DEBUG
                 print("Check server conn: \(mirror.url)")
                 #endif
-                let stat = await LibgenAPI.shared.checkConn(mirror.url)
-                await MainActor.run {
-                    mirror.stat = stat
+                do {
+                    try await Task.sleep(for: .seconds(1.5))
+                    let stat = await LibgenAPI.shared.checkConn(mirror.url)
+                    await MainActor.run {
+                        mirror.stat = stat
+                    }
+                } catch {
+                    print("\(error)")
                 }
             }
     }
@@ -25,7 +30,7 @@ struct MirrorStatView: View {
 
 struct MirrorPicker: View {
     @AppStorage("libgenMirrors") var libgenMirrors: [ServerMirror] = ServerMirror.defaults
-    @AppStorage("baseURL") var selection: String = ServerMirror.defaultMirror.description
+    @AppStorage("baseURL") var selection: String = ServerMirror.defaultMirror.url.absoluteString
 
     var body: some View {
         Picker("Server:", selection: $selection) {

@@ -22,6 +22,7 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
     }
     
     @Published var details: BookDetailsItem?
+    var loadingDetails = false
     /// TODO:
     let series: String = ""
     let tags: String = ""
@@ -72,15 +73,17 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
     }
     
     func loadDetails() async {
-        guard
-            let details = try? await LibgenAPI.shared.parseBookDetails(book: self)
-        else {
-            print("Load details of book \(truncTitle) failed.")
+        if self.loadingDetails {
             return
         }
-        print("Load details of book \(truncTitle) succeed.")
+        await MainActor.run {
+            self.loadingDetails = true
+        }
+        let details = try? await LibgenAPI.shared.parseBookDetails(book: self)
+        print("Load details of book \(truncTitle) \(details == nil ? "failed" : "succeed").")
         await MainActor.run {
             self.details = details
+            self.loadingDetails = false
         }
     }
     

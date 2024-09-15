@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(macOS)
 struct MenuBar: View {
     var body: some View {
         Menu("Downloads") {
@@ -28,8 +29,10 @@ struct MenuBar: View {
     }
 }
 
+
 struct MenuBar_Previews: PreviewProvider {
     static var previews: some View {
         MenuBar()
     }
 }
+#endif

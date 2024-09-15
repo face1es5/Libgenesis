@@ -155,21 +155,23 @@ struct DownloadListView: View {
     var body: some View {
         List(downloadManager.downloadTasks, id: \.self, selection: $selectedTask) { dtask in
             DownloadTaskView(dtask: dtask)
+            Divider()
         }
         .listStyle(.sidebar)
-        .frame(width: 400, height: 200)
         .padding(5)
     }
 }
 
 struct DownloaderView: View {
+    @EnvironmentObject var downloadManager: DownloadManager
     var body: some View {
-        VStack {
-            DownloadListView()
-                .environmentObject(DownloadManager.shared)
-        }
-        .frame(width: 400, height: 400)
-        .navigationTitle("Downloader")
+        DownloadListView()
+            .navigationTitle("Downloader")
+            .toolbar {
+                Button("Clear") {
+                    downloadManager.clear()
+                }
+            }
     }
 }
 

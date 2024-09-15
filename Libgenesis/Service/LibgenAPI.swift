@@ -13,7 +13,7 @@ class LibgenAPI {
     static let shared = LibgenAPI()
 
     var baseURL: String {
-        UserDefaults.standard.string(forKey: "baseURL")  ?? "what:????"
+        UserDefaults.standard.string(forKey: "baseURL")  ?? ServerMirror.defaultMirror.url.absoluteString
     }
     var perPageN: Int {
         UserDefaults.standard.integer(forKey: "perPageN")
@@ -208,13 +208,15 @@ class LibgenAPI {
         return books
     }
     
+    
     /// Search for books
     /// - Parameters:
     ///   - searchStr: search string, emit when string len less than 2.
     ///   - page: page offset, default 1.
     ///   - col: column filter, see enum ColumnFilter.
     /// - Returns: a list of books
-    func search(_ searchStr: String, page: Int = 1, col: ColumnFilter = .def, formats: Set<FormatFilter> = [.def]) async throws -> [BookItem] {
+    func search(_ searchStr: String, page: Int = 1,
+                col: ColumnFilter = .def, formats: Set<FormatFilter> = [.def]) async throws -> [BookItem] {
         var query: [String: String] = [:]
         if searchStr.count >= 2 {   // search for specific books
             query["req"] = searchStr

@@ -42,6 +42,7 @@ struct BookListView: View {
     @State var showBookmarks: Bool = false
     @AppStorage("preferredFormats") var formatFilters: Set<FormatFilter> = [.def]
     @AppStorage("bookLineDisplayMode") var bookDisplayMode: BookLineDisplayMode = .list
+   
     
     var body: some View {
         VStack(spacing: 0) {
@@ -61,7 +62,16 @@ struct BookListView: View {
             ZStack {
                 List(selection: $selBooksVM.books) {
                     ForEach(filteredBooks, id: \.self) { book in
+                        #if !os(iOS)
                         BookView(book, mode: bookDisplayMode)
+                            .contextMenu {
+                                BookContext(book: book)
+                            }
+                        #else
+                        NavigationLink(destination: BookDetailsView(book: book)) {
+                            BookView(book, mode: bookDisplayMode)
+                        }
+                        #endif
                     }
                     if books.count > 0 {
                         HStack {
@@ -144,10 +154,12 @@ struct BookListView: View {
                     Image(systemName: "chevron.compact.down")
                         .resizable()
                         .scaledToFit()
+                        .frame(width: 15)
                 }
             }
             .popover(isPresented: $showBookmarks, arrowEdge: .bottom) {
                 BookmarkGallery()
+                    .frame(width: 400, height: 300)
             }
 
         }
@@ -156,10 +168,12 @@ struct BookListView: View {
     /// Toolbar view
     private var toolbarView: some ToolbarContent {
         Group {
+            #if !os(iOS)
             NavToolbarItem
             ToolbarItem {
                 Spacer()
             }
+            #endif
             ToolbarItemGroup(placement: .primaryAction) {
                 Picker("Display mode", selection: $bookDisplayMode) {
                     ForEach(BookLineDisplayMode.allCases, id: \.self) { mode in
@@ -177,6 +191,7 @@ struct BookListView: View {
                         .imageScale(.large)
                         .popover(isPresented: $showDownload, arrowEdge: .bottom) {
                             DownloadListView()
+                                .frame(width: 400, height: 300)
                         }
                 }
                 .help("Downloads")

@@ -8,6 +8,49 @@
 import Foundation
 import SwiftUI
 
+//class Mirror: Identifiable, Codable, Hashable {
+//    let baseURL: URL
+//    let index: String
+//    var domain: String {
+//        baseURL.domain() ?? "Invalid URL: \(baseURL.absoluteString)"
+//    }
+//    lazy var type: Int = {
+//        let t1 = /^https?:\/\/libgen\.(is|rs|st)\/?$/
+//        let t2 = /^https?:\/\/libgen\.(lc|li|gs|vg|pm)$/
+//        let urlstr = baseURL.absoluteString
+//        if urlstr.contains(t1) {    //type1
+//            return 1
+//        } else if urlstr.contains(t2) { //type2
+//            return 2
+//        } else {    //unknown
+//            return -1
+//        }
+//    }()
+//    var url: URL? {
+//        URL(string: "\(baseURL.absoluteString)/\(index)")
+//    }
+//    var id: URL { baseURL }
+//    static func == (lhs: Mirror, rhs: Mirror) -> Bool {
+//        return lhs.baseURL == rhs.baseURL
+//    }
+//
+//    func hash(into hasher: inout Hasher) {
+//        hasher.combine(baseURL)
+//    }
+//
+//    init?(_ base: String, index: String = "search.php") {
+//        guard let baseURL = URL(string: base)
+//        else {
+//            return nil
+//        }
+//        self.baseURL = baseURL
+//        self.index = index
+//    }
+//
+//    static let _default: Mirror = Mirror("https://libgen.li", index: "index.php")!
+//
+//}
+
 
 struct ServerMirror: Identifiable, Codable, Hashable, CustomStringConvertible {
     let url: URL

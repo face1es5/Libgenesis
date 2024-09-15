@@ -14,19 +14,12 @@ struct BookmarkGallery: View {
     }
     var body: some View {
         ScrollView {
-            LazyVStack {
+            LazyVStack(alignment: .leading) {
                 ForEach(bookmarks, id: \.self) { book in
                     BookMarkView(book: book)
-                        .contextMenu {
-                            BookMarkMenuView(book: book)
-                            Divider()
-                            SharedContextView(book: book)
-                            
-                        }
                 }
             }
         }
-        .frame(width: 400, height: 300)
         .padding()
     }
 }
@@ -34,42 +27,11 @@ struct BookmarkGallery: View {
 struct BookMarkView: View {
     @ObservedObject var book: BookItem
     var body: some View {
-        HStack(alignment: .center, spacing: 10) {
-            CoverView
-            TitleView
-            Spacer()
-        }
-        .task {
-            if book.details == nil {
-                await book.loadDetails()
+        BookCoverView(book: book)
+            .contextMenu {
+                BookMarkMenuView(book: book)
             }
-        }
-    }
-    private var CoverView: some View {
-        VStack {
-            ImageView(url: book.details?.coverURL, width: 100, height: 161.8, cornerRadius: 10, defaultImg: "books.vertical.fill", breathing: true)
-                .frame(width: 100, height: 161.8)
-            
-        }
-    }
-    private var TitleView: some View {
-        VStack {
-            if let detailURL = book.detailURL {
-                Link(destination: detailURL) {
-                    Text(book.title)
-                        .lineLimit(2)
-                }
-            } else if let searchURL = book.searchURL {
-                Link(destination: searchURL) {
-                    Text(book.title)
-                        .lineLimit(2)
-                }
-            } else {
-                Text(book.title)
-            }
-        }
-        .help(book.title)
-        .font(.title2)
+        Divider()
     }
 }
 

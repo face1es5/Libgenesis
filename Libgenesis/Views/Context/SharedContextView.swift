@@ -67,16 +67,52 @@ struct BookMarkMenuView: View {
         bookmarksManager.contain(book)
     }
     var body: some View {
-        Button(action: {
-            if isBookmarked {
-                bookmarksManager.remove(book)
-            } else {
-                bookmarksManager.insert(book)
+        Group {
+            Button(action: {
+                if isBookmarked {
+                    bookmarksManager.remove(book)
+                } else {
+                    bookmarksManager.insert(book)
+                }
+            }) {
+                Label(isBookmarked ? "Remove bookmark" : "Add bookmark", systemImage: isBookmarked ? "bookmark.fill" : "bookmark")
             }
-        }) {
-            Label(isBookmarked ? "Remove bookmark" : "Add bookmark", systemImage: isBookmarked ? "bookmark.fill" : "bookmark")
+            .labelStyle(.titleAndIcon)
+            
+            Button(action: {
+                Task.detached(priority: .background) {
+                    await book.loadDetails()
+                }
+            }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .labelStyle(.titleAndIcon)
+            
+            if let links = book.details?.fileLinks {
+                Divider()
+                Menu("Download \(book.truncTitle) from") {
+                    ForEach(links, id: \.self) { link in
+                        DownloadButton(link, book: book)
+                    }
+                }
+                .labelStyle(.titleAndIcon)
+            }
         }
-        .labelStyle(.titleAndIcon)
+    }
+    private func DownloadButton(_ link: URL, book: BookItem) -> some View {
+        let m = DownloadMirror(link)
+        return (
+            Button {
+                DownloadManager.shared.download(link, book: book)
+            } label: {
+                if m == .unknown {
+                    Label(m.serverName, systemImage: "network")
+                } else {
+                    Label(m.serverName, image: m.rawValue.lowercased())
+                }
+            }
+        )
+
     }
 }
 

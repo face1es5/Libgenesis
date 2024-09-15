@@ -39,29 +39,28 @@ struct LibgenesisApp: App {
             ContentView()
                 .environmentObject(downloadManager)
                 .preferredColorScheme(colorScheme())
-                .onAppear {
-                    #if os(iOS) // in ios, watching
-                    NotificationCenter.default.addObserver(forName: NSApplication.didReceiveMemoryWarningNotification,
-                                                           object: nil,
-                                                           queue: .main) { _ in
-                        clearImageCache()
-                    }
-                    #endif
-                }
                 .environmentObject(selBooksVM)
                 .environmentObject(booksVM)
                 .environmentObject(downloadManager)
                 .environmentObject(recentManager)
                 .environmentObject(bookmarksManager)
         }
+        #if os(macOS)
         Window("Downloader", id: "downloader-window") {
-            DownloaderView()
+            GeometryReader { geo in
+                DownloaderView()
+                    .environmentObject(downloadManager)
+                    .frame(width: geo.size.width, height: geo.size.height)
+            }
         }
         Window("Bookmarks", id: "bookmarks-window") {
-            BookmarkGallery()
-                .environmentObject(bookmarksManager)
+            GeometryReader { geo in
+                BookmarkGallery()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .environmentObject(bookmarksManager)
+            }
+
         }
-        #if !os(watchOS)
         .commands {
             GeneralCommands()
             CommandMenu("Find") {
@@ -75,8 +74,6 @@ struct LibgenesisApp: App {
             DownloadCommands(downloadManager: downloadManager)
             RecentFilesCommands(recentManager: recentManager)
         }
-        #endif
-        #if os(macOS)
         MenuBarExtra(content: {
             MenuBar()
                 .environmentObject(downloadManager)
@@ -114,6 +111,7 @@ struct LibgenesisApp: App {
     
     /// Jump to directory, or parent dir of it.
     static func jumpTo(_ destination: URL?) {
+        #if os(macOS)
         guard
             let url = destination
         else {
@@ -121,6 +119,7 @@ struct LibgenesisApp: App {
             return
         }
         NSWorkspace.shared.open(url.deletingLastPathComponent())
+        #endif
     }
 }
 
