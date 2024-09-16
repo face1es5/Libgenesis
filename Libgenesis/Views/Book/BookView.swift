@@ -82,7 +82,8 @@ struct BookCoverView: View {
         .task(priority: .background) {
             // try query details if there isn't.
             if book.details == nil {
-                await book.loadDetails()
+                // disable this feature as may significantly increase the probability of being blocked from libgen.
+//                await book.loadDetails()
             }
         }
     }

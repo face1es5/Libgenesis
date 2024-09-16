@@ -40,7 +40,7 @@ struct SettingsView: View {
 struct GeneralView: View {
     @AppStorage("saveDir") var saveDir: String = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.path(percentEncoded: true) ?? "/tmp"
     @AppStorage("theme") var theme: Theme = .system
-    @AppStorage("preferredFormats") var preferredFormats: Set<FormatFilter> = [.def]
+    @AppStorage("preferredFormats") var preferredFormats: Set<FormatFilter> = [.all]
     @State var showFileSelector: Bool = false
 
     var body: some View {

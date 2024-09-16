@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BookDetailsToolbar: View {
-    @AppStorage("bookDetailsDisplayMode") var displayMode: BookDetailsDislayMode = .complex
+    @AppStorage("bookDetailsDisplayMode") var displayMode: BookDetailsDislayMode = .common
     var body: some View {
         Group {
             Picker("Display mode", selection: $displayMode) {

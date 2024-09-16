@@ -15,6 +15,7 @@ struct ContentView: View {
         #if !os(iOS)
         NavigationSplitView {
             BookDetailsContainer
+                .frame(minWidth: 300)
         } detail: {
             BookListView()
                 .environmentObject(booksVM)
@@ -33,6 +34,7 @@ struct ContentView: View {
         ScrollView {
             if let book = selBooksVM.firstBook {
                 BookDetailsView(book: book)
+                    .padding(.trailing, 13)
             } else {
                 VStack {
                     Image("stewie")
@@ -62,16 +64,11 @@ struct ContentView: View {
             }
         }
         .toolbar {
-            BookDetailsToolbar()
+            ToolbarItemGroup {
+                BookDetailsToolbar()
+            }
         }
         .padding()
-    }
-    
-    /// Handle a series of downloading.
-    ///
-    func askDownload() {
-        print("Download \(selBooksVM.books.map { $0.title })")
-        DownloadManager.shared.download(selBooksVM.booksArr)
     }
     
 }

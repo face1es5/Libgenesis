@@ -79,10 +79,17 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
         await MainActor.run {
             self.loadingDetails = true
         }
-        let details = try? await LibgenAPI.shared.parseBookDetails(book: self)
-        print("Load details of book \(truncTitle) \(details == nil ? "failed" : "succeed").")
+        do {
+            let details = try await LibgenAPI.shared.parseBookDetails(book: self)
+            await MainActor.run {
+                self.details = details
+            }
+            print("Load details of book \(truncTitle) succeed.")
+        } catch {
+            print("Load details of book \(truncTitle) failed: \(error.localizedDescription)")
+        }
+
         await MainActor.run {
-            self.details = details
             self.loadingDetails = false
         }
     }

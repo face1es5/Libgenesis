@@ -40,10 +40,10 @@ struct BookListView: View {
     @State var showAddSheet: Bool = false
     @State var showDelAlert = false
     @State var showBookmarks: Bool = false
-    @AppStorage("preferredFormats") var formatFilters: Set<FormatFilter> = [.def]
+    @AppStorage("preferredFormats") var formatFilters: Set<FormatFilter> = [.all]
     @AppStorage("bookLineDisplayMode") var bookDisplayMode: BookLineDisplayMode = .list
+    @State var firstappear: Bool = true
    
-    
     var body: some View {
         VStack(spacing: 0) {
             if showFinder {
@@ -59,7 +59,7 @@ struct BookListView: View {
                         doFilter = false
                     }
             }
-            ZStack {
+            ZStack(alignment: .center) {
                 List(selection: $selBooksVM.books) {
                     ForEach(filteredBooks, id: \.self) { book in
                         #if !os(iOS)
@@ -95,37 +95,42 @@ struct BookListView: View {
                 }
                 .listStyle(.sidebar)
                 .toolbar {
-                    toolbarView
+                    ToolbarView
                 }
-                .searchable(text: $searchString, prompt: "Search len should >= 2.")
-                .onSubmit(of: .search) {
-                    forceFetching()
-                }
-                .task {
-                    Task.detached(priority: .background) {
-                        // On appear, force refreshing books.
-                        await fetchingBooks(page, force: true)
-                    }
-                }
-                if loading {
-                    ProgressView()
-                } else if books.count == 0 {
+                if firstappear {
                     VStack {
-                        Image("libgenLarge")
+                        Text("Please search for some books first.")
+                            .font(.title)
+                            .foregroundColor(.secondary)
+                        Image("stewie")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 128, height: 128)
-                        Text("No books available, check connection or filters(maybe you're blocked by server).")
-                            .font(.title)
+                            .frame(width: 200, height: 200)
+                    }
+                    .padding()
+
+                } else {
+                    if loading {
+                        ProgressView()
+                    } else if books.count == 0 {
+                        VStack {
+                            Image("brian")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 200, height: 200)
+                            Text("O0ps!")
+                            Text("No books available, check connection or filters(maybe you're blocked by libgen).")
+                        }
+                        .font(.title)
                     }
                 }
             }
         }
-        .navigationTitle("")
+        .frame(minWidth: 600)
     }
     
-    private var NavToolbarItem: some ToolbarContent {
-        ToolbarItemGroup(placement: .navigation) {
+    private var NavigationToolItem: some View {
+        Group {
             Menu {
                 MirrorAdder(showSheet: $showAddSheet)
                 MirrorDeleter(showAlert: $showDelAlert)
@@ -161,73 +166,87 @@ struct BookListView: View {
                 BookmarkGallery()
                     .frame(width: 400, height: 300)
             }
+            .help("Bookmarks")
+        }
+    }
+    
+    private var CentralToolItem: some View {
+        Group {
+            TextField("Search len shouldn above 2.", text: $searchString)
+                .frame(width: 300, height: 100)
+                .textFieldStyle(.roundedBorder)
+                .onSubmit {
+                    forceFetching()
+                }
+   
+            Button(action: {
+                showFilter.toggle()
+            }) {
+                Image(systemName: "line.3.horizontal.decrease.circle")
+                    .foregroundColor((columnFilter == .def && formatFilters == [.all]) ? Color.secondary : Color.blue)
+            }
+            .popover(isPresented: $showFilter, arrowEdge: .bottom) {
+                FilterContextView(formatFilters: $formatFilters, columnFilter: $columnFilter)
+            }
+        }
+    }
+    
+    private var PrimaryToolItem: some View {
+        Group {
+            Picker("Display mode", selection: $bookDisplayMode) {
+                ForEach(BookLineDisplayMode.allCases, id: \.self) { mode in
+                    Label(mode.rawValue.capitalized, systemImage: mode.icon).tag(mode)
+                }
+            }
+            .pickerStyle(.inline)
+            .help("Change display mode to gallery/list")
+            
+            Button(action: {
+                showDownload.toggle()
+            }) {
+                Image(systemName: "arrow.down.circle")
+                    .foregroundColor(downloadManager.downloadTasks.count == 0 ? Color.secondary : Color.blue)
+                    .imageScale(.large)
+                    .popover(isPresented: $showDownload, arrowEdge: .bottom) {
+                        DownloadListView()
+                            .frame(width: 400, height: 300)
+                    }
+            }
+            .help("Downloads")
 
+            Button(action: { forceFetching() }) {
+                Image(systemName: "network")
+                    .foregroundColor(connErr ? .yellow : .accentColor)
+                    .imageScale(.large)
+            }
+            .keyboardShortcut("r")
+            .popover(isPresented: $showConnPopover) {
+                Text(connErrMsg)
+                    .lineLimit(10)
+                    .frame(width: 200)
+                    .padding()
+            }
+            .onHover { hover in
+                if connErr {
+                    showConnPopover = hover
+                } else {
+                    showConnPopover = false
+                }
+            }
+            .help("Click to refresh")
         }
     }
     
     /// Toolbar view
-    private var toolbarView: some ToolbarContent {
+    private var ToolbarView: some View {
         Group {
-            #if !os(iOS)
-            NavToolbarItem
-            ToolbarItem {
-                Spacer()
-            }
-            #endif
-            ToolbarItemGroup(placement: .primaryAction) {
-                Picker("Display mode", selection: $bookDisplayMode) {
-                    ForEach(BookLineDisplayMode.allCases, id: \.self) { mode in
-                        Label(mode.rawValue.capitalized, systemImage: mode.icon).tag(mode)
-                    }
-                }
-                .pickerStyle(.inline)
-                .help("Change display mode to gallery/list")
-                
-                Button(action: {
-                    showDownload.toggle()
-                }) {
-                    Image(systemName: "arrow.down.circle")
-                        .foregroundColor(downloadManager.downloadTasks.count == 0 ? Color.secondary : Color.blue)
-                        .imageScale(.large)
-                        .popover(isPresented: $showDownload, arrowEdge: .bottom) {
-                            DownloadListView()
-                                .frame(width: 400, height: 300)
-                        }
-                }
-                .help("Downloads")
-
-                Button(action: { forceFetching() }) {
-                    Image(systemName: "network")
-                        .foregroundColor(connErr ? .yellow : .accentColor)
-                        .imageScale(.large)
-                }
-                .keyboardShortcut("r")
-                .popover(isPresented: $showConnPopover) {
-                    Text(connErrMsg)
-                        .lineLimit(10)
-                        .frame(width: 200)
-                        .padding()
-                }
-                .onHover { hover in
-                    if connErr {
-                        showConnPopover = hover
-                    } else {
-                        showConnPopover = false
-                    }
-                }
-                .help("Click to refresh")
-
-                Button(action: {
-                    showFilter.toggle()
-                }) {
-                    Image(systemName: "line.3.horizontal.decrease.circle")
-                        .foregroundColor((columnFilter == .def && formatFilters == [.def]) ? Color.secondary : Color.blue)
-                }
-                .popover(isPresented: $showFilter, arrowEdge: .bottom) {
-                    FilterContextView(formatFilters: $formatFilters, columnFilter: $columnFilter)
-                }
-            }
-
+#if !os(iOS)
+            NavigationToolItem
+#endif
+            Spacer()
+            CentralToolItem
+            Spacer()
+            PrimaryToolItem
         }
     }
     
@@ -251,8 +270,10 @@ struct BookListView: View {
     /// load books of page N, if force, clear previous books
     ///
     func fetchingBooks(_ page: Int = 1, force: Bool = false) async {
-//        if loading { return }
-        await MainActor.run { loading = true }
+        await MainActor.run {
+            firstappear = false
+            loading = true
+        }
         do {
             let books = try await LibgenAPI.shared.search(searchString, page: page, col: columnFilter, formats: formatFilters)
             await MainActor.run {

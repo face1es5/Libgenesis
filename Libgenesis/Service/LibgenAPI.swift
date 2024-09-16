@@ -216,7 +216,7 @@ class LibgenAPI {
     ///   - col: column filter, see enum ColumnFilter.
     /// - Returns: a list of books
     func search(_ searchStr: String, page: Int = 1,
-                col: ColumnFilter = .def, formats: Set<FormatFilter> = [.def]) async throws -> [BookItem] {
+                col: ColumnFilter = .def, formats: Set<FormatFilter> = [.all]) async throws -> [BookItem] {
         var query: [String: String] = [:]
         if searchStr.count >= 2 {   // search for specific books
             query["req"] = searchStr
@@ -239,10 +239,10 @@ class LibgenAPI {
     /// Filter after querying, .i.e filter books locally.
     /// - Parameter formats: format filters
     /// - Returns: filtered books
-    func filter(_ books: [BookItem], formats: Set<FormatFilter> = [.def]) -> [BookItem] {
+    func filter(_ books: [BookItem], formats: Set<FormatFilter> = [.all]) -> [BookItem] {
         if formats.count == 0 { // no filters
             return books
-        } else if formats.count == 1, formats.contains(.def) { // default, just return original data.
+        } else if formats.count == 1, formats.contains(.all) { // default, just return original data.
             return books
         }
         return books.filter { book in

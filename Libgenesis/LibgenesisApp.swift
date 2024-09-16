@@ -45,6 +45,7 @@ struct LibgenesisApp: App {
                 .environmentObject(recentManager)
                 .environmentObject(bookmarksManager)
         }
+        .windowToolbarStyle(UnifiedWindowToolbarStyle(showsTitle: false))
         #if os(macOS)
         Window("Downloader", id: "downloader-window") {
             GeometryReader { geo in

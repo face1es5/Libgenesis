@@ -8,10 +8,8 @@
 import SwiftUI
 import Kingfisher
 
-
-
 struct BookDetailsView: View {
-    @AppStorage("bookDetailsDisplayMode") var displayMode: BookDetailsDislayMode = .complex
+    @AppStorage("bookDetailsDisplayMode") var displayMode: BookDetailsDislayMode = .common
     @ObservedObject var book: BookItem
     @Environment(\.colorScheme) var scheme
     @State var detailsLoaded: Bool = false
@@ -20,6 +18,7 @@ struct BookDetailsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             TitleView
+            Divider()
 #if DEBUG
             DebugView
 #endif
@@ -29,6 +28,7 @@ struct BookDetailsView: View {
                     InfoView
                         .lineLimit(1)
                 }
+                .padding(.leading, 13)
             } else {
                 HStack {
                     Spacer()
@@ -37,6 +37,15 @@ struct BookDetailsView: View {
                 }
                 InfoView
             }
+            
+            if displayMode != .simple {
+                VStack(alignment: .leading) {
+                    Divider()
+                    DownloadHrefsView
+                        .padding(.leading, 13)
+                }
+            }
+            
             MiscView
                 .lineLimit(1)
             if displayMode != .simple {
@@ -207,20 +216,20 @@ struct BookDetailsView: View {
         .padding(.leading, 13)
     }
     
+    private var DownloadHrefsView: some View {
+        HStack(alignment: .top) {
+            Text("Download link pages: ")
+                .bold()
+            ForEach(book.mirrors.indices, id: \.self) { idx in
+                Link(destination: book.mirrors[idx]) {
+                    Text("[\(idx+1)]")
+                }.help(book.mirrors[idx].absoluteString)
+            }
+        }
+    }
+    
     private var MiscView: some View {
         VStack(alignment: .leading, spacing: 5) {
-            if displayMode == .complex {
-                HStack(alignment: .top) {
-                    Text("Download link pages: ")
-                        .bold()
-                    ForEach(book.mirrors.indices, id: \.self) { idx in
-                        Link(destination: book.mirrors[idx]) {
-                            Text("[\(idx+1)]")
-                        }.help(book.mirrors[idx].absoluteString)
-                    }
-                }
-            }
-
             HStack(alignment: .top) {
                 Text("Publisher: ")
                     .bold()
@@ -249,6 +258,7 @@ struct BookDetailsView: View {
                 .bold()
             Text("\(book.id)")
                 .leftAlign(width: fixedKeyWidth)
+            Text("Details loaded: \(book.details == nil ? "NO" : "YES")")
         }
     }
     
@@ -256,21 +266,20 @@ struct BookDetailsView: View {
         VStack {
             if let dhref = book.detailURL {
                 Link(destination: dhref) {
-                    Text(book.title)
-                        .lineLimit(1)
+                    Text(book.title.forceCharWrapping)
                 }
             } else if let href = book.searchURL {
                 Link(destination: href) {
-                    Text(book.title)
-                        .lineLimit(1)
+                    Text(book.title.forceCharWrapping)
                 }
             } else {
-                SelectableText(book.title)
-                    .lineLimit(1)
+                SelectableText(book.title.forceCharWrapping)
             }
         }
+        .lineLimit(5)
         .help(book.title)
         .font(.title2)
+        .padding(.leading, 13)
     }
     
     private func CoverView(width: CGFloat = 100, height: CGFloat = 161.8, radius: CGFloat = 10) -> some View {
