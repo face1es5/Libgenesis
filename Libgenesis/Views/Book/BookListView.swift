@@ -58,9 +58,6 @@ struct BookListView: View {
                         ForEach(books, id: \.self) { book in
                             #if !os(iOS)
                             BookView(book, mode: extraDisplayMode)
-                                .contextMenu {
-                                    BookContext(book: book)
-                                }
                                 .id(book)
                                 .task {
                                     if book == books.last {

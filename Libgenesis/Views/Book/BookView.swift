@@ -157,47 +157,7 @@ struct BookRowView: View {
                 Column(book.id, width: smallColWidth)
             }
         }
-        .contextMenu {
-            BookContext(book: book)
-        }
         .lineLimit(1)
-    }
-}
-
-struct BookContext: View {
-    @ObservedObject var book: BookItem
-    var body: some View {
-        Group {
-            Button("Refresh") {
-                Task.detached(priority: .background) {
-                    await book.loadDetails()
-                }
-            }
-            Divider()
-            SharedContextView(book: book)
-            Divider()
-            Button("Preview") {
-                fatalError("Preview to implemented.")
-            }
-            Divider()
-            BookMarkMenuView(book: book)
-        }
-    }
-}
-
-struct BookView: View {
-    @ObservedObject var book: BookItem
-    let mode: BookLineDisplayMode
-    init(_ book: BookItem, mode: BookLineDisplayMode) {
-        self.book = book
-        self.mode = mode
-    }
-    var body: some View {
-        if mode == .list {
-            BookRowView(book: book)
-        } else if mode == .gallery {
-            BookCoverView(book: book)
-        }
     }
 }
 
@@ -234,3 +194,47 @@ struct BookCoverView: View {
         }
     }
 }
+
+struct BookContext: View {
+    @ObservedObject var book: BookItem
+    var body: some View {
+        Group {
+            Button("Refresh") {
+                Task.detached(priority: .background) {
+                    await book.loadDetails()
+                }
+            }
+            Divider()
+            SharedContextView(book: book)
+            Divider()
+            BookMarkMenuView(book: book)
+        }
+    }
+}
+
+
+struct BookView: View {
+    @ObservedObject var book: BookItem
+    @State var showPreview: Bool = false
+    let mode: BookLineDisplayMode
+    init(_ book: BookItem, mode: BookLineDisplayMode) {
+        self.book = book
+        self.mode = mode
+    }
+    
+    var body: some View {
+        if mode == .list {
+            BookRowView(book: book)
+                .contextMenu {
+                    BookContext(book: book)
+                }
+        } else if mode == .gallery {
+            BookCoverView(book: book)
+                .contextMenu {
+                    BookContext(book: book)
+                }
+        }
+    }
+}
+
+

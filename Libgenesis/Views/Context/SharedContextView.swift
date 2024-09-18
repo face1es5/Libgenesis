@@ -94,15 +94,6 @@ struct BookMarkMenuView: View {
                 Label(isBookmarked ? "Remove bookmark" : "Add bookmark", systemImage: isBookmarked ? "bookmark.fill" : "bookmark")
             }
             .labelStyle(.titleAndIcon)
-            
-            Button(action: {
-                Task.detached(priority: .background) {
-                    await book.loadDetails()
-                }
-            }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
-            }
-            .labelStyle(.titleAndIcon)
         }
     }
 

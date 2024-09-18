@@ -251,21 +251,20 @@ class LibgenAPI {
         #if DEBUG
         print("parse book details of \(book.truncTitle)")
         #endif
-        var desc: String = "N/A"
-        if let isbn = try? /([\d]+)(,[\d+])?/.firstMatch(in: book.isbn) {
-            desc = await GoodreadsAPI.fetchingDesc(for: "\(isbn.1)") ?? "No description available"
-        }
-//        var coverURL: String = ""
         do {
-//            async let doc = try SwiftSoup.parse(try await APIService(to: url).getHtml())
+//            async let desc: String = {
+//                if let isbn = try? /([\d]+)(,[\d+])?/.firstMatch(in: book.isbn) {
+//                    return await GoodreadsAPI.fetchingDesc(for: "\(isbn.1)") ?? "No description available"
+//                }
+//                return "N/A"
+//            }()
+
             async let urls = try parseDirectDownloadLinks(book.mirrors)
-//            desc = try await doc.body()?.select("table > tbody").first()?.select("tr > td[colspan='4'][style]").text() ?? "Book descripition is not available."
-    //        if let table = try await doc.body()?.select("table > tbody").first() {
-    //            desc = try table.select("tr > td[colspan='4'][style]").text()
-    //            if let coverPath = try table.select("tr > td[rowspan='22'] > a[href] > img[src]").first()?.attr("src") {
-    //                coverURL = "\(baseURL)/\(coverPath)"
-    //            }
-    //        }
+            async let desc: String = {
+                guard let url = book.detailURL else { return "N/A" }
+                let doc = try await SwiftSoup.parse(APIService(to: url).getHtml())
+                return try doc.body()?.select("table > tbody").first()?.select("tr > td[colspan='4'][style]").text() ?? "Book descripition is not available."
+            }()
 
             return try await BookDetailsItem(description: desc, fileLinks: urls)
         } catch {

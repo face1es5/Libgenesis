@@ -60,22 +60,18 @@ struct HoveringEffect: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        ZStack {
-            Color.gray
-                .opacity(isOpaque ? opac : 0.0)
-                .edgesIgnoringSafeArea(.all)
-                .animation(
-                    Animation.easeInOut(duration: dura),
-                    value: isOpaque
-                )
-                .cornerRadius(radius)
-            
-            content
-                .onHover { h in
-                    isOpaque = h
-//                    print("Hovering: \(h)")
-                }
-        }
+        content
+            .padding(.vertical, 3)
+            .padding(.horizontal, 8)
+            .background(
+                Color.gray
+                    .opacity(isOpaque ? opac : 0.0)
+                    .animation(Animation.easeInOut(duration: dura), value: isOpaque)
+                    .cornerRadius(radius)
+            )
+            .onHover { h in
+                isOpaque = h
+            }
     }
 }
 
