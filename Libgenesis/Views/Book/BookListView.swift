@@ -27,7 +27,7 @@ struct BookListView: View {
     @State var columnFilter: ColumnFilter = .def
     @State var showDownload: Bool = false
     @State var showBookmarks: Bool = false
-    @AppStorage("preferredFormats") var formatFilters: Set<FormatFilter> = [.all]
+    @State var formatFilters: Set<FormatFilter> = [.all]
     @AppStorage("bookLineDisplayMode") var bookDisplayMode: BookLineDisplayMode = .list
     @State var firstappear: Bool = true
     /// For finder(local filter)
@@ -36,7 +36,7 @@ struct BookListView: View {
     @State var fixedShowFinder: Bool = UserDefaults.standard.bool(forKey: "toggleFinder")
     @State var extraDisplayMode: BookLineDisplayMode = BookLineDisplayMode(rawValue: UserDefaults.standard.string(forKey: "bookLineDisplayMode") ?? "list") ?? .list
     @State var isReachingEnd: Bool = false
-    ///
+
    
     var body: some View {
         ScrollViewReader { proxy in
@@ -123,33 +123,6 @@ struct BookListView: View {
         .onChange(of: bookDisplayMode) { mode in
             extraDisplayMode = mode
         }
-
-    }
-    
-    private var NavigationToolItem: some View {
-        Group {
-            MirrorPicker()
-                .labelStyle(.titleAndIcon)
-                .frame(width: 120)
-            
-            Button(action: {
-                showBookmarks.toggle()
-            }) {
-                HStack {
-                    Label("bookmarks", systemImage: "bookmark.fill")
-                        .foregroundColor(.blue)
-                    Image(systemName: "chevron.compact.down")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 15)
-                }
-            }
-            .popover(isPresented: $showBookmarks, arrowEdge: .bottom) {
-                BookmarkGallery()
-                    .frame(width: 400, height: 300)
-            }
-            .help("Bookmarks")
-        }
     }
     
     private var EmptyStateView: some View {
@@ -157,7 +130,7 @@ struct BookListView: View {
             Text("Please search for some books first.")
                 .font(.title)
                 .foregroundColor(.secondary)
-            Image("stewie")
+            Image("libgenLarge")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 200, height: 200)
@@ -177,29 +150,12 @@ struct BookListView: View {
         .font(.title)
     }
     
-    private var PrincipleToolItem: some View {
+    private var NavigationToolItem: some View {
         Group {
-            TextField("Search len shouldn above 3.", text: $searchString)
-                .frame(width: 300, height: 100)
-                .textFieldStyle(.roundedBorder)
-                .onSubmit {
-                    forceFetching()
-                }
-   
-            Button(action: {
-                showFilter.toggle()
-            }) {
-                Image(systemName: "line.3.horizontal.decrease.circle")
-                    .foregroundColor((columnFilter == .def && formatFilters == [.all]) ? Color.secondary : Color.blue)
-            }
-            .popover(isPresented: $showFilter, arrowEdge: .bottom) {
-                FilterContextView(formatFilters: $formatFilters, columnFilter: $columnFilter)
-            }
-        }
-    }
-    
-    private var PrimaryToolItem: some View {
-        Group {
+            MirrorPicker()
+                .labelStyle(.titleAndIcon)
+                .frame(width: 120)
+            
             Picker("Display mode", selection: $bookDisplayMode) {
                 ForEach(BookLineDisplayMode.allCases, id: \.self) { mode in
                     Label(mode.rawValue.capitalized, systemImage: mode.icon).tag(mode)
@@ -207,23 +163,35 @@ struct BookListView: View {
             }
             .pickerStyle(.inline)
             .help("Change display mode to gallery/list")
-            
+        }
+    }
+    
+    private var PrincipleToolItem: some View {
+        Group {
             Button(action: {
-                showDownload.toggle()
+                showFilter.toggle()
             }) {
-                Image(systemName: "arrow.down.circle")
-                    .foregroundColor(downloadManager.downloadTasks.count == 0 ? Color.secondary : Color.blue)
-                    .imageScale(.large)
-                    .popover(isPresented: $showDownload, arrowEdge: .bottom) {
-                        DownloadListView()
-                            .frame(width: 400, height: 300)
-                    }
+                Image(systemName: "line.3.horizontal.decrease.circle")
+                    .foregroundColor((columnFilter == .def && formatFilters == [.all]) ? Color.secondary : Color.blue)
             }
-            .help("Downloads")
-
+            .popover(isPresented: $showFilter, arrowEdge: .bottom) {
+                FilterContextView(columnFilter: $columnFilter, formatFilters: $formatFilters)
+            }
+            
+            TextField("Search len shouldn above 3.", text: $searchString)
+                .frame(width: 300, height: 100)
+                .textFieldStyle(.roundedBorder)
+                .onSubmit {
+                    forceFetching()
+                }
+        }
+    }
+    
+    private var PrimaryToolItem: some View {
+        Group {
             Button(action: { forceFetching() }) {
                 Image(systemName: connErr ? "network" : "arrow.clockwise.circle.fill" )
-                    .foregroundColor(connErr ? .yellow : .accentColor)
+                    .foregroundColor(connErr ? .yellow : .secondary)
                     .imageScale(.large)
             }
             .keyboardShortcut("r")
@@ -241,6 +209,37 @@ struct BookListView: View {
                 }
             }
             .help("Click to refresh")
+            
+            Button(action: {
+                showDownload.toggle()
+            }) {
+                Image(systemName: "arrow.down.circle")
+                    .foregroundColor(downloadManager.downloadTasks.count == 0 ? Color.secondary : Color.blue)
+                    .imageScale(.large)
+                    .popover(isPresented: $showDownload, arrowEdge: .bottom) {
+                        DownloadListView()
+                            .frame(width: 400, height: 300)
+                    }
+            }
+            .help("Downloads")
+            
+            Button(action: {
+                showBookmarks.toggle()
+            }) {
+                HStack {
+                    Label("bookmarks", systemImage: "books.vertical.fill")
+//                        .foregroundColor(.blue)
+                    Image(systemName: "chevron.compact.down")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 15)
+                }
+            }
+            .popover(isPresented: $showBookmarks, arrowEdge: .trailing) {
+                BookmarkGallery()
+                    .frame(width: 400, height: 300)
+            }
+            .help("Bookmarks")
         }
     }
     
@@ -277,16 +276,16 @@ struct BookListView: View {
     
     /// Fetching books of next page.
     func fetchingNextPage() {
-        if !isReachingEnd {
+        if !isReachingEnd, !loading {
+            page += 1
 #if DEBUG
             print("Query next page: \(page).")
 #endif
-            page += 1
             Task.detached(priority: .background) {
                 await fetchingBooks(page)
             }
         } else {
-            print("Already reached the end.")
+            print("Already reached the end or is loading.")
         }
     }
     
@@ -300,6 +299,14 @@ struct BookListView: View {
             firstappear = false
             loading = true
         }
+        #if DEBUG
+        print("Page: \(page), force: \(force ? 1 : 0), loading: \(loading ? 1 : 0)")
+        print("Formats: ")
+        for f in formatFilters {
+            print(f.rawValue)
+        }
+        #endif
+        
         do {
             let books = try await LibgenAPI.shared.search(searchString, page: page, col: columnFilter, formats: formatFilters)
             await MainActor.run {

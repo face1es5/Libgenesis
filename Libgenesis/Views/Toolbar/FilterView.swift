@@ -19,12 +19,16 @@ struct AdvanceFilterView: View {
                         set: {
                             if $0 {
                                 formatFilters.insert(filter)
+                                formatFilters.remove(.all)
                             } else {
                                 formatFilters.remove(filter)
+                                if formatFilters.count == 0 {
+                                    formatFilters.insert(.all)
+                                }
                             }
                         }
                     ))
-                    .frame(height: 20)
+                    .frame(height: 25)
                     .toggleStyle(.checkmark)
                 }
             }
@@ -55,8 +59,8 @@ struct PageNumPicker: View {
 }
 
 struct FilterContextView: View {
-    @Binding var formatFilters: Set<FormatFilter>
     @Binding var columnFilter: ColumnFilter
+    @Binding var formatFilters: Set<FormatFilter>
     @State var expand: Bool = true
 
     private var ColumnFilterView: some View {

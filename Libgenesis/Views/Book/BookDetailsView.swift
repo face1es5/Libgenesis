@@ -38,23 +38,12 @@ struct BookDetailsView: View {
                 InfoView
             }
             
-            if displayMode != .simple {
-                VStack(alignment: .leading) {
-                    Divider()
-                    DownloadHrefsView
-                        .padding(.leading, 13)
-                }
-            }
-            
             MiscView
-            
+            DescriptionView
             if displayMode != .simple {
                 AttrView
-            }
-            if displayMode != .simple {
                 DownloadsView
             }
-            DescriptionView
             Spacer()
         }
         .task {
@@ -147,7 +136,6 @@ struct BookDetailsView: View {
                     .bold()
             }
         }
-        
     }
     
     private var DownloadsView: some View {
@@ -181,8 +169,11 @@ struct BookDetailsView: View {
                 }
                 .padding(5)
             } label: {
-                Label("Downloads", systemImage: "square.and.arrow.down.on.square.fill")
-                    .bold()
+                HStack( alignment: .center, spacing: 10) {
+                    Label("Downloads", systemImage: "square.and.arrow.down.on.square.fill")
+                        .bold()
+                    DownloadLinks
+                }
             }
         }
     }
@@ -218,6 +209,16 @@ struct BookDetailsView: View {
         .padding(.leading, 13)
     }
     
+    private var DownloadLinks: some View {
+        Group {
+            ForEach(book.mirrors.indices, id: \.self) { idx in
+                Link(destination: book.mirrors[idx]) {
+                    Text("[\(idx+1)]")
+                }.help(book.mirrors[idx].absoluteString)
+            }
+        }
+    }
+    
     private var DownloadHrefsView: some View {
         HStack(alignment: .top) {
             Text("Download link pages: ")
@@ -228,6 +229,7 @@ struct BookDetailsView: View {
                 }.help(book.mirrors[idx].absoluteString)
             }
         }
+        .padding(.leading, 13)
     }
     
     private var MiscView: some View {

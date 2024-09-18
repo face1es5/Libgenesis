@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct BookDetailsBottomToolbar: View {
+struct BookDetailsToolbar: View {
     @EnvironmentObject var booksSel: BooksSelectionModel
     @EnvironmentObject var bookmarkManager: BookmarksModel
     var book: BookItem? {
@@ -15,40 +15,26 @@ struct BookDetailsBottomToolbar: View {
     }
     
     var body: some View {
-        HStack {
-            Button(action: {
-                Task.detached(priority: .background) {
-                    await askDownload()
-                }
-            }) {
-                Image(systemName: "icloud.and.arrow.down.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(booksSel.firstBook == nil ? .gray : .blue)
-            }
-            .hoveringEffect(0.5, duration: 1, radius: 5)
-            .buttonStyle(.borderless)
-            .disabled(booksSel.firstBook == nil)
-            .help("Click to download this book.")
-            
+        Group {
             Spacer()
             
             Button(action: {
                 toggleBookmark()
             }) {
                 Image(systemName: isBookmarked() ? "bookmark.fill" : "bookmark")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(booksSel.firstBook == nil ? .gray : .blue)
             }
-            .hoveringEffect(0.5, duration: 1, radius: 5)
-            .buttonStyle(.borderless)
             .disabled(booksSel.firstBook == nil)
             .help("Click to add/remove bookmark.")
-            
 
+            Button(action: {
+                Task.detached(priority: .background) {
+                    await askDownload()
+                }
+            }) {
+                Image(systemName: "square.and.arrow.down.on.square.fill")
+            }
+            .disabled(booksSel.firstBook == nil)
+            .help("Click to download this book.")
         }
     }
     
@@ -76,22 +62,21 @@ struct BookDetailsBottomToolbar: View {
     }
 }
 
-struct BookDetailsToolbar: View {
+struct BookDetailsBottomToolBar: View {
     @AppStorage("bookDetailsDisplayMode") var displayMode: BookDetailsDislayMode = .common
     
     var body: some View {
         HStack {
-            Picker("Display mode", selection: $displayMode) {
+            Picker("", selection: $displayMode) {
                 ForEach(BookDetailsDislayMode.allCases) { mode in
                     Label(mode.rawValue, systemImage: mode.icon)
                         .tag(mode)
                 }
             }
-            .pickerStyle(.inline)
+            .frame(width: 180)
+            .labelStyle(.iconOnly)
+            .pickerStyle(.segmented)
             .help("Display book info in complex/detail/simple mode.")
-            
-
-            
         }
     }
     

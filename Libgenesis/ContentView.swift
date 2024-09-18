@@ -17,8 +17,7 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 BookDetailsContainer
                 Spacer()
-                Divider()
-                BookDetailsBottomToolbar()
+                BookDetailsBottomToolBar()
                     .frame(height: 20)
                     .padding()
             }
