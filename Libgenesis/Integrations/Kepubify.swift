@@ -24,6 +24,10 @@ class KepubConverter {
         return res?.trimmingCharacters(in: CharacterSet(charactersIn: "\0"))
     }
     
+    private var shouldReplace: Bool {
+        UserDefaults.standard.bool(forKey: "replaceAfterConversion")
+    }
+    
     private init() {
         guard let arch = arch()
         else {
@@ -35,7 +39,6 @@ class KepubConverter {
         } else if arch.contains("arm64") {
             exec = Bundle.main.url(forAuxiliaryExecutable: "kepubify-arm")
         }
-
     }
     
     // convert and overite, suppose that src points to a valid and wellformed epub file.
@@ -66,6 +69,15 @@ class KepubConverter {
                 DispatchQueue.main.async {
                     if proc.terminationStatus == 0 {    // success
                         let res = String(data: outpipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? "No ouput."
+                        if self.shouldReplace {  // remove original file
+                            if FileManager.default.fileExists(atPath: file) {
+                                do {
+                                    try FileManager.default.removeItem(at: URL(filePath: file))
+                                } catch {
+                                    print("Error when replacing original file: \(error.localizedDescription)")
+                                }
+                            }
+                        }
                         completion(.success(res))
                     } else {    //fail
                         let res = String(data: errpipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? "No error output."

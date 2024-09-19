@@ -45,12 +45,6 @@ class DownloadManager: ObservableObject {
         addDownloadTask(dtask)
     }
     
-    /// TODO: Download selected book.
-    ///
-    func downloadSelected() {
-        fatalError("Implement download selected book globally.")
-    }
-    
     /// Add a list of tasks.
     func addDownloadTasks(_ dtasks: [DownloadTask]) {
         condition.lock()

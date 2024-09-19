@@ -37,7 +37,7 @@ struct ContentView: View {
     }
     
     var BookDetailsContainer: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             if let book = selBooksVM.firstBook {
                 BookDetailsView(book: book)
                     .padding(.trailing, 13)

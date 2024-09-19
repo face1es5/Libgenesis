@@ -11,6 +11,9 @@ struct BookListView: View {
     @EnvironmentObject var booksVM: BooksViewModel
     @EnvironmentObject var selBooksVM: BooksSelectionModel
     @EnvironmentObject var downloadManager: DownloadManager
+    var downloadCount: Int {
+        downloadManager.downloadTasks.count
+    }
     var books: [BookItem] {
         booksVM.books
     }
@@ -184,11 +187,7 @@ struct BookListView: View {
                 .onSubmit {
                     forceFetching()
                 }
-        }
-    }
-    
-    private var PrimaryToolItem: some View {
-        Group {
+            
             Button(action: { forceFetching() }) {
                 Image(systemName: connErr ? "network" : "arrow.clockwise.circle.fill" )
                     .foregroundColor(connErr ? .yellow : .secondary)
@@ -210,16 +209,25 @@ struct BookListView: View {
             }
             .help("Click to refresh")
             
+        }
+    }
+    
+    private var PrimaryToolItem: some View {
+        Group {
             Button(action: {
                 showDownload.toggle()
             }) {
-                Image(systemName: "arrow.down.circle")
-                    .foregroundColor(downloadManager.downloadTasks.count == 0 ? Color.secondary : Color.blue)
-                    .imageScale(.large)
-                    .popover(isPresented: $showDownload, arrowEdge: .bottom) {
-                        DownloadListView()
-                            .frame(width: 400, height: 300)
-                    }
+                HStack {
+                    Image(systemName: "arrow.down.circle")
+                        .imageScale(.large)
+                        .foregroundColor(downloadCount == 0 ? Color.secondary : Color.blue)
+                    Text("\(downloadCount)")
+                        .font(.caption)
+                }
+                .popover(isPresented: $showDownload, arrowEdge: .bottom) {
+                    DownloadPopover()
+                        .frame(width: 400, height: 300)
+                }
             }
             .help("Downloads")
             
@@ -228,7 +236,6 @@ struct BookListView: View {
             }) {
                 HStack {
                     Label("bookmarks", systemImage: "books.vertical.fill")
-//                        .foregroundColor(.blue)
                     Image(systemName: "chevron.compact.down")
                         .resizable()
                         .scaledToFit()
@@ -276,7 +283,9 @@ struct BookListView: View {
     
     /// Fetching books of next page.
     func fetchingNextPage() {
-        if !isReachingEnd, !loading {
+//        If loading, should load next page, but if the res can't fill the screen, will make load next page impossibly as have reached the end when loading the first page, so just wish the user have patience to wait for loading and don't scroll to bottom too often.
+//        if !isReachingEnd, !loading {
+        if !isReachingEnd {
             page += 1
 #if DEBUG
             print("Query next page: \(page).")

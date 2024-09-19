@@ -11,7 +11,7 @@ extension View {
     func breathingEffect(_ factor: Double = 0.1) -> some View {
         self.modifier(BreathingEffect(factor: factor))
     }
-    func hoveringEffect(_ factor: Double = 0.1, duration: Double = 1, radius: Double = 0) -> some View {
+    func hoveringEffect(_ factor: Double = 0.1, duration: Double = 0.5, radius: Double = 0) -> some View {
         self.modifier(HoveringEffect(factor, duration: duration, radius: radius))
     }
     func textSelectable(_ scheme: ColorScheme) -> some View {

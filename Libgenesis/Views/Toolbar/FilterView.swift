@@ -12,32 +12,33 @@ struct AdvanceFilterView: View {
     @State var expand: Bool = true
     var body: some View {
         DisclosureGroup(isExpanded: $expand) {
-            Form {
-                ForEach(FormatFilter.allCases) { filter in
-                    Toggle(filter.desc, isOn: Binding(
-                        get: { formatFilters.contains(filter) },
-                        set: {
-                            if $0 {
-                                formatFilters.insert(filter)
-                                formatFilters.remove(.all)
-                            } else {
-                                formatFilters.remove(filter)
-                                if formatFilters.count == 0 {
-                                    formatFilters.insert(.all)
-                                }
+            ForEach(FormatFilter.allCases) { filter in
+                Toggle(filter.desc, isOn: Binding(
+                    get: { formatFilters.contains(filter) },
+                    set: {
+                        if $0 {
+                            formatFilters.insert(filter)
+                            formatFilters.remove(.all)
+                        } else {
+                            formatFilters.remove(filter)
+                            if formatFilters.count == 0 {
+                                formatFilters.insert(.all)
                             }
                         }
-                    ))
-                    .frame(height: 25)
-                    .toggleStyle(.checkmark)
-                }
+                    }
+                ))
+                .frame(height: 30)
+                .toggleStyle(.checkmark)
             }
-            .padding(.top, 5)
         } label: {
             HStack {
                 Text("Format")
-                Image(systemName: "doc.text")
-                    .foregroundColor(.blue)
+                Image(systemName: "doc.fill")
+            }
+            .onTapGesture {
+                withAnimation {
+                    expand.toggle()
+                }
             }
             .help("Choose expected formats")
         }
@@ -58,50 +59,65 @@ struct PageNumPicker: View {
     }
 }
 
+struct ColumnFilterView: View {
+    @Binding var columnFilter: ColumnFilter
+    @State var iscolExpanded: Bool = true
+    var body: some View {
+        DisclosureGroup(isExpanded: $iscolExpanded) {
+            ForEach(ColumnFilter.allCases) { filter in
+                Toggle(filter.desc, isOn: Binding(
+                    get: { columnFilter == filter },
+                    set: {
+                        if $0 {
+                            columnFilter = filter
+                        } else {
+                            columnFilter = .def
+                        }
+                    }
+                ))
+                .frame(height: 30)
+                .toggleStyle(.checkmark)
+            }
+        } label: {
+            HStack {
+                Text("Column")
+                Image(systemName: "rectangle.split.3x1.fill")
+            }
+            .onTapGesture {
+                withAnimation {
+                    iscolExpanded.toggle()
+                }
+            }
+            .help("Once any column choosed except Default, search string will be applied into that field only.")
+        }
+    }
+
+}
+
 struct FilterContextView: View {
     @Binding var columnFilter: ColumnFilter
     @Binding var formatFilters: Set<FormatFilter>
-    @State var expand: Bool = true
-
-    private var ColumnFilterView: some View {
-        ForEach(ColumnFilter.allCases) { filter in
-            Toggle(filter.desc, isOn: Binding(
-                get: { columnFilter == filter },
-                set: {
-                    if $0 {
-                        columnFilter = filter
-                    } else {
-                        columnFilter = .def
-                    }
-                }
-            ))
-            .frame(height: 30)
-            .toggleStyle(.checkmark)
-        }
-    }
     
     var body: some View {
-        Form {
-            Button("Clear filters") {
-                clearFilter()
-            }
-            PageNumPicker()
-            HStack(alignment: .top, spacing: 10) {
-                DisclosureGroup(isExpanded: $expand) {
-                    ColumnFilterView
-                } label: {
-                    HStack {
-                        Text("Column")
-                        Image(systemName: "eyeglasses")
-                            .foregroundColor(.blue)
-                    }
-                    .help("Once any column choosed except Default, search string will be applied into that field only.")
+        VStack {
+            HStack {
+                Spacer()
+                Button("Reset") {
+                    clearFilter()
                 }
-                AdvanceFilterView(formatFilters: $formatFilters)
             }
-            .frame(width: 250)
+            Form {
+                PageNumPicker()
+                HStack(alignment: .top, spacing: 10) {
+                    ColumnFilterView(columnFilter: $columnFilter)
+                    AdvanceFilterView(formatFilters: $formatFilters)
+                }
+            }
+            
         }
         .padding()
+        .frame(width: 300)
+
     }
     
     private func clearFilter() {

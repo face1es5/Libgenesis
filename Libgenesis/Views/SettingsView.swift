@@ -191,7 +191,9 @@ struct NetworkSettigsView: View {
 
 struct IntegrationSettingsView: View {
     @AppStorage("useKepubify") var useKepubify: Bool = false
+    @AppStorage("replaceAfterConversion") var replAfterConv: Bool = false
     @State var kepubPopover: Bool = false
+    @State var replPopover: Bool = false
     @Environment(\.colorScheme) var scheme: ColorScheme
     var body: some View {
         Form {
@@ -212,6 +214,26 @@ struct IntegrationSettingsView: View {
                                 Link("homepage", destination: URL(string: "https://pgaskin.net/kepubify/")!)
                             }
                             .frame(width: 200)
+                            .padding()
+                        }
+                }
+            }
+            
+            Toggle(isOn: $replAfterConv) {
+                HStack {
+                    Text("Replace original file after converted by kepubify")
+                    Image(systemName: "info.circle.fill")
+                        .foregroundColor(.blue)
+                        .onTapGesture {
+                            replPopover.toggle()
+                        }
+                        .popover(isPresented: $replPopover, arrowEdge: .trailing) {
+                            VStack(alignment: .leading) {
+                                Text("By default, the orignal epub file and converted file are saved both.")
+                                Text(".e.g: example.epub, example.kepub.epub")
+                                Text("If enable, the original epub file will be removed after conversion.")
+                            }
+                            .frame(width: 250)
                             .padding()
                         }
                 }

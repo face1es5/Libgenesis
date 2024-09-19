@@ -14,6 +14,9 @@ struct BookDetailsView: View {
     @Environment(\.colorScheme) var scheme
     @State var detailsLoaded: Bool = false
     let fixedKeyWidth: CGFloat = 80
+    @State var isattrExpanded: Bool = false
+    @State var isdescExpanded: Bool = false
+    @State var isdownExpanded: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -33,7 +36,8 @@ struct BookDetailsView: View {
                 HStack {
                     Spacer()
                     CoverView(width: 123.6, height: 200, radius: 15)
-                    Spacer()
+                       .padding(.leading, 13)
+                   Spacer()
                 }
                 InfoView
             }
@@ -71,7 +75,7 @@ struct BookDetailsView: View {
     
     private var DescriptionView: some View {
         Group {
-            DisclosureGroup {
+            DisclosureGroup(isExpanded: $isdescExpanded) {
                 VStack(alignment: .leading) {
                     HStack(alignment: .top) {
                         if detailsLoaded, let details = book.details {    // load success
@@ -97,13 +101,18 @@ struct BookDetailsView: View {
                             .scaleEffect(x: 0.5, y: 0.5)
                     }
                 }
+                .onTapGesture {
+                    withAnimation {
+                        isdescExpanded.toggle()
+                    }
+                }
             }
         }
     }
     
     private var AttrView: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            DisclosureGroup {
+        VStack(alignment: .leading, spacing: 8) {
+            DisclosureGroup(isExpanded: $isattrExpanded) {
                 VStack(alignment: .leading) {
                     HStack(alignment: .top) {
                         Text("Md5: ")
@@ -132,15 +141,20 @@ struct BookDetailsView: View {
                 }
                 .padding()
             } label: {
-                Label("More information", systemImage: "info.bubble.fill")
+                Label("More information", systemImage: "info.circle.fill")
                     .bold()
+                    .onTapGesture {
+                        withAnimation {
+                            isattrExpanded.toggle()
+                        }
+                    }
             }
         }
     }
     
     private var DownloadsView: some View {
         Group {
-            DisclosureGroup {
+            DisclosureGroup(isExpanded: $isdownExpanded) {
                 VStack(alignment: .leading, spacing: 20) {
                     if let links = book.details?.fileLinks {
                         ForEach(links, id: \.self) { link in
@@ -155,7 +169,7 @@ struct BookDetailsView: View {
                             .onTapGesture {
                                 DownloadManager.shared.download(link, book: book)
                             }
-                            .hoveringEffect(0.5, duration: 1, radius: 5)
+                            .hoveringEffect(0.5, duration: 0.5, radius: 5)
                             .contextMenu {
                                 Button("Download \(book.truncTitle) from this mirror") {
                                     DownloadManager.shared.download(link, book: book)
@@ -172,6 +186,11 @@ struct BookDetailsView: View {
                 HStack( alignment: .center, spacing: 10) {
                     Label("Downloads", systemImage: "square.and.arrow.down.on.square.fill")
                         .bold()
+                        .onTapGesture {
+                            withAnimation {
+                                isdownExpanded.toggle()
+                            }
+                        }
                     DownloadLinks
                 }
             }
@@ -179,7 +198,24 @@ struct BookDetailsView: View {
     }
     
     private var InfoView: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 8) {
+            if displayMode != .complex {
+                HStack(alignment: .center) {
+                    Spacer()
+                    Label("\(book.format)", systemImage: "doc.fill")
+                        .bold()
+                    Spacer()
+                    Divider()
+                    Spacer()
+                    Label("\(book.size)", systemImage: "externaldrive")
+                        .bold()
+                    Spacer()
+                }
+                .padding(8) // Add padding inside the container
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(10) // Add rounded edges
+            }
+
             HStack(alignment: .top) {
                 Text("Author(s): ")
                     .bold()
@@ -188,22 +224,31 @@ struct BookDetailsView: View {
                     .help(book.authors)
             }
             HStack(alignment: .top) {
-                Text("Language: ")
+                Text("Publisher: ")
                     .bold()
                     .leftAlign(width: fixedKeyWidth)
-                SelectableText(book.language)
+                SelectableText(book.publisher)
             }
             HStack(alignment: .top) {
-                Text("Size: ")
+                Text("Year: ")
                     .bold()
                     .leftAlign(width: fixedKeyWidth)
-                SelectableText("\(book.size)")
+                Text("\(book.year)")
             }
-            HStack(alignment: .top) {
-                Text("Format: ")
-                    .bold()
-                    .leftAlign(width: fixedKeyWidth)
-                SelectableText("\(book.format)")
+
+            if displayMode == .complex {
+                HStack(alignment: .top) {
+                    Text("Size: ")
+                        .bold()
+                        .leftAlign(width: fixedKeyWidth)
+                    SelectableText("\(book.size)")
+                }
+                HStack(alignment: .top) {
+                    Text("Format: ")
+                        .bold()
+                        .leftAlign(width: fixedKeyWidth)
+                    SelectableText("\(book.format)")
+                }
             }
         }
         .padding(.leading, 13)
@@ -233,18 +278,12 @@ struct BookDetailsView: View {
     }
     
     private var MiscView: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top) {
-                Text("Publisher: ")
+                Text("Language: ")
                     .bold()
                     .leftAlign(width: fixedKeyWidth)
-                SelectableText(book.publisher)
-            }
-            HStack(alignment: .top) {
-                Text("Year: ")
-                    .bold()
-                    .leftAlign(width: fixedKeyWidth)
-                Text("\(book.year)")
+                SelectableText(book.language)
             }
             HStack(alignment: .top) {
                 Text("Pages: ")
@@ -301,8 +340,6 @@ struct BookDetailsView: View {
         )
     }
 }
-
-
 
 struct BookDetailsView_Previews: PreviewProvider {
     static var previews: some View {
