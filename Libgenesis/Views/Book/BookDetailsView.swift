@@ -22,9 +22,6 @@ struct BookDetailsView: View {
         VStack(alignment: .leading, spacing: 5) {
             TitleView
             Divider()
-#if DEBUG
-            DebugView
-#endif
             if displayMode == .complex {
                 HStack {
                     CoverView()
@@ -155,7 +152,7 @@ struct BookDetailsView: View {
     private var DownloadsView: some View {
         Group {
             DisclosureGroup(isExpanded: $isdownExpanded) {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 10) {
                     if let links = book.details?.fileLinks {
                         ForEach(links, id: \.self) { link in
                             HStack {
@@ -220,9 +217,22 @@ struct BookDetailsView: View {
                 Text("Author(s): ")
                     .bold()
                     .leftAlign(width: fixedKeyWidth)
-                SelectableText(book.authors)
-                    .help(book.authors)
+                VStack(alignment: .leading) {
+                    ForEach(book.authors.indices, id: \.self) { i in
+                        if let url = book.authors[i].url {
+                            Link(destination: url) {
+                                Text(book.authors[i].description)
+                                    .lineLimit(1)
+                            }
+                        } else {
+                            Text(book.authors[i].description)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+
             }
+            
             HStack(alignment: .top) {
                 Text("Publisher: ")
                     .bold()
@@ -293,16 +303,6 @@ struct BookDetailsView: View {
             }
         }
         .padding(.leading, 13)
-    }
-    
-    private var DebugView: some View {
-        HStack {
-            Text("ID: ")
-                .bold()
-            Text("\(book.id)")
-                .leftAlign(width: fixedKeyWidth)
-            Text("Details loaded: \(book.details == nil ? "NO" : "YES")")
-        }
     }
     
     private var TitleView: some View {

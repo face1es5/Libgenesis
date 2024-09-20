@@ -38,7 +38,7 @@ class LibgenAPI {
     func parseTableContents(_ ele: Element) throws -> BookItem {
         var colIndex: Int = 0
         var id: String = "N/A"
-        var authors: String = "N/A"
+        var authors: [AuthorItem] = []
         var title: String = "N/A"
         var publisher: String = "N/A"
         var year: Int = 0
@@ -62,7 +62,11 @@ class LibgenAPI {
                 id = try col.text()
                 break;
             case 1: //authors
-                authors = try col.text()
+                try col.select("a[href]").forEach { au in
+                    if let author = try? AuthorItem(name: au.text(), url: URL(string: "\(baseURL)/\(au.attr("href").urlEncode())")) {
+                        authors.append(author)
+                    }
+                }
                 break;
             case 2: //title, md5, and
                 if let titleTag = try col.select("td a[id=\(id)]").first() {
@@ -152,7 +156,7 @@ class LibgenAPI {
         var coverURL: URL?
         var colIndex: Int = 0
         var id: String = "N/A"
-        var authors: String = "N/A"
+        var authors: [AuthorItem] = []
         var series: String = "N/A"
         var periodical: String = "N/A"
         var title: String = "N/A"
@@ -163,11 +167,10 @@ class LibgenAPI {
         var size: String = "N/A"
         var format: String = "N/A"
         var mirrors: [URL] = []
-        var edit: String = "N/A"
-        var edition: String = "N/A"
+        let edit: String = "N/A"
+        let edition: String = "N/A"
         var isbn: String = "N/A"
         var md5: String = "N/A"
-        var hrefstr: String = "N/A"
         var searchURL: URL?
         var detailURL: URL?
         let md5reg = /md5=([A-Fa-f0-9]{32})/
@@ -176,7 +179,7 @@ class LibgenAPI {
             switch colIndex {
             case 0:
                 break
-            case 1:
+            case 1: //md5, mirror, detail url, cover url, title
                 if let mirror = try? URL(string: "\(baseURL)\(col.select("a").attr("href"))") {
                     mirrors.append(mirror)
                     if let match = try md5reg.firstMatch(in: mirror.absoluteString) {
@@ -190,8 +193,12 @@ class LibgenAPI {
                 coverURL = try? URL(string: "\(baseURL)\(col.select("img").attr("src"))")
                 title = try col.select("td[colspan='2'] > b > a").text()
                 break
-            case 2:
-                authors = try col.select("a[href]").text()
+            case 2: // author
+                try col.select("a[href]").forEach { au in
+                    if let author = try? AuthorItem(name: au.text(), url: URL(string: "\(baseURL)/\(au.attr("href").urlEncode())")) {
+                        authors.append(author)
+                    }
+                }
                 break
             case 3:
                 series = try col.select("td").get(1).text()
@@ -207,7 +214,7 @@ class LibgenAPI {
                 language = try col.select("td").get(1).text()
                 pages = try Int(col.select("td").get(3).text()) ?? 0
                 break
-            case 7:
+            case 7: // isbn, id
                 isbn = try col.select("td").get(1).text()
                 id = try col.select("td").get(3).text()
                 break
@@ -252,13 +259,6 @@ class LibgenAPI {
         print("parse book details of \(book.truncTitle)")
         #endif
         do {
-//            async let desc: String = {
-//                if let isbn = try? /([\d]+)(,[\d+])?/.firstMatch(in: book.isbn) {
-//                    return await GoodreadsAPI.fetchingDesc(for: "\(isbn.1)") ?? "No description available"
-//                }
-//                return "N/A"
-//            }()
-
             async let urls = try parseDirectDownloadLinks(book.mirrors)
             async let desc: String = {
                 guard let url = book.detailURL else { return "N/A" }
@@ -302,29 +302,18 @@ class LibgenAPI {
         }
         let ht = try await APIService(to: url).getHtml()
         let doc: Document = try SwiftSoup.parse(ht)
-        #if DEBUG
-        var tableHeader: [String] = []
-        #endif
         var books: [BookItem] = []
         if let bookeles = try doc.body()?.select("table.c").first()?.getElementsByTag("tbody").first() {
             var idx = 0
             for book in try bookeles.getElementsByTag("tr") {
-                if idx == 0 {
-                    #if DEBUG
-                    tableHeader = try parseTableHeader(book)
-                    #endif
-                } else {
+                if idx > 0 {
                     books.append(try parseTableContents(book))
+                    idx += 1
                 }
-                idx += 1
             }
         }
-        #if DEBUG
-//        print("header: \(tableHeader)")
-        #endif
         return books
     }
-    
     
     /// Search for books
     /// - Parameters:
@@ -332,14 +321,20 @@ class LibgenAPI {
     ///   - page: page offset, default 1.
     ///   - col: column filter, see enum ColumnFilter.
     /// - Returns: a list of books
-    func search(_ searchStr: String, page: Int = 1,
-                col: ColumnFilter = .def, formats: Set<FormatFilter> = [.all]) async throws -> [BookItem] {
+    func search(_ searchStr: String, page: Int = 1, col: ColumnFilter = .def,
+                formats: Set<FormatFilter> = [.all], topic: Int = 0) async throws -> [BookItem] {
         var query: [String: String] = [:]
-        if searchStr.count >= 2 {   // search for specific books
+
+        if topic > 0 {
+            if searchStr.count > 0 {
+                query["req"] = "topicid\(topic)-\(searchStr)"
+            } else {
+                query["req"] = "topicid\(topic)"
+            }
+        } else {
             query["req"] = searchStr
-        } else {    // lastest books
-            query["mode"] = "last"
         }
+        
         // page offset
         query["page"] = "\(page)"
         // results num
@@ -349,12 +344,125 @@ class LibgenAPI {
         // cover mode
         query["view"] = "detailed"
         
-//        let books = try await queryBooks(url: makeURL(baseURL: baseURL, path: "search.php", query: query))
         let books = try await queryBooksWithCover(url: makeURL(baseURL: baseURL, path: "search.php", query: query))
         
         return filter(books, formats: formats)
     }
     
+    /// Parse fiction book
+    func parseFiction(_ ele: Element) throws -> BookItem? {
+        let coverURL: URL? = nil
+        var colIndex: Int = 0
+        var id: String = "N/A"
+        var authors: [AuthorItem] = []
+        var series: String = "N/A"
+        let periodical: String = "N/A"
+        var title: String = "N/A"
+        let publisher: String = "N/A"
+        let year: Int = 0
+        let pages: Int = 0
+        var language: String = "N/A"
+        var size: String = "N/A"
+        var format: String = "N/A"
+        var mirrors: [URL] = []
+        let edit: String = "N/A"
+        let edition: String = "N/A"
+        var isbn: String = "N/A"
+        var md5: String = "N/A"
+        let searchURL: URL? = nil
+        var detailURL: URL?
+        let md5reg = /fiction\/([A-Fa-f0-9]{32})/
+        let filereg = /(\w+)\s\/\s([\d\.]+\s\w+)/
+        
+        try ele.select("td").forEach { col in
+            switch colIndex {
+            case 0: //authors
+                if let au = try? col.getElementsByTag("a").first(),
+                   let name = try? au.text(),
+                   let url = try? URL(string: "\(baseURL)\(au.attr("href"))") {
+                    authors.append(AuthorItem(name: name, url: url))
+                }
+                break
+            case 1: //series
+                series = try col.text()
+                break
+            case 2: //title, detail url, md5, isbn?
+                if let atag = try? col.select("p > a").first() {
+                    title = try atag.text()
+                    let href = try atag.attr("href")
+                    detailURL = URL(string: "\(baseURL)\(href)")
+                    if let match = try md5reg.firstMatch(in: href) {
+                        md5 = "\(match.1)"
+                    }
+                }
+                if let str = try? col.select("p.catalog_identifier").text(),
+                   let match = try /ISBN:\s([\d]+)/.firstMatch(in: str) {
+                    isbn = "\(match.1)"
+                }
+                break
+            case 3: //language
+                language = try col.text()
+                break
+            case 4: //format, size
+                if let match = try filereg.firstMatch(in: col.text()) {
+                    format = "\(match.1)".lowercased()
+                    size = "\(match.2)"
+                }
+                break
+            case 5: //mirrors
+                try col.getElementsByTag("a").forEach { atag in
+                    if let href = try? atag.attr("href"),
+                       let url = URL(string: href) {
+                        mirrors.append(url)
+                    }
+                }
+                id = UUID().uuidString
+                break
+            case 6: //edit
+                break
+            default:
+                break
+            }
+            colIndex += 1
+        }
+        
+        if id == "N/A" {
+            return nil
+        }
+        
+        return BookItem(
+            id: id, authors: authors, title: title, publisher: publisher, year: year,
+            pages: pages, language: language, size: size, format: format, mirrors: mirrors, edit: edit,
+            md5: md5, detailURL: detailURL, searchURL: searchURL, isbn: isbn, edition: edition, coverURL: coverURL)
+    }
+    
+    /// Parse fiction records from a table
+    func parseFictions(url: URL?) async throws -> [BookItem] {
+        guard let url = url
+        else {
+            throw APIError.nilURL
+        }
+        let doc = try await SwiftSoup.parse(APIService(to: url.absoluteString).getHtml())
+        var books: [BookItem] = []
+        do {
+            try doc.select("table.catalog > tbody > tr").forEach { item in
+                if let book = try? parseFiction(item) {
+                    books.append(book)
+                }
+            }
+        } catch {
+            print("\(error)")
+        }
+        return books
+    }
+    
+    /// Search fictions
+    func searchFiction(_ searchStr: String, page: Int = 1, formats: Set<FormatFilter> = [.all]) async throws -> [BookItem] {
+        let query: [String: String] = ["q": searchStr, "page": "\(page)"]
+        let books = try await parseFictions(url: makeURL(baseURL: baseURL, path: "fiction", query: query))
+        
+        return filter(books, formats: formats)
+    }
     
     /// Filter after querying, .i.e filter books locally.
     /// - Parameter formats: format filters
@@ -457,3 +565,4 @@ class LibgenAPI {
         return await checkConn(url)
     }
 }
+

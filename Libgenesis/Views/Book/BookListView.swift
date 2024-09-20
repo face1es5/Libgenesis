@@ -23,6 +23,15 @@ struct BookListView: View {
     @State var page: Int = 1
     @State var loading: Bool = true    // true if querying books
     @State var searchString: String = ""
+    var searchPrompt: String {
+        if searchForTopic, topicName != "Select a topic" {
+            return topicName
+        } else if searchForFictions {
+            return "Fictions"
+        } else {
+            return "Search len shouldn above 2"
+        }
+    }
     @State var connErr: Bool = false
     @State var connErrMsg: String = ""
     @State var showConnPopover: Bool = false
@@ -39,7 +48,13 @@ struct BookListView: View {
     @State var fixedShowFinder: Bool = UserDefaults.standard.bool(forKey: "toggleFinder")
     @State var extraDisplayMode: BookLineDisplayMode = BookLineDisplayMode(rawValue: UserDefaults.standard.string(forKey: "bookLineDisplayMode") ?? "list") ?? .list
     @State var isReachingEnd: Bool = false
-
+    @State var searchForFictions: Bool = false
+    var isFilterInUse: Bool {
+        columnFilter != .def || formatFilters != [.all] || searchForFictions != false || searchForTopic != false
+    }
+    @State var searchForTopic: Bool = false
+    @State var topicID: Int = ComputerTopic.AlgorithmsAndDataStructures.rawValue
+    @State var topicName: String = "Select a topic"
    
     var body: some View {
         ScrollViewReader { proxy in
@@ -175,13 +190,15 @@ struct BookListView: View {
                 showFilter.toggle()
             }) {
                 Image(systemName: "line.3.horizontal.decrease.circle")
-                    .foregroundColor((columnFilter == .def && formatFilters == [.all]) ? Color.secondary : Color.blue)
+                    .foregroundColor(isFilterInUse ? Color.blue : Color.secondary)
             }
             .popover(isPresented: $showFilter, arrowEdge: .bottom) {
-                FilterContextView(columnFilter: $columnFilter, formatFilters: $formatFilters)
+                FilterContextView(columnFilter: $columnFilter, formatFilters: $formatFilters,
+                                  useFiction: $searchForFictions,
+                                  useTopic: $searchForTopic, topicID: $topicID, topicName: $topicName)
             }
             
-            TextField("Search len shouldn above 3.", text: $searchString)
+            TextField(searchPrompt, text: $searchString)
                 .frame(width: 300, height: 100)
                 .textFieldStyle(.roundedBorder)
                 .onSubmit {
@@ -301,7 +318,7 @@ struct BookListView: View {
     /// load books of page N, if force, clear previous books
     ///
     func fetchingBooks(_ page: Int = 1, force: Bool = false) async {
-        if searchString.count <= 2 {
+        if searchString.count <= 2, !searchForTopic {
             return
         }
         await MainActor.run {
@@ -317,7 +334,14 @@ struct BookListView: View {
         #endif
         
         do {
-            let books = try await LibgenAPI.shared.search(searchString, page: page, col: columnFilter, formats: formatFilters)
+            var books: [BookItem]
+            if searchForFictions {
+                books = try await LibgenAPI.shared.searchFiction(searchString, page: page, formats: formatFilters)
+            } else {
+                books = try await LibgenAPI.shared.search(searchString, page: page,
+                                                          col: columnFilter, formats: formatFilters, topic: topicID)
+            }
+
             await MainActor.run {
                 isReachingEnd = books.count == 0 // if no books available, indicate there's an end.
                 if force {

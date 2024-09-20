@@ -150,7 +150,7 @@ struct FilterBarView: View {
             str = book.text
             break
         case .author:
-            str = book.authors
+            str = book.authorLiteral
             break
         case .title:
             str = book.title

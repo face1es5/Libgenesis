@@ -133,7 +133,7 @@ struct BookRowView: View {
         HStack {
             Column(book.title, width: largeColWidth)
             if cols.contains(.author) {
-                Column(book.authors, width: colWidth)
+                Column(book.authorLiteral, width: colWidth)
             }
             if cols.contains(.year) {
                 Column("\(book.year)", width: smallColWidth)
@@ -172,7 +172,7 @@ struct BookCoverView: View {
                 Text(book.title)
                     .textSelectable(scheme)
                     .font(.title2)
-                Text(book.authors)
+                Text(book.authorLiteral)
                 HStack {
                     Text(book.format)
                     Text(book.language)

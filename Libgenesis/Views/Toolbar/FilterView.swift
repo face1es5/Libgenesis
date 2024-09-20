@@ -16,13 +16,17 @@ struct AdvanceFilterView: View {
                 Toggle(filter.desc, isOn: Binding(
                     get: { formatFilters.contains(filter) },
                     set: {
-                        if $0 {
-                            formatFilters.insert(filter)
-                            formatFilters.remove(.all)
+                        if filter == .all {
+                            formatFilters = [.all]
                         } else {
-                            formatFilters.remove(filter)
-                            if formatFilters.count == 0 {
-                                formatFilters.insert(.all)
+                            if $0 {
+                                formatFilters.insert(filter)
+                                formatFilters.remove(.all)
+                            } else {
+                                formatFilters.remove(filter)
+                                if formatFilters.count == 0 {
+                                    formatFilters.insert(.all)
+                                }
                             }
                         }
                     }
@@ -97,32 +101,219 @@ struct ColumnFilterView: View {
 struct FilterContextView: View {
     @Binding var columnFilter: ColumnFilter
     @Binding var formatFilters: Set<FormatFilter>
+    @Binding var useFiction: Bool
+    @Binding var useTopic: Bool
+    @Binding var topicID: Int
+    @Binding var topicName: String
+    
+    var TopicMenus: some View {
+        Group {
+            Group {
+                Menu("Technology") {
+                    ForEach(TechnologyTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Art") {
+                    ForEach(ArtTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Biology") {
+                    ForEach(BiologyTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Chemistry") {
+                    ForEach(ChemistryTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Computer") {
+                    ForEach(ComputerTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Geography") {
+                    ForEach(GeographyTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Geology") {
+                    ForEach(GeologyTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Jurisprudence") {
+                    ForEach(JurisprudenceTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Housekeeping, leisure") {
+                    ForEach(HousekeepingTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("History") {
+                    ForEach(HistoryTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+            }
+            Group {
+                Menu("Linguistics") {
+                    ForEach(LinguisticsTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Literature") {
+                    ForEach(LiteratureTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Mathematics") {
+                    ForEach(MathematicsTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Medicine") {
+                    ForEach(MedicineTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Other Social Science") {
+                    ForEach(OtherSocialSciencesTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Physics") {
+                    ForEach(PhysicsTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+            }
+            Group {
+                Menu("Physical Educ. and Sport") {
+                    ForEach(PhysicalEducAndSportTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Psychology") {
+                    ForEach(PsychologyTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Religion") {
+                    ForEach(ReligionTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Science") {
+                    ForEach(ScienceTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+            }
+        }
+    }
     
     var body: some View {
-        VStack {
-            HStack {
-                Spacer()
-                Button("Reset") {
-                    clearFilter()
-                }
-            }
-            Form {
-                PageNumPicker()
-                HStack(alignment: .top, spacing: 10) {
-                    ColumnFilterView(columnFilter: $columnFilter)
-                    AdvanceFilterView(formatFilters: $formatFilters)
-                }
+        Form {
+            Button("Reset") {
+                clearFilter()
             }
             
+            HStack(alignment: .center) {
+                Toggle("Search in topic:", isOn: $useTopic)
+                Menu(topicName) {
+                    TopicMenus
+                }
+                .disabled(useTopic == false)
+            }
+            .padding(.vertical, 5)
+            .disabled(useFiction)
+            
+            Toggle(isOn: $useFiction) {
+                Text("Search for fictions")
+            }
+            .disabled(useTopic)
+            
+            PageNumPicker()
+            HStack(alignment: .top, spacing: 10) {
+                ColumnFilterView(columnFilter: $columnFilter)
+                AdvanceFilterView(formatFilters: $formatFilters)
+            }
         }
         .padding()
-        .frame(width: 300)
+        .frame(width: 400)
 
     }
     
     private func clearFilter() {
         columnFilter = .def
         formatFilters = [.all]
+        useFiction = false
+        useTopic = false
     }
 
 }

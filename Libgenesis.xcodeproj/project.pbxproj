@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CF06EFF82C9E1B85001EFBA0 /* TopicsEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF06EFF72C9E1B85001EFBA0 /* TopicsEnum.swift */; };
 		CF0A15342C91F94000CB5B4A /* FilterBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0A15332C91F94000CB5B4A /* FilterBarView.swift */; };
 		CF0C61192C8EBA8300503879 /* MirrorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61182C8EBA8300503879 /* MirrorPicker.swift */; };
 		CF0C611B2C8EEDA100503879 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CF0C611A2C8EEDA100503879 /* Credits.rtf */; };
@@ -81,6 +82,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		CF06EFF72C9E1B85001EFBA0 /* TopicsEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicsEnum.swift; sourceTree = "<group>"; };
 		CF0A15332C91F94000CB5B4A /* FilterBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterBarView.swift; sourceTree = "<group>"; };
 		CF0C04842C9B163F003B4437 /* Libgenesis.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Libgenesis.entitlements; sourceTree = "<group>"; };
 		CF0C61182C8EBA8300503879 /* MirrorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorPicker.swift; sourceTree = "<group>"; };
@@ -313,6 +315,7 @@
 				CFFF12472C8DB5AB00DC4240 /* BooksViewModel.swift */,
 				CF0C61362C8F42C700503879 /* BookDisplayMode.swift */,
 				CF0C61382C8F528500503879 /* BookmarksModel.swift */,
+				CF06EFF72C9E1B85001EFBA0 /* TopicsEnum.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -468,6 +471,7 @@
 				CFFF124C2C8DC64D00DC4240 /* SharedContextView.swift in Sources */,
 				CFF4F3252C8C478A00396BD7 /* Animations.swift in Sources */,
 				CFDEC1662C7D722100FDF3E4 /* APIService.swift in Sources */,
+				CF06EFF82C9E1B85001EFBA0 /* TopicsEnum.swift in Sources */,
 				CFFF123D2C8D90EB00DC4240 /* Filter.swift in Sources */,
 				CFFF12442C8DB35700DC4240 /* FilterView.swift in Sources */,
 				CF0C61352C8F423A00503879 /* BookDetailsToolbar.swift in Sources */,
