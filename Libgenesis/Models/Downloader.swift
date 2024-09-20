@@ -53,7 +53,7 @@ class DownloadManager: ObservableObject {
         condition.signal()
     }
     
-    /// Add tasks.
+    /// Add task.
     func addDownloadTask(_ dtask: DownloadTask) {
         condition.lock()
         downloadTasks.append(dtask)

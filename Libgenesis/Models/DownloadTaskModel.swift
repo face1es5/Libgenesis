@@ -248,6 +248,7 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
         // and then, create download request, over
         self.downloadReq = createDownloadReq()
     }
+    
     /// Start/Restart downloding
     ///
     func join() {
@@ -256,16 +257,10 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
         Task.detached(priority: .background) {
             do {
                 // generate save location
-                try await MainActor.run {
-                    try self.makeLocalURL()
-                }
-
+                try self.makeLocalURL()
                 print("ready to download into \(self.localURL!.absoluteString)")
                 self.prepareToStart()
-                
-                await MainActor.run {
-                    self.downloadReq = self.createDownloadReq()
-                }
+                self.downloadReq = self.createDownloadReq()
             } catch {
                 self.setFailureStatus()
                 print("download \(self.name) failed: \(error)")
