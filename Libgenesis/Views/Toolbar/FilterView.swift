@@ -101,10 +101,10 @@ struct ColumnFilterView: View {
 struct FilterContextView: View {
     @Binding var columnFilter: ColumnFilter
     @Binding var formatFilters: Set<FormatFilter>
-    @Binding var useFiction: Bool
     @Binding var useTopic: Bool
     @Binding var topicID: Int
     @Binding var topicName: String
+    @Binding var searchDomain: SearchDomain
     
     var TopicMenus: some View {
         Group {
@@ -282,27 +282,32 @@ struct FilterContextView: View {
             Button("Reset") {
                 clearFilter()
             }
+            .buttonStyle(.borderedProminent)
+            
+            Picker("", selection: $searchDomain) {
+                ForEach(SearchDomain.allCases, id: \.self) { d in
+                    Text("\(d.desc)")
+                        .tag(d)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.vertical, 10)
             
             HStack(alignment: .center) {
                 Toggle("Search in topic:", isOn: $useTopic)
                 Menu(topicName) {
                     TopicMenus
                 }
-                .disabled(useTopic == false)
             }
-            .padding(.vertical, 5)
-            .disabled(useFiction)
-            
-            Toggle(isOn: $useFiction) {
-                Text("Search for fictions")
-            }
-            .disabled(useTopic)
-            
-            PageNumPicker()
+            .disabled(searchDomain != .def)
+        
             HStack(alignment: .top, spacing: 10) {
                 ColumnFilterView(columnFilter: $columnFilter)
                 AdvanceFilterView(formatFilters: $formatFilters)
             }
+            
+            PageNumPicker()
+                .padding(.vertical, 5)
         }
         .padding()
         .frame(width: 400)
@@ -312,7 +317,7 @@ struct FilterContextView: View {
     private func clearFilter() {
         columnFilter = .def
         formatFilters = [.all]
-        useFiction = false
+        searchDomain = .def
         useTopic = false
     }
 

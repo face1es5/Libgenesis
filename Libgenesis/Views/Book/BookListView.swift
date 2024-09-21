@@ -23,13 +23,19 @@ struct BookListView: View {
     @State var page: Int = 1
     @State var loading: Bool = true    // true if querying books
     @State var searchString: String = ""
+    @State var searchDomain: SearchDomain = .def
     var searchPrompt: String {
         if searchForTopic, topicName != "Select a topic" {
             return topicName
-        } else if searchForFictions {
-            return "Fictions"
         } else {
-            return "Search len shouldn above 2"
+            switch(searchDomain) {
+            case .def:
+                return "Search len shouldn above 2"
+            case .fiction:
+                return "Fictions"
+            case .sci:
+                return "Scientific Articles"
+            }
         }
     }
     @State var connErr: Bool = false
@@ -48,9 +54,8 @@ struct BookListView: View {
     @State var fixedShowFinder: Bool = UserDefaults.standard.bool(forKey: "toggleFinder")
     @State var extraDisplayMode: BookLineDisplayMode = BookLineDisplayMode(rawValue: UserDefaults.standard.string(forKey: "bookLineDisplayMode") ?? "list") ?? .list
     @State var isReachingEnd: Bool = false
-    @State var searchForFictions: Bool = false
     var isFilterInUse: Bool {
-        columnFilter != .def || formatFilters != [.all] || searchForFictions != false || searchForTopic != false
+        columnFilter != .def || formatFilters != [.all] || searchDomain != .def || searchForTopic != false
     }
     @State var searchForTopic: Bool = false
     @State var topicID: Int = ComputerTopic.AlgorithmsAndDataStructures.rawValue
@@ -194,8 +199,8 @@ struct BookListView: View {
             }
             .popover(isPresented: $showFilter, arrowEdge: .bottom) {
                 FilterContextView(columnFilter: $columnFilter, formatFilters: $formatFilters,
-                                  useFiction: $searchForFictions,
-                                  useTopic: $searchForTopic, topicID: $topicID, topicName: $topicName)
+                                  useTopic: $searchForTopic, topicID: $topicID, topicName: $topicName,
+                                  searchDomain: $searchDomain)
             }
             
             TextField(searchPrompt, text: $searchString)
@@ -206,7 +211,7 @@ struct BookListView: View {
                 }
             
             Button(action: { forceFetching() }) {
-                Image(systemName: connErr ? "network" : "arrow.clockwise.circle.fill" )
+                Image(systemName: "arrow.clockwise.circle.fill" )
                     .foregroundColor(connErr ? .yellow : .secondary)
                     .imageScale(.large)
             }
@@ -335,11 +340,12 @@ struct BookListView: View {
         
         do {
             var books: [BookItem]
-            if searchForFictions {
+            if searchDomain == .fiction {
                 books = try await LibgenAPI.shared.searchFiction(searchString, page: page, formats: formatFilters)
             } else {
                 books = try await LibgenAPI.shared.search(searchString, page: page,
-                                                          col: columnFilter, formats: formatFilters, topic: topicID)
+                                                          col: columnFilter, formats: formatFilters,
+                                                          topic: (searchForTopic ? topicID : 0))
             }
 
             await MainActor.run {

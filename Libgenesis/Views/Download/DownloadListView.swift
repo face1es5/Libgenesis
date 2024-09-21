@@ -185,7 +185,6 @@ struct DownloadListView: View {
             }
         }
         .listStyle(.sidebar)
-        .padding(5)
     }
 }
 

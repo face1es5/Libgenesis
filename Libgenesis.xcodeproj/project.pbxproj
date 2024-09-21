@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		CF06EFF82C9E1B85001EFBA0 /* TopicsEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF06EFF72C9E1B85001EFBA0 /* TopicsEnum.swift */; };
+		CF06EFFA2C9E36DA001EFBA0 /* SearchDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF06EFF92C9E36DA001EFBA0 /* SearchDomain.swift */; };
 		CF0A15342C91F94000CB5B4A /* FilterBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0A15332C91F94000CB5B4A /* FilterBarView.swift */; };
 		CF0C61192C8EBA8300503879 /* MirrorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61182C8EBA8300503879 /* MirrorPicker.swift */; };
 		CF0C611B2C8EEDA100503879 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CF0C611A2C8EEDA100503879 /* Credits.rtf */; };
@@ -83,6 +84,7 @@
 
 /* Begin PBXFileReference section */
 		CF06EFF72C9E1B85001EFBA0 /* TopicsEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicsEnum.swift; sourceTree = "<group>"; };
+		CF06EFF92C9E36DA001EFBA0 /* SearchDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDomain.swift; sourceTree = "<group>"; };
 		CF0A15332C91F94000CB5B4A /* FilterBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterBarView.swift; sourceTree = "<group>"; };
 		CF0C04842C9B163F003B4437 /* Libgenesis.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Libgenesis.entitlements; sourceTree = "<group>"; };
 		CF0C61182C8EBA8300503879 /* MirrorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorPicker.swift; sourceTree = "<group>"; };
@@ -316,6 +318,7 @@
 				CF0C61362C8F42C700503879 /* BookDisplayMode.swift */,
 				CF0C61382C8F528500503879 /* BookmarksModel.swift */,
 				CF06EFF72C9E1B85001EFBA0 /* TopicsEnum.swift */,
+				CF06EFF92C9E36DA001EFBA0 /* SearchDomain.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -458,6 +461,7 @@
 				CFDEC1572C7D6A9F00FDF3E4 /* ContentView.swift in Sources */,
 				CFE2977C2C8B2388007C403A /* GeneralCommands.swift in Sources */,
 				CFFF12462C8DB3B400DC4240 /* BookListView.swift in Sources */,
+				CF06EFFA2C9E36DA001EFBA0 /* SearchDomain.swift in Sources */,
 				CFE297852C8B7AAA007C403A /* MenuBar.swift in Sources */,
 				CFE297802C8B3C5A007C403A /* SettingsView.swift in Sources */,
 				CFFF12482C8DB5AB00DC4240 /* BooksViewModel.swift in Sources */,
