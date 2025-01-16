@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "libgen2.png",
+      "filename" : "icon_128x128 1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "libgen2 1.png",
+      "filename" : "icon_128x128@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "libgen2 2.png",
+      "filename" : "icon_512x512.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

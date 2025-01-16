@@ -11,6 +11,9 @@ struct BookListView: View {
     @EnvironmentObject var booksVM: BooksViewModel
     @EnvironmentObject var selBooksVM: BooksSelectionModel
     @EnvironmentObject var downloadManager: DownloadManager
+    var downloadCount: Int {
+        downloadManager.downloadTasks.count
+    }
     var books: [BookItem] {
         booksVM.books
     }
@@ -20,6 +23,21 @@ struct BookListView: View {
     @State var page: Int = 1
     @State var loading: Bool = true    // true if querying books
     @State var searchString: String = ""
+    @State var searchDomain: SearchDomain = .def
+    var searchPrompt: String {
+        if searchForTopic, topicName != "Select a topic" {
+            return topicName
+        } else {
+            switch(searchDomain) {
+            case .def:
+                return "Search len shouldn above 2"
+            case .fiction:
+                return "Fictions"
+            case .sci:
+                return "Scientific Articles"
+            }
+        }
+    }
     @State var connErr: Bool = false
     @State var connErrMsg: String = ""
     @State var showConnPopover: Bool = false
@@ -27,7 +45,7 @@ struct BookListView: View {
     @State var columnFilter: ColumnFilter = .def
     @State var showDownload: Bool = false
     @State var showBookmarks: Bool = false
-    @AppStorage("preferredFormats") var formatFilters: Set<FormatFilter> = [.all]
+    @State var formatFilters: Set<FormatFilter> = [.all]
     @AppStorage("bookLineDisplayMode") var bookDisplayMode: BookLineDisplayMode = .list
     @State var firstappear: Bool = true
     /// For finder(local filter)
@@ -36,7 +54,12 @@ struct BookListView: View {
     @State var fixedShowFinder: Bool = UserDefaults.standard.bool(forKey: "toggleFinder")
     @State var extraDisplayMode: BookLineDisplayMode = BookLineDisplayMode(rawValue: UserDefaults.standard.string(forKey: "bookLineDisplayMode") ?? "list") ?? .list
     @State var isReachingEnd: Bool = false
-    ///
+    var isFilterInUse: Bool {
+        columnFilter != .def || formatFilters != [.all] || searchDomain != .def || searchForTopic != false
+    }
+    @State var searchForTopic: Bool = false
+    @State var topicID: Int = ComputerTopic.AlgorithmsAndDataStructures.rawValue
+    @State var topicName: String = "Select a topic"
    
     var body: some View {
         ScrollViewReader { proxy in
@@ -58,9 +81,6 @@ struct BookListView: View {
                         ForEach(books, id: \.self) { book in
                             #if !os(iOS)
                             BookView(book, mode: extraDisplayMode)
-                                .contextMenu {
-                                    BookContext(book: book)
-                                }
                                 .id(book)
                                 .task {
                                     if book == books.last {
@@ -118,49 +138,43 @@ struct BookListView: View {
             }
             .frame(minWidth: 600)
         }
-        .onChange(of: showFinder) { _ in
+        .onChange(of: showFinder, initial: false) { _, _ in
             withAnimation {
                 fixedShowFinder.toggle()
             }
         }
-        .onChange(of: bookDisplayMode) { mode in
+        .onChange(of: bookDisplayMode, initial: false) { _, mode in
             extraDisplayMode = mode
-        }
-
-    }
-    
-    private var NavigationToolItem: some View {
-        Group {
-            MirrorPicker()
-                .labelStyle(.titleAndIcon)
-                .frame(width: 120)
-            
-            Button(action: {
-                showBookmarks.toggle()
-            }) {
-                HStack {
-                    Label("bookmarks", systemImage: "bookmark.fill")
-                        .foregroundColor(.blue)
-                    Image(systemName: "chevron.compact.down")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 15)
-                }
-            }
-            .popover(isPresented: $showBookmarks, arrowEdge: .bottom) {
-                BookmarkGallery()
-                    .frame(width: 400, height: 300)
-            }
-            .help("Bookmarks")
         }
     }
     
     private var EmptyStateView: some View {
         VStack {
-            Text("Please search for some books first.")
+            Text("Please search for some books first")
                 .font(.title)
                 .foregroundColor(.secondary)
-            Image("stewie")
+            HStack(spacing: 5) {
+                Text("Use")
+                HStack {
+                    Image(systemName: "command")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 12, height: 12)
+                        .padding(.leading, 5)
+                        .padding(.vertical, 5)
+                    Text("L")
+                        .padding(.trailing, 5)
+                }
+                .foregroundStyle(.blue)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke(.blue, lineWidth: 2)
+                }
+                Text("to trigger search")
+
+            }
+            .font(.title2)
+            Image("libgenLarge")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 200, height: 200)
@@ -180,29 +194,12 @@ struct BookListView: View {
         .font(.title)
     }
     
-    private var PrincipleToolItem: some View {
+    private var NavigationToolItem: some View {
         Group {
-            TextField("Search len shouldn above 3.", text: $searchString)
-                .frame(width: 300, height: 100)
-                .textFieldStyle(.roundedBorder)
-                .onSubmit {
-                    forceFetching()
-                }
-   
-            Button(action: {
-                showFilter.toggle()
-            }) {
-                Image(systemName: "line.3.horizontal.decrease.circle")
-                    .foregroundColor((columnFilter == .def && formatFilters == [.all]) ? Color.secondary : Color.blue)
-            }
-            .popover(isPresented: $showFilter, arrowEdge: .bottom) {
-                FilterContextView(formatFilters: $formatFilters, columnFilter: $columnFilter)
-            }
-        }
-    }
-    
-    private var PrimaryToolItem: some View {
-        Group {
+            MirrorPicker()
+                .labelStyle(.titleAndIcon)
+                .frame(width: 120)
+            
             Picker("Display mode", selection: $bookDisplayMode) {
                 ForEach(BookLineDisplayMode.allCases, id: \.self) { mode in
                     Label(mode.rawValue.capitalized, systemImage: mode.icon).tag(mode)
@@ -210,23 +207,28 @@ struct BookListView: View {
             }
             .pickerStyle(.inline)
             .help("Change display mode to gallery/list")
-            
+        }
+    }
+    
+    private var PrincipleToolItem: some View {
+        HStack {
             Button(action: {
-                showDownload.toggle()
+                showFilter.toggle()
             }) {
-                Image(systemName: "arrow.down.circle")
-                    .foregroundColor(downloadManager.downloadTasks.count == 0 ? Color.secondary : Color.blue)
-                    .imageScale(.large)
-                    .popover(isPresented: $showDownload, arrowEdge: .bottom) {
-                        DownloadListView()
-                            .frame(width: 400, height: 300)
-                    }
+                Image(systemName: "line.3.horizontal.decrease.circle")
+                    .foregroundColor(isFilterInUse ? Color.blue : Color.secondary)
             }
-            .help("Downloads")
-
+            .popover(isPresented: $showFilter, arrowEdge: .bottom) {
+                FilterContextView(columnFilter: $columnFilter, formatFilters: $formatFilters,
+                                  useTopic: $searchForTopic, topicID: $topicID, topicName: $topicName,
+                                  searchDomain: $searchDomain)
+            }
+            
+            SearchFieldView(searchString: $searchString, onSubmitAction: forceFetching)
+                
             Button(action: { forceFetching() }) {
-                Image(systemName: connErr ? "network" : "arrow.clockwise.circle.fill" )
-                    .foregroundColor(connErr ? .yellow : .accentColor)
+                Image(systemName: "arrow.clockwise.circle.fill" )
+                    .foregroundColor(connErr ? .yellow : .secondary)
                     .imageScale(.large)
             }
             .keyboardShortcut("r")
@@ -244,6 +246,45 @@ struct BookListView: View {
                 }
             }
             .help("Click to refresh")
+            
+        }
+    }
+    
+    private var PrimaryToolItem: some View {
+        Group {
+            Button(action: {
+                showDownload.toggle()
+            }) {
+                HStack {
+                    Image(systemName: "arrow.down.circle")
+                        .imageScale(.large)
+                        .foregroundColor(downloadCount == 0 ? Color.secondary : Color.blue)
+                    Text("\(downloadCount)")
+                        .font(.caption)
+                }
+                .popover(isPresented: $showDownload, arrowEdge: .bottom) {
+                    DownloadPopover()
+                        .frame(width: 400, height: 300)
+                }
+            }
+            .help("Downloads")
+            
+            Button(action: {
+                showBookmarks.toggle()
+            }) {
+                HStack {
+                    Label("bookmarks", systemImage: "books.vertical.fill")
+                    Image(systemName: "chevron.compact.down")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 15)
+                }
+            }
+            .popover(isPresented: $showBookmarks, arrowEdge: .trailing) {
+                BookmarkGallery()
+                    .frame(width: 400, height: 300)
+            }
+            .help("Bookmarks")
         }
     }
     
@@ -254,14 +295,13 @@ struct BookListView: View {
             NavigationToolItem
 #endif
             Spacer()
-            PrincipleToolItem
+            PrincipleToolItem.focusSection()
             Spacer()
             PrimaryToolItem
         }
     }
     
     /// Handle a series of downloading.
-    ///
     func askDownload() {
         print("Download \(selectedBooks.map { $0.title })")
         DownloadManager.shared.download(Array(selectedBooks))
@@ -280,31 +320,47 @@ struct BookListView: View {
     
     /// Fetching books of next page.
     func fetchingNextPage() {
+//        If loading, should load next page, but if the res can't fill the screen, will make load next page impossibly as have reached the end when loading the first page, so just wish the user have patience to wait for loading and don't scroll to bottom too often.
+//        if !isReachingEnd, !loading {
         if !isReachingEnd {
+            page += 1
 #if DEBUG
             print("Query next page: \(page).")
 #endif
-            page += 1
             Task.detached(priority: .background) {
                 await fetchingBooks(page)
             }
         } else {
-            print("Already reached the end.")
+            print("Already reached the end or is loading.")
         }
     }
     
     /// load books of page N, if force, clear previous books
     ///
     func fetchingBooks(_ page: Int = 1, force: Bool = false) async {
-        if searchString.count <= 2 {
+        if searchString.count < 2, !searchForTopic {
             return
         }
         await MainActor.run {
             firstappear = false
             loading = true
         }
+        #if DEBUG
+        print("Page: \(page), force: \(force ? 1 : 0), loading: \(loading ? 1 : 0)")
+        print("Formats: ")
+        for f in formatFilters {
+            print(f.rawValue)
+        }
+        #endif
+        
         do {
-            let books = try await LibgenAPI.shared.search(searchString, page: page, col: columnFilter, formats: formatFilters)
+            var books: [BookItem]
+            if searchDomain == .fiction {
+                books = try await LibgenAPI.shared.searchFiction(searchString, page: page, formats: formatFilters)
+            } else {
+                books = try await LibgenAPI.shared.search(searchString, page: page, col: columnFilter, formats: formatFilters, topic: (searchForTopic ? topicID : 0))
+            }
+
             await MainActor.run {
                 isReachingEnd = books.count == 0 // if no books available, indicate there's an end.
                 if force {
@@ -327,6 +383,57 @@ struct BookListView: View {
             if force {
                 selBooksVM.clear()
             }
+        }
+    }
+}
+
+struct SearchFieldView: View {
+    @Binding var searchString: String
+    @FocusState var isSearchFieldFocused: Bool
+    var onSubmitAction: () -> Void
+
+    var body: some View {
+        HStack {
+            HStack {
+                Button("") {
+                    isSearchFieldFocused = true
+                }
+                .frame(width: 0)
+                .padding(0)
+                .buttonStyle(.plain)
+                .keyboardShortcut("L", modifiers: [.command])
+                .opacity(0)
+                .allowsHitTesting(false)
+
+                Image(systemName: "magnifyingglass")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 12, height: 12)
+                    .opacity(0.8)
+
+                TextField("Search", text: $searchString)
+                    .focused($isSearchFieldFocused)
+                    .frame(width: 350)
+                    .textFieldStyle(.plain)
+                    .onSubmit {
+                        onSubmitAction()
+                    }
+
+                HStack(spacing: 1) {
+                    Image(systemName: "command")
+                    Text("L")
+                }
+                .foregroundStyle(isSearchFieldFocused ? Color.secondary : .blue)
+                .opacity(0.8)
+                .padding(.trailing, 5)
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(
+                        isSearchFieldFocused ? Color.blue : .gray.opacity(0.3), lineWidth: isSearchFieldFocused ? 2.0 : 0.5)
+                    .frame(height: 28)
+            }
+            .animation(.smooth, value: isSearchFieldFocused)
         }
     }
 }

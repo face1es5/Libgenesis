@@ -12,28 +12,37 @@ struct AdvanceFilterView: View {
     @State var expand: Bool = true
     var body: some View {
         DisclosureGroup(isExpanded: $expand) {
-            Form {
-                ForEach(FormatFilter.allCases) { filter in
-                    Toggle(filter.desc, isOn: Binding(
-                        get: { formatFilters.contains(filter) },
-                        set: {
+            ForEach(FormatFilter.allCases) { filter in
+                Toggle(filter.desc, isOn: Binding(
+                    get: { formatFilters.contains(filter) },
+                    set: {
+                        if filter == .all {
+                            formatFilters = [.all]
+                        } else {
                             if $0 {
                                 formatFilters.insert(filter)
+                                formatFilters.remove(.all)
                             } else {
                                 formatFilters.remove(filter)
+                                if formatFilters.count == 0 {
+                                    formatFilters.insert(.all)
+                                }
                             }
                         }
-                    ))
-                    .frame(height: 20)
-                    .toggleStyle(.checkmark)
-                }
+                    }
+                ))
+                .frame(height: 30)
+                .toggleStyle(.checkmark)
             }
-            .padding(.top, 5)
         } label: {
             HStack {
                 Text("Format")
-                Image(systemName: "doc.text")
-                    .foregroundColor(.blue)
+                Image(systemName: "doc.fill")
+            }
+            .onTapGesture {
+                withAnimation {
+                    expand.toggle()
+                }
             }
             .help("Choose expected formats")
         }
@@ -54,55 +63,262 @@ struct PageNumPicker: View {
     }
 }
 
-struct FilterContextView: View {
-    @Binding var formatFilters: Set<FormatFilter>
+struct ColumnFilterView: View {
     @Binding var columnFilter: ColumnFilter
-    @State var expand: Bool = true
+    @State var iscolExpanded: Bool = true
+    var body: some View {
+        DisclosureGroup(isExpanded: $iscolExpanded) {
+            ForEach(ColumnFilter.allCases) { filter in
+                Toggle(filter.desc, isOn: Binding(
+                    get: { columnFilter == filter },
+                    set: {
+                        if $0 {
+                            columnFilter = filter
+                        } else {
+                            columnFilter = .def
+                        }
+                    }
+                ))
+                .frame(height: 30)
+                .toggleStyle(.checkmark)
+            }
+        } label: {
+            HStack {
+                Text("Column")
+                Image(systemName: "rectangle.split.3x1.fill")
+            }
+            .onTapGesture {
+                withAnimation {
+                    iscolExpanded.toggle()
+                }
+            }
+            .help("Once any column choosed except Default, search string will be applied into that field only.")
+        }
+    }
 
-    private var ColumnFilterView: some View {
-        ForEach(ColumnFilter.allCases) { filter in
-            Toggle(filter.desc, isOn: Binding(
-                get: { columnFilter == filter },
-                set: {
-                    if $0 {
-                        columnFilter = filter
-                    } else {
-                        columnFilter = .def
+}
+
+struct FilterContextView: View {
+    @Binding var columnFilter: ColumnFilter
+    @Binding var formatFilters: Set<FormatFilter>
+    @Binding var useTopic: Bool
+    @Binding var topicID: Int
+    @Binding var topicName: String
+    @Binding var searchDomain: SearchDomain
+    
+    var TopicMenus: some View {
+        Group {
+            Group {
+                Menu("Technology") {
+                    ForEach(TechnologyTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
                     }
                 }
-            ))
-            .frame(height: 30)
-            .toggleStyle(.checkmark)
+                Menu("Art") {
+                    ForEach(ArtTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Biology") {
+                    ForEach(BiologyTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Chemistry") {
+                    ForEach(ChemistryTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Computer") {
+                    ForEach(ComputerTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Geography") {
+                    ForEach(GeographyTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Geology") {
+                    ForEach(GeologyTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Jurisprudence") {
+                    ForEach(JurisprudenceTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Housekeeping, leisure") {
+                    ForEach(HousekeepingTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("History") {
+                    ForEach(HistoryTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+            }
+            Group {
+                Menu("Linguistics") {
+                    ForEach(LinguisticsTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Literature") {
+                    ForEach(LiteratureTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Mathematics") {
+                    ForEach(MathematicsTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Medicine") {
+                    ForEach(MedicineTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Other Social Science") {
+                    ForEach(OtherSocialSciencesTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Physics") {
+                    ForEach(PhysicsTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+            }
+            Group {
+                Menu("Physical Educ. and Sport") {
+                    ForEach(PhysicalEducAndSportTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Psychology") {
+                    ForEach(PsychologyTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Religion") {
+                    ForEach(ReligionTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+                Menu("Science") {
+                    ForEach(ScienceTopic.allCases, id: \.self) { tp in
+                        Button("\(tp.desc)") {
+                            topicName = tp.desc
+                            topicID = tp.rawValue
+                        }
+                    }
+                }
+            }
         }
     }
     
     var body: some View {
         Form {
-            Button("Clear filters") {
+            Button("Reset") {
                 clearFilter()
             }
-            PageNumPicker()
-            HStack(alignment: .top, spacing: 10) {
-                DisclosureGroup(isExpanded: $expand) {
-                    ColumnFilterView
-                } label: {
-                    HStack {
-                        Text("Column")
-                        Image(systemName: "eyeglasses")
-                            .foregroundColor(.blue)
-                    }
-                    .help("Once any column choosed except Default, search string will be applied into that field only.")
+            .buttonStyle(.borderedProminent)
+            
+            Picker("", selection: $searchDomain) {
+                ForEach(SearchDomain.allCases, id: \.self) { d in
+                    Text("\(d.desc)")
+                        .tag(d)
                 }
+            }
+            .pickerStyle(.segmented)
+            .padding(.vertical, 10)
+            
+            HStack(alignment: .center) {
+                Toggle("Search in topic:", isOn: $useTopic)
+                Menu(topicName) {
+                    TopicMenus
+                }
+            }
+            .disabled(searchDomain != .def)
+        
+            HStack(alignment: .top, spacing: 10) {
+                ColumnFilterView(columnFilter: $columnFilter)
                 AdvanceFilterView(formatFilters: $formatFilters)
             }
-            .frame(width: 250)
+            
+            PageNumPicker()
+                .padding(.vertical, 5)
         }
         .padding()
+        .frame(width: 400)
+
     }
     
     private func clearFilter() {
         columnFilter = .def
         formatFilters = [.all]
+        searchDomain = .def
+        useTopic = false
     }
 
 }

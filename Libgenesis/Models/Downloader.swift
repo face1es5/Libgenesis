@@ -45,12 +45,6 @@ class DownloadManager: ObservableObject {
         addDownloadTask(dtask)
     }
     
-    /// TODO: Download selected book.
-    ///
-    func downloadSelected() {
-        fatalError("Implement download selected book globally.")
-    }
-    
     /// Add a list of tasks.
     func addDownloadTasks(_ dtasks: [DownloadTask]) {
         condition.lock()
@@ -59,7 +53,7 @@ class DownloadManager: ObservableObject {
         condition.signal()
     }
     
-    /// Add tasks.
+    /// Add task.
     func addDownloadTask(_ dtask: DownloadTask) {
         condition.lock()
         downloadTasks.append(dtask)
@@ -130,10 +124,8 @@ class DownloadManager: ObservableObject {
             guard let self = self else { return }
             while(true) {
                 // aquire lock and waiting for new downloading task.
-                while(downloadTasks.isEmpty) {
-                    condition.lock()
-                    condition.wait()
-                }
+                condition.lock()
+                while(downloadTasks.isEmpty) { condition.wait() }
                 guard
                     let task = downloadTasks.first(where: { $0.started == false })
                 else {

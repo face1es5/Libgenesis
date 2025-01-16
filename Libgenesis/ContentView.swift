@@ -14,8 +14,14 @@ struct ContentView: View {
     var body: some View {
         #if !os(iOS)
         NavigationSplitView {
-            BookDetailsContainer
-                .frame(minWidth: 320)
+            VStack(spacing: 0) {
+                BookDetailsContainer
+                Spacer()
+                BookDetailsBottomToolBar()
+                    .frame(height: 20)
+                    .padding()
+            }
+            .frame(minWidth: 320)
         } detail: {
             BookListView()
                 .environmentObject(booksVM)
@@ -31,7 +37,7 @@ struct ContentView: View {
     }
     
     var BookDetailsContainer: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             if let book = selBooksVM.firstBook {
                 BookDetailsView(book: book)
                     .padding(.trailing, 13)
@@ -48,7 +54,11 @@ struct ContentView: View {
         }
         .contextMenu {
             Button("Refresh") {
-                selBooksVM.loadDetails()
+                if let book = selBooksVM.firstBook {
+                    Task.detached(priority: .background) {
+                        await book.loadDetails()
+                    }
+                }
             }
             .keyboardShortcut("r")
             if let book = selBooksVM.firstBook {

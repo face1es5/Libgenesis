@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CF06EFF82C9E1B85001EFBA0 /* TopicsEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF06EFF72C9E1B85001EFBA0 /* TopicsEnum.swift */; };
+		CF06EFFA2C9E36DA001EFBA0 /* SearchDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF06EFF92C9E36DA001EFBA0 /* SearchDomain.swift */; };
 		CF0A15342C91F94000CB5B4A /* FilterBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0A15332C91F94000CB5B4A /* FilterBarView.swift */; };
 		CF0C61192C8EBA8300503879 /* MirrorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0C61182C8EBA8300503879 /* MirrorPicker.swift */; };
 		CF0C611B2C8EEDA100503879 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CF0C611A2C8EEDA100503879 /* Credits.rtf */; };
@@ -81,7 +83,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		CF06EFF72C9E1B85001EFBA0 /* TopicsEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicsEnum.swift; sourceTree = "<group>"; };
+		CF06EFF92C9E36DA001EFBA0 /* SearchDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDomain.swift; sourceTree = "<group>"; };
 		CF0A15332C91F94000CB5B4A /* FilterBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterBarView.swift; sourceTree = "<group>"; };
+		CF0C04842C9B163F003B4437 /* Libgenesis.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Libgenesis.entitlements; sourceTree = "<group>"; };
 		CF0C61182C8EBA8300503879 /* MirrorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorPicker.swift; sourceTree = "<group>"; };
 		CF0C611A2C8EEDA100503879 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		CF0C611C2C8EEDFB00503879 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -94,7 +99,6 @@
 		CFDEC1542C7D6A9F00FDF3E4 /* LibgenesisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibgenesisApp.swift; sourceTree = "<group>"; };
 		CFDEC1562C7D6A9F00FDF3E4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CFDEC1582C7D6AA000FDF3E4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		CFDEC15A2C7D6AA000FDF3E4 /* Libgenesis.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Libgenesis.entitlements; sourceTree = "<group>"; };
 		CFDEC15C2C7D6AA000FDF3E4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		CFDEC1632C7D6EB600FDF3E4 /* ServiceMirror.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceMirror.swift; sourceTree = "<group>"; };
 		CFDEC1652C7D722100FDF3E4 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
@@ -216,8 +220,8 @@
 				CFDEC1542C7D6A9F00FDF3E4 /* LibgenesisApp.swift */,
 				CFDEC1562C7D6A9F00FDF3E4 /* ContentView.swift */,
 				CFE297792C8A8F58007C403A /* Info.plist */,
+				CF0C04842C9B163F003B4437 /* Libgenesis.entitlements */,
 				CFDEC1582C7D6AA000FDF3E4 /* Assets.xcassets */,
-				CFDEC15A2C7D6AA000FDF3E4 /* Libgenesis.entitlements */,
 				CFDEC15B2C7D6AA000FDF3E4 /* Preview Content */,
 				CF0C611A2C8EEDA100503879 /* Credits.rtf */,
 			);
@@ -313,6 +317,8 @@
 				CFFF12472C8DB5AB00DC4240 /* BooksViewModel.swift */,
 				CF0C61362C8F42C700503879 /* BookDisplayMode.swift */,
 				CF0C61382C8F528500503879 /* BookmarksModel.swift */,
+				CF06EFF72C9E1B85001EFBA0 /* TopicsEnum.swift */,
+				CF06EFF92C9E36DA001EFBA0 /* SearchDomain.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -455,6 +461,7 @@
 				CFDEC1572C7D6A9F00FDF3E4 /* ContentView.swift in Sources */,
 				CFE2977C2C8B2388007C403A /* GeneralCommands.swift in Sources */,
 				CFFF12462C8DB3B400DC4240 /* BookListView.swift in Sources */,
+				CF06EFFA2C9E36DA001EFBA0 /* SearchDomain.swift in Sources */,
 				CFE297852C8B7AAA007C403A /* MenuBar.swift in Sources */,
 				CFE297802C8B3C5A007C403A /* SettingsView.swift in Sources */,
 				CFFF12482C8DB5AB00DC4240 /* BooksViewModel.swift in Sources */,
@@ -468,6 +475,7 @@
 				CFFF124C2C8DC64D00DC4240 /* SharedContextView.swift in Sources */,
 				CFF4F3252C8C478A00396BD7 /* Animations.swift in Sources */,
 				CFDEC1662C7D722100FDF3E4 /* APIService.swift in Sources */,
+				CF06EFF82C9E1B85001EFBA0 /* TopicsEnum.swift in Sources */,
 				CFFF123D2C8D90EB00DC4240 /* Filter.swift in Sources */,
 				CFFF12442C8DB35700DC4240 /* FilterView.swift in Sources */,
 				CF0C61352C8F423A00503879 /* BookDetailsToolbar.swift in Sources */,
@@ -517,6 +525,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = GY29NY469M;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -537,6 +546,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CODE_SIGN_FLAGS = "";
 				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -581,6 +591,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = GY29NY469M;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -594,6 +605,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_CODE_SIGN_FLAGS = "";
 				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -608,6 +620,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Libgenesis/Libgenesis.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Libgenesis/Preview Content\"";
@@ -630,8 +643,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 1.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Paramecium.Libgenesis;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -650,6 +663,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Libgenesis/Libgenesis.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Libgenesis/Preview Content\"";
@@ -672,8 +686,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 1.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Paramecium.Libgenesis;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;

@@ -71,7 +71,7 @@ struct LibgenesisApp: App {
                 }
                 .keyboardShortcut("F")
             }
-            DownloadCommands(downloadManager: downloadManager)
+            DownloadCommands(downloadManager: downloadManager, recentManager: recentManager)
             RecentFilesCommands(recentManager: recentManager)
         }
         MenuBarExtra(content: {

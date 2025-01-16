@@ -19,8 +19,8 @@ struct BookmarkGallery: View {
                     BookMarkView(book: book)
                 }
             }
+            .padding(.horizontal)
         }
-        .padding()
     }
 }
 
@@ -32,7 +32,6 @@ struct BookMarkView: View {
                 SharedContextView(book: book)
                 BookMarkMenuView(book: book)
             }
-        Divider()
     }
 }
 

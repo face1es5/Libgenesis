@@ -9,16 +9,18 @@ import Foundation
 import Alamofire
 
 enum FileError: Error, LocalizedError {
-    case write, read, notDirectory, notFile
+    case write(String)
+    case read, notFile
+    case notDirectory(String)
     
     var localizedDescription: String? {
         switch self {
-        case .write:
-            return NSLocalizedString("No writing permission.", comment: "")
+        case .write(let dir):
+            return "No writing permission for: \(dir)"
         case .read:
             return NSLocalizedString("No reading permission.", comment: "")
-        case .notDirectory:
-            return NSLocalizedString("Invalid dir path.", comment: "")
+        case .notDirectory(let dir):
+            return "Invalid dir path: \(dir)"
         case .notFile:
             return NSLocalizedString("Invalid file path.", comment: "")
         }
@@ -38,6 +40,15 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
     let book: BookItem
     var targetURL: URL
     lazy var name: String = book.truncTitle
+    
+    // TODO: make state as enum.
+    // runnable/suspended -> join/resume
+    // finished -> (re)join if failed
+    enum TaskState: String, CaseIterable, Identifiable {
+        case runnable, suspended, finished
+        var id: Self { self }
+    }
+    @Published var taskState: TaskState = .runnable
     
     @Published var started: Bool = false
     @Published var loading: Bool = false
@@ -89,6 +100,10 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
     
     /// make remote url into local file url, some simple checks and validate, this will change filename probably.
     static func makeLocalURL(path: String, filename: String, random: Bool = false) throws -> URL {
+        var path = path
+        if path.count > 0, path.last != "/" {
+            path = "\(path)/"
+        }
         let dir = URL(filePath: path)
         var fname = filename.urlDecode()    // decode
         // trunc
@@ -96,7 +111,7 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
             fname = String(fname.prefix(256))
         }
         if !dir.hasDirectoryPath {
-            throw FileError.notDirectory
+            throw FileError.notDirectory(path)
         }
         // convert '/' of name into %2f
         fname = fname.replacingOccurrences(of: "/", with: "%2F")
@@ -242,6 +257,7 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
         // and then, create download request, over
         self.downloadReq = createDownloadReq()
     }
+    
     /// Start/Restart downloding
     ///
     func join() {
@@ -250,22 +266,16 @@ class DownloadTask: ObservableObject, Identifiable, Hashable, Equatable {
         Task.detached(priority: .background) {
             do {
                 // generate save location
-                try await MainActor.run {
-                    try self.makeLocalURL()
-                }
-
+                try self.makeLocalURL()
                 print("ready to download into \(self.localURL!.absoluteString)")
                 self.prepareToStart()
-                
-                await MainActor.run {
-                    self.downloadReq = self.createDownloadReq()
-                }
-            } catch FileError.write {
-                fatalError("Handle directory wirte permission.")
-                
+                self.downloadReq = self.createDownloadReq()
             } catch {
                 self.setFailureStatus()
                 print("download \(self.name) failed: \(error)")
+                await MainActor.run {
+                    self.errorStr = error.localizedDescription
+                }
             }
         }
     }

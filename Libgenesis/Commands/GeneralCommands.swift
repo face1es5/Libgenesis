@@ -16,10 +16,12 @@ struct GeneralCommands: Commands {
 
 struct DownloadCommands: Commands {
     @ObservedObject var downloadManager: DownloadManager
+    @ObservedObject var recentManager: RecentlyFilesManager
     var body: some Commands {
         CommandMenu("Download") {
             PlainDownloadListView()
                 .environmentObject(downloadManager)
+                .environmentObject(recentManager)
         }
     }
 }

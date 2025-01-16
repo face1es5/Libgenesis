@@ -11,7 +11,7 @@ extension View {
     func breathingEffect(_ factor: Double = 0.1) -> some View {
         self.modifier(BreathingEffect(factor: factor))
     }
-    func hoveringEffect(_ factor: Double = 0.1, duration: Double = 1, radius: Double = 0) -> some View {
+    func hoveringEffect(_ factor: Double = 0.1, duration: Double = 0.5, radius: Double = 0) -> some View {
         self.modifier(HoveringEffect(factor, duration: duration, radius: radius))
     }
     func textSelectable(_ scheme: ColorScheme) -> some View {
@@ -60,22 +60,18 @@ struct HoveringEffect: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        ZStack {
-            Color.gray
-                .opacity(isOpaque ? opac : 0.0)
-                .edgesIgnoringSafeArea(.all)
-                .animation(
-                    Animation.easeInOut(duration: dura),
-                    value: isOpaque
-                )
-                .cornerRadius(radius)
-            
-            content
-                .onHover { h in
-                    isOpaque = h
-//                    print("Hovering: \(h)")
-                }
-        }
+        content
+            .padding(.vertical, 3)
+            .padding(.horizontal, 8)
+            .background(
+                Color.gray
+                    .opacity(isOpaque ? opac : 0.0)
+                    .animation(Animation.easeInOut(duration: dura), value: isOpaque)
+                    .cornerRadius(radius)
+            )
+            .onHover { h in
+                isOpaque = h
+            }
     }
 }
 

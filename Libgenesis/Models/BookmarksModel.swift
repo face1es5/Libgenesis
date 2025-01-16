@@ -43,7 +43,7 @@ class BookmarksModel: ObservableObject {
 
     }
     func contain(_ book: BookItem) -> Bool {
-        return books.contains(book)
+        return books.first(where: { $0.md5 == book.md5 }) != nil
     }
     
 }

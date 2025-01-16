@@ -42,8 +42,10 @@ enum FormatFilter: String, CaseIterable, Identifiable, Codable {
     
     var desc: String {
         switch self {
+        case .all:
+            return "All"
         default:
-            return self.rawValue.capitalized
+            return self.rawValue
         }
     }
 }

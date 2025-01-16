@@ -27,7 +27,7 @@ struct PlainDownloadListView: View {
             .disabled(true)
         } else {
             VStack {
-                ForEach(downloadManager.downloadTasks, id: \.self) { dtask in
+                ForEach(downloadManager.downloadTasks.reversed(), id: \.self) { dtask in
                     Button(dtask.book.title) {
                         if !dtask.loading, dtask.success {
                             recentManager.preview(dtask.localURL)
@@ -96,7 +96,7 @@ struct DownloadTaskView: View {
                     Image(systemName: "play.circle.fill")
                         .frame(width: 30, height: 30)
                         .scaledToFit()
-                        .foregroundColor(.green)
+                        .foregroundStyle(.gray.opacity(0.6))
                         .onTapGesture {
                             dtask.resume()
                         }
@@ -142,10 +142,35 @@ struct DownloadTaskView: View {
             Button("Remove from list") {
                 DownloadManager.shared.removeDownloadTask(dtask)
             }
-            Button("Remove all(this will also cancel any tasks in progress!)") {
-                DownloadManager.shared.clear()
-            }
         }
+    }
+}
+
+struct DownloadPopover: View {
+    @EnvironmentObject var downloadManager: DownloadManager
+    @State var selectedTask: DownloadTask?
+    var body: some View {
+        VStack {
+            HStack(alignment: .center) {
+                Spacer()
+                Text("Downloads")
+                Spacer()
+            }
+            .overlay(alignment: .trailing) {
+                Button("Clear") {
+                    downloadManager.clear()
+                }
+            }
+
+            List(selection: $selectedTask) {
+                ForEach(downloadManager.downloadTasks.reversed(), id: \.self) { dtask in
+                    DownloadTaskView(dtask: dtask)
+                    Divider()
+                }
+            }
+            .listStyle(.sidebar)
+        }
+        .padding()
     }
 }
 
@@ -153,12 +178,13 @@ struct DownloadListView: View {
     @EnvironmentObject var downloadManager: DownloadManager
     @State var selectedTask: DownloadTask?
     var body: some View {
-        List(downloadManager.downloadTasks, id: \.self, selection: $selectedTask) { dtask in
-            DownloadTaskView(dtask: dtask)
-            Divider()
+        List(selection: $selectedTask) {
+            ForEach(downloadManager.downloadTasks.reversed(), id: \.self) { dtask in
+                DownloadTaskView(dtask: dtask)
+                Divider()
+            }
         }
         .listStyle(.sidebar)
-        .padding(5)
     }
 }
 

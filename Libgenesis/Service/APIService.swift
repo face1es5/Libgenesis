@@ -44,19 +44,6 @@ class APIService {
         fatalError("Implement original download api.")
     }
     
-    func downloadTo(_ local: URL) throws {
-        let destination: DownloadRequest.Destination = { _, _ in
-            return (local, [.removePreviousFile, .createIntermediateDirectories])
-        }
-        guard let url = URL(string: urlstr) else { throw APIError.invalidURL }
-        AF.download(url, to: destination)
-            .downloadProgress { progress in
-                print("Download progress: \(progress.fractionCompleted)")
-            }
-            .response { resp in
-                debugPrint(resp)
-            }
-    }
 }
 
 enum APIError: Error, LocalizedError {
@@ -72,7 +59,7 @@ enum APIError: Error, LocalizedError {
         case .invalidResponse:
             return "Invalid response."
         case .badResponse(let code):
-            return "Invalid response: \(code)"
+            return "Bad response status code: \(code)"
         case .decodingError:
             return "Decoding error"
         case .nilURL:

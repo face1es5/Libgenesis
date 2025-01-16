@@ -28,6 +28,10 @@ enum ColumnField: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .author:
             return "Author(s)"
+        case .isbn:
+            return "ISBN"
+        case .ID:
+            return "ID"
         default:
             return self.rawValue.capitalized
         }
@@ -127,13 +131,11 @@ struct BookRowView: View {
         DownloadManager.shared.download(book)
     }
     
-    @State var fuck: Int = 1
-    
     var body: some View {
         HStack {
             Column(book.title, width: largeColWidth)
             if cols.contains(.author) {
-                Column(book.authors, width: colWidth)
+                Column(book.authorLiteral, width: colWidth)
             }
             if cols.contains(.year) {
                 Column("\(book.year)", width: smallColWidth)
@@ -157,10 +159,45 @@ struct BookRowView: View {
                 Column(book.id, width: smallColWidth)
             }
         }
-        .contextMenu {
-            BookContext(book: book)
-        }
         .lineLimit(1)
+    }
+}
+
+/// Book with cover
+struct BookCoverView: View {
+    @ObservedObject var book: BookItem
+    @Environment(\.colorScheme) var scheme: ColorScheme
+    var body: some View {
+        HStack(spacing: 20) {
+            CoverView
+            VStack(alignment: .leading, spacing: 5) {
+                Text(book.title)
+                    .textSelectable(scheme)
+                    .font(.title2)
+                Text(book.authorLiteral)
+                HStack {
+                    Text(book.format)
+                    Text(book.language)
+                    Text(book.size)
+                }
+                .font(.caption)
+                if book.details?.fileLinks.count ?? 0 > 0 {
+                    Text("Download available")
+                        .padding(4)
+                        .foregroundColor(.secondary)
+                        .background(Color.gray.opacity(0.3))
+                        .clipShape(RoundedRectangle(cornerRadius: 5))
+                }
+            }
+            .animation(.smooth, value: book.details?.fileLinks.count)
+        }
+    }
+    
+    private var CoverView: some View {
+        VStack {
+            ImageView(url: book.coverURL, width: 74.16, height: 120, cornerRadius: 10, defaultImg: "sailboat.fill", breathing: true)
+                .frame(width: 74.16, height: 120)
+        }
     }
 }
 
@@ -176,61 +213,34 @@ struct BookContext: View {
             Divider()
             SharedContextView(book: book)
             Divider()
-            Button("Preview") {
-                fatalError("Preview to implemented.")
-            }
-            Divider()
             BookMarkMenuView(book: book)
         }
     }
 }
 
+
 struct BookView: View {
     @ObservedObject var book: BookItem
+    @State var showPreview: Bool = false
     let mode: BookLineDisplayMode
     init(_ book: BookItem, mode: BookLineDisplayMode) {
         self.book = book
         self.mode = mode
     }
+    
     var body: some View {
         if mode == .list {
             BookRowView(book: book)
+                .contextMenu {
+                    BookContext(book: book)
+                }
         } else if mode == .gallery {
             BookCoverView(book: book)
+                .contextMenu {
+                    BookContext(book: book)
+                }
         }
     }
 }
 
-/// Book with cover
-struct BookCoverView: View {
-    @ObservedObject var book: BookItem
-    @Environment(\.colorScheme) var scheme: ColorScheme
-    var body: some View {
-        HStack(spacing: 20) {
-            CoverView
-            VStack(alignment: .leading, spacing: 5) {
-                Text(book.title)
-                    .textSelectable(scheme)
-                    .font(.title2)
-                Text(book.authors)
-                HStack {
-                    Text(book.format)
-                    Text(book.language)
-                    Text(book.size)
-                }
-                .font(.caption)
-                if book.details?.fileLinks.count ?? 0 > 0 {
-                    Text("Download available")
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-    }
-    
-    private var CoverView: some View {
-        VStack {
-            ImageView(url: book.coverURL, width: 74.16, height: 120, cornerRadius: 10, defaultImg: "sailboat.fill", breathing: true)
-                .frame(width: 74.16, height: 120)
-        }
-    }
-}
+

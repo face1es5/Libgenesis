@@ -12,6 +12,14 @@ struct BookDetailsItem: Codable, Equatable {
     var fileLinks: [URL] = []
 }
 
+struct AuthorItem: CustomStringConvertible, Codable {
+    let name: String
+    let url: URL?
+    var description: String {
+        name
+    }
+}
+
 class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
     static func == (lhs: BookItem, rhs: BookItem) -> Bool {
         return lhs.id == rhs.id && lhs.md5 == rhs.md5
@@ -27,12 +35,18 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
     let tags: String = ""
     ///
     var text: String {
-        "\(title) \(authors) \(id) \(publisher) \(year) \(series) \(isbn) \(language) \(md5) \(tags)"
+        "\(title) \(authorLiteral) \(id) \(publisher) \(year) \(series) \(isbn) \(language) \(md5) \(tags)"
     }
     let id: String
-    let authors: String
-    var authorSeqs: [String] {
-        authors.components(separatedBy: ",")
+    var authors: [AuthorItem]
+    var authorLiteral: String {
+        var str = "\(authors)"
+        if str.count == 0 {
+            return "N/A"
+        }
+        str.removeFirst()
+        str.removeLast()
+        return str
     }
     let title: String
     var truncTitle: String
@@ -46,15 +60,14 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
     let edit: String
     let md5: String
     let detailURL: URL?    // detail URL of this book
-    let searchURL: URL?  // URL to search this book
     let isbn: String    // ISBN number
     let edition: String
     var downloadLinks: [String] = []
     var loadingDetails: Bool = false
     
-    init(id: String, authors: String, title: String, publisher: String, year: Int, pages: Int,
+    init(id: String, authors: [AuthorItem], title: String, publisher: String, year: Int, pages: Int,
          language: String, size: String, format: String, mirrors: [URL], edit: String, md5: String,
-         detailURL: URL?, searchURL: URL?, isbn: String, edition: String, coverURL: URL? = nil) {
+         detailURL: URL?, isbn: String, edition: String, coverURL: URL? = nil) {
         self.id = id
         self.authors = authors
         self.title = title
@@ -68,7 +81,6 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
         self.edit = edit
         self.md5 = md5
         self.detailURL = detailURL
-        self.searchURL = searchURL
         self.isbn = isbn
         self.edition = edition
         self.truncTitle = String(title.prefix(15))+"..."
@@ -105,7 +117,7 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decode(String.self, forKey: .id)
-        self.authors = try container.decode(String.self, forKey: .authors)
+        self.authors = try container.decode([AuthorItem].self, forKey: .authors)
         self.title = try container.decode(String.self, forKey: .title)
         self.truncTitle = try container.decode(String.self, forKey: .truncTitle)
         self.publisher = try container.decode(String.self, forKey: .publisher)
@@ -118,7 +130,6 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
         self.edit = try container.decode(String.self, forKey: .edit)
         self.md5 = try container.decode(String.self, forKey: .md5)
         self.detailURL = try container.decodeIfPresent(URL.self, forKey: .detailHerf)
-        self.searchURL = try container.decodeIfPresent(URL.self, forKey: .href)
         self.coverURL = try container.decodeIfPresent(URL.self, forKey: .coverURL)
         self.isbn = try container.decode(String.self, forKey: .isbn)
         self.edition = try container.decode(String.self, forKey: .edition)
@@ -141,7 +152,6 @@ class BookItem: ObservableObject, Codable, Identifiable, Hashable, Equatable  {
         try container.encode(edit, forKey: .edit)
         try container.encode(md5, forKey: .md5)
         try container.encodeIfPresent(detailURL, forKey: .detailHerf)
-        try container.encodeIfPresent(searchURL, forKey: .href)
         try container.encodeIfPresent(coverURL, forKey: .coverURL)
         try container.encode(isbn, forKey: .isbn)
         try container.encode(edition, forKey: .edition)
